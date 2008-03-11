@@ -1,0 +1,26 @@
+#!/usr/local/bin/gosh
+
+(use oldtype.util)
+
+(define ot-mypage (format "~a/_@~a:mypage.ot"
+                          (oldtype:editpath)
+                          (oldtype:user-local)))
+
+(define (main argv)
+  (with-output-to-file ot-mypage
+    (lambda ()
+      (display (format "- Edit page of today. => [[~a:~a]]" (oldtype:user-local) (oldtype:get-string-of-today))) (newline)
+      (for-each
+       (lambda (filename)
+         (with-input-from-file (string-append (oldtype:editpath) "/" filename)
+           (lambda ()
+             (display "----") (newline)
+             (display 
+              (string-append "[[" (oldtype:otpath->wikiname filename) "]]"))
+             (newline)
+             (for-each print (port->string-list (current-input-port))))))
+       (reverse
+        (sort
+         (oldtype:get-pagelist (string-append 
+                                (oldtype:user-local)
+                                ":[0-9]+"))))))))

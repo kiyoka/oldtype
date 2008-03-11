@@ -1,0 +1,75 @@
+* 行指向のWiki記法
+このページはOldTypeの記法の実験を兼ねています。
+どんなことが出来るかはサンプルを見てもらえれば大体わかるはずです。
+
+** 段落
+!行頭から文章を始めると、1行1段落になります。
+!次の行です。
+行頭から文章を始めると、1行1段落になります。
+次の行です。
+
+** 引用
+! 行頭に1つ以上のスペースを入れると、引用になります。
+! 次の行です。
+ 行頭に1つ以上のスペースを入れると、引用になります。
+ 次の行です。
+
+** WikiName
+! 表記:
+!   [[Test:FormatSample]]
+!   [[FileDoesNotExist]]
+- [[Test:フォーマットサンプル]]
+箇条書きの下位レベルの文章
+- [[ThisNameDoesNotExist]]
+
+
+** 外部リンク
+! 表記:
+!   [[http://www.sumibi.org/|Sumibi.org]]
+!   http://www.sumibi.org/
+!   http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg
+- [[http://www.sumibi.org/|Sumibi.org]]へのリンク
+- http://www.sumibi.org/
+- http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg
+** 画像
+! 表記:
+!   ##(img ../img/sasami_face48.png)
+- ささみのアイコン
+  ##(img ../img/sasami_face48.png)
+! 表記:
+!   ##(img http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg)
+- 途中で寝ちゃいました...
+  ##(img http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg)
+
+** 見出し
+
+! 表記:
+!* 1番目
+!** 2番目
+!*** 3番目
+* 1番目
+** 2番目
+*** 3番目
+
+
+** 箇条書き
+! 表記:
+!- 1番目
+!-- 2番目
+!--- 3番目
+- 1番目
+-- 2番目
+--- 3番目
+
+! 表記:
+!# 1番目
+!## 2番目
+!### 3番目
+# 1番目
+## 2番目
+### 3番目
+
+! 表記:
+!----
+----
+

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+. ${OT_HOME}/bin/lib.sh
+
+export LANG=ja_JP.UTF-8
+export LC_CTYPE=ja_JP.UTF-8
+
+if [ "$OT_EDITHOME" = "" ] ; then
+  echo "Please environment variables OT_EDITHOME"
+  exit 1
+fi
+
+cd ${OT_EDITHOME}/edit
+lst="`svn ls --username ${OT_USER_BACKEND} --password ${OT_PASS_BACKEND} --no-auth-cache | grep -v '!RecentChanges.ot' | grep -v '!AllPages.ot' | awk '{ printf( \"%s@HEAD \", $0 ); }'`"
+if [ -z "${lst}" ] ; then
+    exit 0;
+fi
+
+_svn t --xml info ${lst} | ${OT_HOME}/src/oldtype_svninfo shell | while read line
+do
+  if [ "" != "${line}" ] ; then
+      eval ${line}
+      name=`basename ${name} .ot`
+      echo "- CHANGED ${commit_date}: [[${name}]] by ([[${commit_author}]])"
+  fi
+done | sort -r > ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
+if [ -s ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ]; then
+  /bin/mv -f ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ${OT_EDITHOME}/edit/!RecentChanges.ot
+else
+  echo "Warning: The filesize of !RecentChanges.ot.tmp was zero. otRecentChanges program did not change it."
+fi
+

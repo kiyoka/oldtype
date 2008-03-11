@@ -1,0 +1,331 @@
+;; -*- coding: utf-8; mode: kahua -*-
+;;
+;;  Copyright (c) 2008 Kiyoka Nishiyama, All rights reserved.
+;;  See COPYING for terms and conditions of using this software
+;;
+;; $Id:$
+;;
+
+
+(define (oldtype:static-base-path)
+  (string-append "/kahua/" (kahua-worker-type) "/"))
+
+
+(define (oldtype:static-image-path)
+  (string-append "/kahua/" (kahua-worker-type) "/staticimg/"))
+
+
+;; <!-- SiteSearch Google -->
+;; <form method="get" action="http://www.google.co.jp/custom" target="_top">
+;; <table border="0" bgcolor="#ffffff">
+;; <tr><td nowrap="nowrap" valign="top" align="left" height="32">
+;; <a href="http://www.google.com/">
+;; <img src="http://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
+;; </td>
+;; <td nowrap="nowrap">
+;; <input type="hidden" name="domains" value="oldtype.sumibi.org"></input>
+;; <label for="sbi" style="display: none">検索用語を入力</label>
+;; <input type="text" name="q" size="20" maxlength="255" value="" id="sbi"></input>
+;; <label for="sbb" style="display: none">検索フォームを送信</label>
+;; <input type="submit" name="sa" value="検索" id="sbb"></input>
+;; </td></tr>
+;; <tr>
+;; <td>&nbsp;</td>
+;; <td nowrap="nowrap">
+;; <table>
+;; <tr>
+;; <td>
+;; <input type="radio" name="sitesearch" value="" id="ss0"></input>
+;; <label for="ss0" title="ウェブ検索"><font size="-1" color="#000000">Web</font></label></td>
+;; <td>
+;; <input type="radio" name="sitesearch" value="oldtype.sumibi.org" checked id="ss1"></input>
+;; <label for="ss1" title="検索 oldtype.sumibi.org"><font size="-1" color="#000000">oldtype.sumibi.org</font></label></td>
+;; </tr>
+;; </table>
+;; <input type="hidden" name="client" value="pub-5721837636688174"></input>
+;; <input type="hidden" name="forid" value="1"></input>
+;; <input type="hidden" name="ie" value="UTF-8"></input>
+;; <input type="hidden" name="oe" value="UTF-8"></input>
+;; <input type="hidden" name="safe" value="active"></input>
+;; <input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://oldtype.sumibi.org/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://oldtype.sumibi.org/;LP:1;FORID:1"></input>
+;; <input type="hidden" name="hl" value="ja"></input>
+;; </td></tr></table>
+;; </form>
+;;<!-- SiteSearch Google -->
+(define (oldtype:google-searchbox)
+  (form/
+   (@/ (method "get")
+       (action "http://www.google.co.jp/custom")
+       (target "_top"))
+   (table/
+    (@/ (class "searchbox"))
+    (tr/
+     (td/
+      (@/ (nowrap "nowrap")
+          (valign "top")
+          (align "left")
+          (height "32"))
+      (a/
+       (@/ (href "http://www.google.com/"))
+       (img/
+        (@/ (src "http://www.google.com/logos/Logo_25wht.gif")
+            (border "0")
+            (alt "Google")
+            (align "middle")))))
+     (td/
+      (@/ (nowrap "nowrap"))
+      (input/ 
+       (@/ (type "hidden")
+           (name "domains")
+           (value "oldtype.sumibi.org")))
+      (label/
+       (@/ (for "sbi")
+           (style "display: none"))
+       "検索用語を入力")
+      (input/
+       (@/ (type "text")
+           (name "q")
+           (size "20")
+           (maxlength "255")
+           (value "")
+           (id "sbi")))
+      (label/
+       (@/ (for "sbb")
+           (style "display: none"))
+       "検索フォームを送信")
+      (input/
+       (@/
+        (type "submit")
+        (name "sa")
+        (value "検索")
+        (id "sbb")))))
+    (tr/
+     (td/ 
+      (input/
+       (@/ (type "radio")
+           (name "sitesearch")
+           (value "")
+           (id "ss0")))
+      (label/
+       (@/ (for "ss0")
+           (title "ウェブ検索"))
+       (font/
+        (@/ (size "-1")
+            (color "#000000"))
+        "Web")))
+     (td/
+      (input/
+       (@/ (type "radio")
+           (name "sitesearch")
+           (value "oldtype.sumibi.org")
+           (checked "")
+           (id "ss1")))
+      (label/
+       (@/ (for "ss1")
+           (title"検索 oldtype.sumibi.org"))
+       (font/
+        (@/ (size "-1")
+            (color "#000000"))
+        "oldtype.sumibi.org")))))
+   (input/
+    (@/ (type "hidden") (name "client") (value "pub-5721837636688174")))
+   (input/
+    (@/ (type "hidden") (name "forid")  (value "1")))
+   (input/
+    (@/ (type "hidden") (name "ie")     (value "UTF-8")))
+   (input/
+    (@/ (type "hidden") (name "oe")     (value "UTF-8")))
+   (input/
+    (@/ (type "hidden") (name "safe")   (value "active")))
+   (input/
+    (@/ (type "hidden")
+        (name "cof")
+        (value "GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://oldtype.sumibi.org/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://oldtype.sumibi.org/;LP:1;FORID:1")))
+   (input/
+    (@/ (type "hidden") (name "hl")     (value "ja")))))
+
+
+(define (oldtype:icon-image sym)
+  (case sym
+    ((info)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.info.png"))
+               (alt "INFO") (class "icon"))))
+    ((edit)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.pencil.png"))
+               (alt "EDIT") (class "icon"))))
+    ((logo)
+     (a/ (@/ (href "/"))
+         (img/ (@/ (src (string-append (oldtype:static-image-path) "oldtype_logo_small.png"))
+                   (class "logo")
+                   (alt "OldTypeLogo")))))
+    ((new0)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new0.png"))
+               (alt "0") (class "icon"))))
+    ((new1)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new1.png"))
+               (alt "1") (class "icon"))))
+    ((new2)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new2.png"))
+               (alt "2") (class "icon"))))
+    ((new3)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new3.png"))
+               (alt "3") (class "icon"))))
+    ((new4)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new4.png"))
+               (alt "4") (class "icon"))))
+    ((new5)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.new5.png"))
+               (alt "5") (class "icon"))))
+    ((vline0)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new0.png"))
+               (class "barcode") (alt "0"))))
+    ((vline1)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new1.png"))
+               (class "barcode") (alt "1"))))
+    ((vline2)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new2.png"))
+               (class "barcode") (alt "2"))))
+    ((vline3)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new3.png"))
+               (class "barcode") (alt "3"))))
+    ((vline4)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new4.png"))
+               (class "barcode") (alt "4"))))
+    ((vline5)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "vline.new5.png"))
+               (class "barcode") (alt "5"))))
+    ((ul1)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "dot18.png"))
+               (alt "-") (class "icon"))))
+    ((ul2)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "dot14.png"))
+               (alt "--") (class "icon"))))
+    ((ul3)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "dot12.png"))
+               (alt "---") (class "icon"))))
+    ((ol1)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "triangle18.png"))
+               (alt "#") (class "icon"))))
+    ((ol2)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "triangle14.png"))
+               (alt "##") (class "icon"))))
+    ((ol3)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "triangle12.png"))
+               (alt "###") (class "icon"))))
+    ((cancel)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.cancel_round.png"))
+               (alt "[X]") (class "icon"))))
+    (else
+     `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
+    
+
+(define (oldtype:format-macro expr)
+  (let ((command (car expr))
+        (arg  ;; symbol list to string list.
+         (map
+          (lambda (x)
+            (if (number? x)
+                (number->string x)
+                (symbol->string x)))
+          (cdr expr)))
+        (len (length (cdr expr))))
+    (case command
+      ((img)
+       (if (< 0 len)
+           (img/ (@/ (src
+                      (let1 str (car arg)
+                            (if (#/^[.][.]/ str)
+                                (string-append (oldtype:static-base-path) "img/" str)
+                                str)))
+                     (alt (oldtype:otpath->basename (car arg)))))
+           (p/ "!!Error : No argument ##(img URL) command")))
+      ((todo)
+       (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.todo.png"))
+                 (alt "TODO") (class "wideicon"))))
+      ((done)
+       (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.done.png"))
+                 (alt "done") (class "wideicon"))))
+      ((youtube)
+       (if (< 0 len)
+           (object/
+            (@/ (width  "425")
+                (height "355"))
+            (param/
+             (@/ (name  "movie")
+                 (value (format "~a" (car arg)))))
+            (param/
+             (@/ (name  "wmode")
+                 (value "transparent")))
+            (embed/
+             (@/ (src   (format "http://www.youtube.com/v/~a" (car arg)))
+                 (type  "application/x-shockwave-flash")
+                 (wmode "transparent")
+                 (width "425")
+                 (height"355"))))
+           (p/ "!!Error : No argument ##(youtube URL) command")))
+
+      ;; thumbnail image by SimpleAPI
+      ((thumb)
+       (if (< 0 len)
+           (let1 _url (car arg)
+                 (a/
+                  (@/ (href _url)
+                      (target "_blank"))
+                  (img/
+                   (@/ (src (format "http://img.simpleapi.net/small/~a" _url))
+                       (alt _url)
+                       (width "128")
+                       (height "128")
+                       (hspace "4")
+                       (vspace "4")
+                       (align "left")
+                       (border "0")))))
+           (p/ "!!Error : No argument ##(thumb URL) command")))
+
+      ((amazon)
+       (if (< 0 len)
+           (let1 _asin (car arg)
+                 (if (#/^[0-9a-zA-Z]+$/ _asin)
+                     (a/
+                      (@/ (href (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" _asin)))
+                      (img/
+                       (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
+                           (alt _asin))))
+                     `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
+           (p/ "!!Error : No argument ##(amazon URL) command")))
+      
+      ;; download link oldtype-mode.el source code
+      ((download-el)
+       (a/ (@/ (href (string-append (oldtype:static-base-path) "oldtype-mode.el")))
+           "[Download oldtype-mode.el now]"))
+      (else
+       `(p/ ,(format "!!Error : no such macro \"~a\"!!" command))))))
+
+
+(define (oldtype:gen-page-path wikiname)
+  (string-append
+   "/show-page/" wikiname))
+
+(define (oldtype:expand-wiki-name name)
+  (let1 url-name
+        (string-split name #/\|/)
+
+        (case (length url-name)
+          ((1)
+           (a/ (@/ (href (string-append (oldtype:gen-page-path (car url-name))))) (car url-name)))
+          (else
+           (node-set
+            (list
+             (a/ (@/ (href (car url-name)) (target "_blank"))
+                 (cadr url-name))
+             (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.extlink.png"))
+                       (alt "EXT") (class "icon")))))))))
+
+
+(define (oldtype:is-editable wikiname)
+  (not (#/^!/ wikiname)))
+
+
+(define (oldtype:contents-exists? wikiname)
+  (file-exists?
+   (gen-sexp-filename wikiname)))

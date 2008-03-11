@@ -1,0 +1,38 @@
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Style-Type" content="text/css" />
+ <link rel="stylesheet" href="oldtype1.css" type="text/css" />
+ <title>Emacs:Emacsのノウハウ</title>
+</head>
+<body>
+<h2 id="H-idieks">日本語ファイル名をutf-8で扱う方法 </h2>
+ <p class="li1">diredで日本語</p>
+ <p class="p1">これで、diredの両方でutf-8のファイル名が扱える。</p>
+ <p class="li1">検証したのは Emacs 22.1 のみ。</p>
+<pre>  (setq default-file-name-coding-system 'utf-8)</pre>
+ <p class="li1">psvn.elで日本語</p>
+ <p class="li2">以下の環境変数をutf-8に設定する</p>
+<pre> LC_CTYPE=ja_JP.UTF-8</pre>
+<pre> LANG=ja_JP.UTF-8</pre>
+ <p class="li2">但し、M-x svn-status は動作するようになったが、commitすると、svn failed: Valid UTF-8 dataというエラーメッセージが出る。</p>
+<p class="p1">この原因は、 *svn-status* バッファからファイル選択したファイル名が svn に渡るときに、EUC-JPで渡される事が分かった。対策として、カスタマイズ変数 file-coding-system-alist の最後に(default)に utf-8 を追加すれば良い。下記は設定値。</p>
+<form action=".">
+  <input class="input1" type="text" size="60" value="どこでもクリックすると1行だけ編集可能となる。">
+  <input class="decidebutton" type="button" value="決定"> &nbsp;&nbsp;&nbsp;&nbsp;  <input type="button" value="キャンセル">
+</form>
+
+<pre>(("\\.dz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.g?z\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.tgz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.tbz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.bz2\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.Z\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.elc\\'" emacs-mule . emacs-mule)</pre>
+<pre> ("\\.utf\\(-8\\)?\\'" . utf-8)</pre>
+<pre> ("\\(\\`\\|/\\)loaddefs.el\\'" raw-text . raw-text-unix)</pre>
+<pre> ("\\.tar\\'" no-conversion . no-conversion)</pre>
+<pre> ("" utf-8 . utf-8))</pre>
+</body>
+</head>
+</html>

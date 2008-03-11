@@ -1,0 +1,310 @@
+;; -*- coding: utf-8; mode: kahua -*-
+;;
+;;  Copyright (c) 2008 Kiyoka Nishiyama, All rights reserved.
+;;  See COPYING for terms and conditions of using this software
+;;
+;; $Id:$
+;;
+
+(use oldtype.parse)
+(use oldtype.format)
+(use oldtype.util)
+(use oldtype.kahualib)
+(load "oldtype/version.kahua")
+(load "oldtype/util.kahua")
+(use util.list)
+(use util.match)
+(use gauche.sequence)
+
+(define page-template
+  (kahua:make-xml-template
+   (kahua-template-path "oldtype/page.xml")))
+
+
+(define-entry (version)
+  (kahua:xml-template->sxml
+   page-template
+   :title (title/ (@/ (id "title"))
+		 "oldtype")
+   :body (div/ (@/ (id "body"))
+	       (h1/ (format "oldtype: version ~a"
+			    *oldtype-version*))
+	       (a/cont/ (@@/ (cont greeting))
+			"greeting"))))
+
+
+
+(define (oldtype-info-of-line param)
+  (assq-ref param 'committer))
+
+
+(define (oldtype-user-agent)
+  (let1 ua (kahua-meta-ref "HTTP_USER_AGENT")
+        (cond
+         ((#/w3m[\/]/ ua)
+          'w3m)
+         (else
+          #t))))
+
+
+;; utility : internal sxml format to barcode link
+(define (sxml->barcode sxmls page-src)
+  (if (eq? 'w3m (oldtype-user-agent))
+      (br/)
+      (node-set/
+       (text/ "Click to jump:")
+       (map/
+         (lambda (x)
+           (let ((name  (car x))
+                 (param (cadr x)))
+             (case name
+               ((div)
+                (let ((latest-rate (assq-ref param 'latest-rate))
+                      (id          (assq-ref param 'lineno)))
+                  (a/ (@/ (href  (format "#~d" id)))
+                      (case latest-rate
+                        ((0)  (oldtype:icon-image 'vline0))
+                        ((1)  (oldtype:icon-image 'vline1))
+                        ((2)  (oldtype:icon-image 'vline2))
+                        ((3)  (oldtype:icon-image 'vline3))
+                        ((4)  (oldtype:icon-image 'vline4))
+                        (else (oldtype:icon-image 'vline5)))))))))
+         sxmls))))
+
+  
+;; utility : internal sxml format to highger-order-tag
+(define (sxml->higher-order-tag wikiname sxmls page-src)
+  (define _nbsp "\u00a0")
+  (define (space->nbsp string)
+    (regexp-replace-all #/ / string _nbsp))
+  (let1 is-w3m (eq? 'w3m (oldtype-user-agent))
+        (div/
+         (node-set
+    (let rec
+        ((sxmls sxmls))
+      (match sxmls
+             (()  '())
+             (((and (name . _) sxml) . rest) ;; generic node
+              (let1 arg (cdr sxml)
+                    (cons
+                     (case name
+                       ((div)
+                        (let* ((param (car arg)) ;; param is assoc-list
+                               (_first
+                                (a/cont/ (@@/ (cont
+                                               (entry-lambda ()
+                                                 (standard-page
+                                                  wikiname
+                                                  (br/)
+                                                  (div/
+                                                   (h2/ "Information of This Line.")
+                                                   (table/
+                                                    (tr/
+                                                     (td/ "EmacsLisp")
+                                                     (td/ (format ";; (oldtype-openfile \"~a\" ~a)" wikiname (assq-ref param 'lineno))))
+                                                    (tr/
+                                                     (td/ "committer")
+                                                     (td/ (assq-ref param 'committer)))
+                                                    (tr/
+                                                     (td/ "original-src")
+                                                     (td/ (assq-ref param 'orig)))
+                                                    (tr/
+                                                     (td/ "lineno")
+                                                     (td/ (assq-ref param 'lineno))))
+                                                   (h2/ "Information of This Page.")
+                                                   (pre/
+                                                    (node-set
+                                                     (map-with-index
+                                                      (lambda (index orig)
+                                                        (if (eq? (+ index 1) (assq-ref param 'lineno))
+                                                            (b/ (@/ (class "here"))
+                                                                (string-append orig "\n"))
+                                                            (string-append orig "\n")))
+                                                      page-src)))
+                                                   )))))
+                                         (node-set
+                                          (list
+                                           (if is-w3m
+                                               (text/ "info")
+                                               (oldtype:icon-image 'info))
+                                           (case (assq-ref param 'latest-rate)
+                                             ((0)  (oldtype:icon-image 'new0))
+                                             ((1)  (oldtype:icon-image 'new1))
+                                             ((2)  (oldtype:icon-image 'new2))
+                                             ((3)  (oldtype:icon-image 'new3))
+                                             ((4)  (oldtype:icon-image 'new4))
+                                             (else (if is-w3m
+                                                       (space->nbsp "  ")
+                                                       (oldtype:icon-image 'new5))))))))
+                               (_rest
+                                (node-set (rec (cdr arg)))))
+                          (if is-w3m
+                              (span/ _first " " _rest (br/))
+                              (let1 lineno (assq-ref param 'lineno)
+                                    `(,@(div/
+                                         (@/
+                                          (id    lineno)
+                                          (class (format "new~d" (assq-ref param 'latest-rate)))
+                                          (style "float: none;"))
+                                         (div/ (@/ (style "position: absolute; left: 2em; font-size: small;"))
+                                               _first
+                                               (oldtype:expand-wiki-name (symbol->string (assq-ref param 'committer))))
+                                         (if (oldtype:is-editable wikiname)
+                                             (div/ (@/ (style "padding-left:  5em;")
+                                                       (onClick (format "otEditStart( ~a );" lineno)))
+                                                   _rest)
+                                             (div/ (@/ (style "padding-left:  5em;"))
+                                                   _rest))
+                                         (div/ (@/
+                                                (id (format "~a:editarea" lineno))
+                                                (style "display: none; height: 4em; padding-left: 5em;"))
+                                               (form/ (@/ (id (format "~a:editform" lineno))
+                                                          (action "."))
+                                                      (input/ (@/
+                                                               (id (format "~a:edittext" lineno))
+                                                               (size 80)
+                                                               (type "text")
+                                                               (value (assq-ref param 'orig))))
+                                                      (space->nbsp "  ")
+                                                      (input/ (@/
+                                                               (type "button")
+                                                               (value "Submit")
+                                                               (onClick (format "otEditEnd( ~a );" lineno))))
+                                                      (br/)
+                                                      (strong/ (@/ (class "notice"))
+                                                               "This is a demonstration. you cannot update this wiki page, sorry...")))))))))
+                       ((a)
+                        (let1 param (car arg) ;; param is assoc-list
+                              `(,@(a/
+                                   (@/
+                                    (href (assq-ref param 'href)))
+                                   (node-set (rec (cdr arg)))))))
+                       ((p-normal pre-quote pre-verb pre-ul1 pre-ul2 pre-ul3 pre-ol1 pre-ol2 pre-ol3 h1 h2 h3 h4 h5 h6)
+                        (if is-w3m
+                            (case name
+                              ((p-normal)    `(,@(span/                                (node-set (rec arg)))))
+                              ((pre-quote)   `(,@(span/                                (node-set (rec arg)))))
+                              ((pre-verb)    `(,@(span/ (b/                            (node-set (rec arg))))))
+                              ((pre-ul1)     `(,@(span/ 
+                                                  (oldtype:icon-image 'ul1)            (node-set (rec arg)))))
+                              ((pre-ul2)     `(,@(span/
+                                                  _nbsp
+                                                  (oldtype:icon-image 'ul2)            (node-set (rec arg)))))
+                              ((pre-ul3)     `(,@(span/
+                                                  _nbsp _nbsp
+                                                  (oldtype:icon-image 'ul3)            (node-set (rec arg)))))
+                              ((pre-ol1)     `(,@(span/
+                                                  (oldtype:icon-image 'ol1)            (node-set (rec arg)))))
+                              ((pre-ol2)     `(,@(span/
+                                                  _nbsp
+                                                  (oldtype:icon-image 'ol2)            (node-set (rec arg)))))
+                              ((pre-ol3)     `(,@(span/ 
+                                                  _nbsp _nbsp
+                                                  (oldtype:icon-image 'ol3)            (node-set (rec arg)))))
+                              ((h1)          `(,@(h1/ (@/ (id "h1"))                   (node-set (rec arg)))))
+                              ((h2)          `(,@(h2/ (@/ (id "h2"))                   (node-set (rec arg)))))
+                              ((h3)          `(,@(h3/ (@/ (id "h3"))                   (node-set (rec arg)))))
+                              ((h4)          `(,@(h4/ (@/ (id "h4"))                   (node-set (rec arg)))))
+                              ((h5)          `(,@(h5/ (@/ (id "h5"))                   (node-set (rec arg)))))
+                              ((h6)          `(,@(h6/ (@/ (id "h6"))                   (node-set (rec arg))))))
+                            (case name
+                              ((p-normal)    `(,@(p/   (@/ (class "oldtype"))          (node-set (rec arg)))))
+                              ((pre-quote)   `(,@(pre/ (@/ (class "quote"))            (node-set (rec arg)))))
+                              ((pre-verb)    `(,@(pre/ (@/ (class "verb"))             (node-set (rec arg)))))
+                              ((pre-ul1)     `(,@(pre/ (@/ (class "ul1"))              (node-set (rec arg)))))
+                              ((pre-ul2)     `(,@(pre/ (@/ (class "ul2"))              (node-set (rec arg)))))
+                              ((pre-ul3)     `(,@(pre/ (@/ (class "ul3"))              (node-set (rec arg)))))
+                              ((pre-ol1)     `(,@(pre/ (@/ (class "ol1"))              (node-set (rec arg)))))
+                              ((pre-ol2)     `(,@(pre/ (@/ (class "ol2"))              (node-set (rec arg)))))
+                              ((pre-ol3)     `(,@(pre/ (@/ (class "ol3"))              (node-set (rec arg)))))
+                              ((h1)          `(,@(h1/  (@/ (id "h1"))                  (node-set (rec arg)))))
+                              ((h2)          `(,@(h2/  (@/ (id "h2"))                  (node-set (rec arg)))))
+                              ((h3)          `(,@(h3/  (@/ (id "h3"))                  (node-set (rec arg)))))
+                              ((h4)          `(,@(h4/  (@/ (id "h4"))                  (node-set (rec arg)))))
+                              ((h5)          `(,@(h5/  (@/ (id "h5"))                  (node-set (rec arg)))))
+                              ((h6)          `(,@(h6/  (@/ (id "h6"))                  (node-set (rec arg))))))))
+                       ((wiki-macro)  `(,@(oldtype:format-macro arg)))
+                       ((wiki-name)   `(,@(oldtype:expand-wiki-name (car arg))))
+                       ((hr)          (hr/))
+                       (else
+                        `(p/ ,(format "!!Error : no such tag \"~a\"!!" name))))
+                     (rec rest))))
+             ((other . rest)
+              (cons
+               (if string?
+                   (space->nbsp other)
+                   other)
+               (rec rest)))))))))
+
+
+(define (standard-page wikiname barcode nodes)
+  (html/ (head/ (title/ wikiname)
+                (link/ (@/ (rel "stylesheet") (type "text/css")
+                           (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
+                (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/prototype.js"))      (type "text/javascript")))
+                (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/scriptaculous.js"))  (type "text/javascript")))
+                (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/oldtype.js"))               (type "text/javascript"))))
+         (body/
+          (div/ (@/ (class "header"))
+                (div/ (@/ (style "float: left;"))
+                      (if (eq? 'w3m (oldtype-user-agent))
+                          (div/
+                           (format " ;; (oldtype-openfile \"~a\" 1)" wikiname)
+                           (br/))
+                          (text/ ""))
+                      (oldtype:icon-image 'logo)
+                      (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))) "[RecentChanges]")
+                      (text/ " ")
+                      (a/ (@/ (href (oldtype:gen-page-path "!AllPages")))      "[AllPages]")
+                      (text/ " ")
+                      (span/ "(Late")
+                      (oldtype:icon-image 'new4)
+                      (oldtype:icon-image 'new3)
+                      (oldtype:icon-image 'new2)
+                      (oldtype:icon-image 'new1)
+                      (oldtype:icon-image 'new0)
+                      (span/ "Latest)")
+                      (span/ (@/ (class "forw3m"))))
+                (div/
+                 (oldtype:google-searchbox)))
+          (br/)
+          (h1/ wikiname)
+          barcode
+          (hr/)
+          nodes
+          (div/ (@/ (class "footer"))
+                "Generated by OldType "
+                *oldtype-version*))))
+
+
+(define (show-page/page wikiname)
+  (let1 sexp (oldtype:load-sexp (kahua-site-root) wikiname)
+        (standard-page
+         wikiname
+         (if sexp
+             (sxml->barcode
+              (car (assq-ref sexp 'sxml))
+              (car (assq-ref sexp 'src)))
+             (br/))
+         (if sexp
+             (sxml->higher-order-tag
+              wikiname
+              (car (assq-ref sexp 'sxml))
+              (car (assq-ref sexp 'src)))
+             (div/
+              (p/
+               (@/ (class "center"))
+               (strong/
+                (@/ (class "caption"))
+                "This wikipage was not found.")))))))
+
+
+
+(define-entry (show-page wikiname)
+  (let ((wikiname (or wikiname "index")))
+    (show-page/page wikiname)))
+
+;
+; initialization
+;
+(initialize-main-proc show-page)

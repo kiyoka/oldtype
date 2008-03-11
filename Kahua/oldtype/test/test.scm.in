@@ -1,0 +1,61 @@
+;; -*- coding: utf-8; mode: scheme -*-
+;; test oldtype script.
+;; $Id:$
+
+(use gauche.test)
+(use file.util)
+(use text.tree)
+(use sxml.ssax)
+(use sxml.sxpath)
+(use kahua)
+(use kahua.test.xml)
+(use kahua.test.worker)
+
+(test-start "oldtype")
+
+(define GOSH "##GOSH##")
+(define *PLUGINS* '(##PLUGINS##))
+(define *config* "test.conf")
+
+(sys-system "rm -rf _tmp _work oldtype")
+(sys-mkdir "oldtype" #o755)
+(sys-mkdir "_tmp" #o755)
+(sys-mkdir "_work" #o755)
+(sys-mkdir "_work/plugins" #o755)
+(sys-mkdir "_work/templates" #o755)
+(sys-mkdir "_work/templates/oldtype" #o755)
+
+(copy-file "../plugins/oldtype.scm"  "_work/plugins/oldtype.scm")
+(copy-file "../templates/page.xml"  "_work/templates/oldtype/page.xml")
+
+(kahua-init *config*)
+
+;;------------------------------------------------------------
+;; Run oldtype
+(test-section "kahua-server oldtype.kahua")
+
+(with-worker
+ (w `(,GOSH "-I.." "-I##KAHUA_LIB##" "kahua-server.scm" "-c" ,*config*
+            "../oldtype/oldtype.kahua"))
+
+ (test* "run oldtype.kahua" #t (worker-running? w))
+
+
+;  (test* "oldtype"
+;         '(html (head (title "Hello, world!"))
+;                (body (h1 "Hello, world!")
+;                      (a (@ (href ?&)) "version")))
+;         (call-worker/gsid w '() '() (lambda (h b) (tree->string b)))
+;         (make-match&pick w))
+
+;  (test* "version"
+;        '(html (head (title "oldtype: version ##PROJECT_VERSION##"))
+;               (body (h1 "oldtype: version ##PROJECT_VERSION##")
+;                     (a ?@ ?*)))
+;        (call-worker/gsid w '() '() (lambda (h b) (tree->string b)))
+;        (make-match&pick w))
+
+ )
+
+(test-end)
+

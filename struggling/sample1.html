@@ -1,0 +1,39 @@
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Style-Type" content="text/css" />
+ <link rel="stylesheet" href="oldtype1.css" type="text/css" />
+ <title>Emacs:Emacsのノウハウ</title>
+</head>
+<body>
+<h2 id="H-idieks">日本語ファイル名をutf-8で扱う方法 </h2>
+<ul>
+ <li>diredで日本語</li>
+ <p>これで、diredの両方でutf-8のファイル名が扱える。</p>
+ <li>検証したのは Emacs 22.1 のみ。</li>
+</ul>
+<pre>  (setq default-file-name-coding-system 'utf-8)</pre>
+<ul>
+ <li>psvn.elで日本語</li>
+ <ol>
+  <li>以下の環境変数をutf-8に設定する</li>
+  <pre> LC_CTYPE=ja_JP.UTF-8</pre><pre> LANG=ja_JP.UTF-8</pre>
+  <li>但し、M-x svn-status は動作するようになったが、commitすると、svn failed: Valid UTF-8 dataというエラーメッセージが出る。</li>
+<p>この原因は、 *svn-status* バッファからファイル選択したファイル名が svn に渡るときに、EUC-JPで渡される事が分かった。対策として、カスタマイズ変数 file-coding-system-alist の最後に(default)に utf-8 を追加すれば良い。下記は設定値。</p>
+<pre></pre>
+<pre>(("\\.dz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.g?z\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.tgz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.tbz\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.bz2\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.Z\\(~\\|\\.~[0-9]+~\\)?\\'" no-conversion . no-conversion)</pre>
+<pre> ("\\.elc\\'" emacs-mule . emacs-mule)</pre>
+<pre> ("\\.utf\\(-8\\)?\\'" . utf-8)</pre>
+<pre> ("\\(\\`\\|/\\)loaddefs.el\\'" raw-text . raw-text-unix)</pre>
+<pre> ("\\.tar\\'" no-conversion . no-conversion)</pre>
+<pre> ("" utf-8 . utf-8))</pre>
+ </ol>
+</ul>
+</body>
+</head>
+</html>

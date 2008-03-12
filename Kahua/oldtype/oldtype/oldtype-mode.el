@@ -4,7 +4,7 @@
 ;;
 ;;   Copyright (C) 2007 Kiyoka Nishiyama
 ;;
-;;     $Id: oldtype-mode.el 289 2008-03-01 01:50:33Z kiyoka $
+;;     $Id: oldtype-mode.el 242 2008-02-02 09:58:22Z kiyoka $
 ;;
 ;; This file is part of oldtype-mode
 ;;
@@ -28,18 +28,21 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.4]
+;;     1. Added image displaying feature for ##(amazon ASIN) command.
+;;
 ;;   [0.0.3]
-;;     1. Added ##(amazon ASIN) command.
+;;     1. Supported URL to ##(amazon ASIN) command conversion feature.  ( C-c C-c key )
 ;;
 ;;   [0.0.2]
 ;;     1. Added ##(todo),##(undo) command.
 ;;     2. Added oldtype-openfile( wikiname ) function.
-
+;; 
 ;;   [0.0.1]
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.0.3")
+(defconst oldtype-version "0.0.4")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -304,6 +307,16 @@ Buffer string between BEG and END are replaced with URL."
 ;; fontification
 ;;
 (defun oldtype-install-fontification ()
+  ;;
+  ;; "4873113482"
+  ;;   => "http://images.amazon.com/images/P/4873113482.09.MZZZZZZZ_.jpg"
+  ;;
+  ;; test pattern:
+  ;;   (amazon-asincode-to-url "4873113482")
+  ;;
+  (defun amazon-asincode-to-url (asincode)
+    (format "http://images.amazon.com/images/P/%s.09.MZZZZZZZ_.jpg" asincode))
+
   (defun code-linep (pos)
     (save-excursion
       (goto-char pos)
@@ -328,6 +341,8 @@ Buffer string between BEG and END are replaced with URL."
 	 "\\([\[][\[]\\)\\([^\]]+\\)\\([\]][\]]\\)")
 	(_image-pattern
  	 "\\(##[(]img[ ]+\\)\\([^)]+\\)\\([)]\\)")
+	(_amazon-pattern
+ 	 "\\(##[(]amazon[ ]+\\)\\([^)]+\\)\\([)]\\)")
 	(_simple-command-pattern
  	 "\\(##[(]\\(todo\\|done\\)[)]\\)"))
 
@@ -359,6 +374,24 @@ Buffer string between BEG and END are replaced with URL."
 					    end
 					    `(
 					      (src . ,image-url)))))
+	     t)
+
+	    ;; ##(amazon asincode)
+	    (,_amazon-pattern
+	     2
+	     (when (not (code-linep (match-beginning 2)))
+	       (let* ((beg       (match-beginning 1))
+		      (asincode  (match-string-no-properties 2))
+		      (end       (match-end 3)))
+		 (compose-region beg
+				 end
+				 oldtype-image-icon-string)
+		 (oldtype-remove-image beg
+				       end)
+		 (oldtype-insert-image-file beg
+					    end
+					    `(
+					      (src . ,(amazon-asincode-to-url asincode))))))
 	     t)
 
 	    ;; ##(todo), ##(done) ...

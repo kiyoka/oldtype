@@ -382,30 +382,29 @@ Buffer string between BEG and END are replaced with URL."
 
 	    ;; ##(amazon asincode), ##(youtube asincode), 
 	    (,_various-webservice-pattern
-	     2
-	     (when (not (code-linep (match-beginning 2)))
-	       (let* ((beg       (match-beginning 1))
-		      (command   (match-string-no-properties 1))
-		      (value     (match-string-no-properties 2))
-		      (end       (match-end 5)))
-		 (compose-region beg
-				 end
-				 oldtype-image-icon-string)
-		 (oldtype-remove-image beg
-				       end)
-		 (oldtype-insert-image-file beg
-					    end
-					    `(
-					      (src . 
-						   ,(case (intern command)
-						      (amazon
-						       (amazon-asincode-to-url value))
-						      (youtube
-						       (youtube-video-to-url value))
-						      (nil
-						       "")))))))
+	     3
+	     (let* ((beg       (match-beginning 1))
+		    (command   (match-string-no-properties 2))
+		    (value     (match-string-no-properties 3))
+		    (end       (match-end 4)))
+	       (compose-region beg
+			       end
+			       oldtype-image-icon-string)
+	       (oldtype-remove-image beg
+				     end)
+	       (oldtype-insert-image-file beg
+					  end
+					  `(
+					    (src . 
+						 ,(case (intern command)
+						    (amazon
+						     (amazon-asincode-to-url value))
+						    (youtube
+						     (youtube-video-to-url value))
+						    (nil
+						     ""))))))
 	     t)
-
+	    
 	    ;; ##(todo), ##(done) ...
 	    (,_simple-command-pattern
 	     2

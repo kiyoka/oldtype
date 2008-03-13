@@ -29,7 +29,8 @@
 ;;
 ;; ChangeLog:
 ;;   [0.0.4]
-;;     1. Added image displaying feature for ##(amazon ASIN) command.
+;;     1. Added image displaying feature for ##(amazon  asincode)  command.
+;;     2. Added image displaying feature for ##(youtube videocode) command.
 ;;
 ;;   [0.0.3]
 ;;     1. Supported URL to ##(amazon ASIN) command conversion feature.  ( C-c C-c key )
@@ -317,6 +318,9 @@ Buffer string between BEG and END are replaced with URL."
   (defun amazon-asincode-to-url (asincode)
     (format "http://images.amazon.com/images/P/%s.09.MZZZZZZZ_.jpg" asincode))
 
+  (defun youtube-video-to-url (videocode)
+    (format "http://img.youtube.com/vi/%s/1.jpg" videocode))
+
   (defun code-linep (pos)
     (save-excursion
       (goto-char pos)
@@ -341,8 +345,8 @@ Buffer string between BEG and END are replaced with URL."
 	 "\\([\[][\[]\\)\\([^\]]+\\)\\([\]][\]]\\)")
 	(_image-pattern
  	 "\\(##[(]img[ ]+\\)\\([^)]+\\)\\([)]\\)")
-	(_amazon-pattern
- 	 "\\(##[(]amazon[ ]+\\)\\([^)]+\\)\\([)]\\)")
+	(_various-webservice-pattern
+ 	 "\\(##[(]\\(amazon\\|youtube\\)[ ]+\\)\\([^)]+\\)\\([)]\\)")
 	(_simple-command-pattern
  	 "\\(##[(]\\(todo\\|done\\)[)]\\)"))
 
@@ -376,13 +380,14 @@ Buffer string between BEG and END are replaced with URL."
 					      (src . ,image-url)))))
 	     t)
 
-	    ;; ##(amazon asincode)
-	    (,_amazon-pattern
+	    ;; ##(amazon asincode), ##(youtube asincode), 
+	    (,_various-webservice-pattern
 	     2
 	     (when (not (code-linep (match-beginning 2)))
 	       (let* ((beg       (match-beginning 1))
-		      (asincode  (match-string-no-properties 2))
-		      (end       (match-end 3)))
+		      (command   (match-string-no-properties 1))
+		      (value     (match-string-no-properties 2))
+		      (end       (match-end 5)))
 		 (compose-region beg
 				 end
 				 oldtype-image-icon-string)
@@ -391,7 +396,14 @@ Buffer string between BEG and END are replaced with URL."
 		 (oldtype-insert-image-file beg
 					    end
 					    `(
-					      (src . ,(amazon-asincode-to-url asincode))))))
+					      (src . 
+						   ,(case (intern command)
+						      (amazon
+						       (amazon-asincode-to-url value))
+						      (youtube
+						       (youtube-video-to-url value))
+						      (nil
+						       "")))))))
 	     t)
 
 	    ;; ##(todo), ##(done) ...

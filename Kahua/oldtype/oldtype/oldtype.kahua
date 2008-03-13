@@ -151,7 +151,7 @@
                                                (oldtype:expand-wiki-name (symbol->string (assq-ref param 'committer))))
                                          (if (oldtype:is-editable wikiname)
                                              (div/ (@/ (style "padding-left:  5em;")
-                                                       (onClick (format "otEditStart( ~a );" lineno)))
+                                                       (onDblClick (format "otEditStart( ~a );" lineno)))
                                                    _rest)
                                              (div/ (@/ (style "padding-left:  5em;"))
                                                    _rest))

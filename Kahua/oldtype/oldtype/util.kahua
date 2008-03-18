@@ -329,3 +329,30 @@
 (define (oldtype:contents-exists? wikiname)
   (file-exists?
    (gen-sexp-filename wikiname)))
+
+(define (oldtype:kahua-app-args)
+  (let1 alist
+        (map
+         (lambda (a b)
+           (cons a b))
+         (iota (length (kahua-app-args)))
+         (kahua-app-args))
+
+        (map
+         (lambda (key value)
+           (cons (string->symbol (cdr key))
+                 (cdr value)))
+         (filter (lambda (x) (= 0 (modulo (car x) 2)))  alist)
+         (filter (lambda (x) (= 1 (modulo (car x) 2)))  alist))))
+
+(define (oldtype:get-fqdn)
+  (assq-ref (oldtype:kahua-app-args) 'fqdn))
+
+(define (oldtype:hatena-bookmarks wikiname)
+  (let1 path (if (string=? wikiname "index")
+                 "/"
+                 (oldtype:gen-page-path wikiname))
+        (node-set/
+         (a/ (@/ (href (string-append "http://b.hatena.ne.jp/entry/http://" (oldtype:get-fqdn) path)))
+             (img/ (@/ (src "http://d.hatena.ne.jp/images/b_entry_de.gif"))))
+         (img/ (@/ (src (string-append "http://b.hatena.ne.jp/entry/image/http://" (oldtype:get-fqdn) path)))))))

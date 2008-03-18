@@ -268,7 +268,7 @@
                 (div/
                  (oldtype:google-searchbox)))
           (br/)
-          (h1/ wikiname)
+          (h1/ wikiname  " "  (oldtype:hatena-bookmarks wikiname))
           barcode
           (hr/)
           nodes

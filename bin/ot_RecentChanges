@@ -1,4 +1,5 @@
 #!/bin/bash
+DISPLAY_LINES=30
 
 . ${OT_HOME}/bin/lib.sh
 
@@ -23,7 +24,7 @@ do
       name=`basename ${name} .ot`
       echo "- CHANGED ${commit_date}: [[${name}]] by ([[${commit_author}]])"
   fi
-done | sort -r > ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
+done | sort -r | head -${DISPLAY_LINES} > ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
 if [ -s ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ]; then
   /bin/mv -f ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ${OT_EDITHOME}/edit/!RecentChanges.ot
 else

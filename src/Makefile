@@ -18,7 +18,4 @@ test:
 
 svninfo:
 	svn --xml info ${OTSAMPLE} > info.xml
-	./oldtype_svninfo shell < info.xml
-
-t:
-	./oldtype_svninfo shell < /tmp/t.xml
+	gosh -I ../Kahua/oldtype ./oldtype_svninfo shell < info.xml

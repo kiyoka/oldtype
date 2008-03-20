@@ -107,7 +107,7 @@
 ;; str:
 ;;   "2007-09-25T12:54:09.955196Z"
 ;; result:
-;;   ((nanosecond . 0) (second . 9) (minute . 54) (hour . 12) (day . 25) (month . 9) (year . 2007) (zone-offset . 9))
+;;   ((nanosecond . 0) (second . 9) (minute . 54) (hour . 12) (day . 25) (month . 9) (year . 2007) (zone-offset . 0))
 (define (oldtype:date-string->date-alist str)
   (let* ((splitted (map string->number (string-split str #/[TZ.\-:]/)))
          (date-object
@@ -118,7 +118,7 @@
                      (third  splitted) ;;day
                      (second splitted) ;;month
                      (first  splitted) ;;year
-                     +9 ;;zone-offset
+                     0 ;;zone-offset
                      )))
     `(
       (nanosecond  . ,(date-nanosecond date-object))

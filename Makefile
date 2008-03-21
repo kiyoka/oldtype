@@ -7,3 +7,4 @@ stable:
 	tar xfC ../stable.tar ../branches/stable
 	/bin/rm -f ../stable.tar
 	cat ./config.sh | sed 's/OT_MASTER=nil/OT_MASTER=t/' | sed 's/site-unstable/site-stable/' > ../branches/stable/config.sh
+	cat ./Kahua/oldtype/Makefile | sed 's/site-unstable/site-stable/' > ../branches/stable/Kahua/oldtype/Makefile

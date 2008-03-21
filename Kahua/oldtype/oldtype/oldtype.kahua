@@ -10,6 +10,7 @@
 (use oldtype.format)
 (use oldtype.util)
 (use oldtype.kahualib)
+(use srfi-1)
 (load "oldtype/version.kahua")
 (load "oldtype/util.kahua")
 (use util.list)

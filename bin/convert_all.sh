@@ -29,6 +29,9 @@ cd        ${OT_EDITHOME}/edit/
 mkdir -p  ${OT_EDITHOME}/_out
 mkdir -p  ${OT_EDITHOME}/_tmp
 
+# copy images
+mkdir -p  ${OT_STATICHOME}/img
+/bin/cp -f ${OT_EDITHOME}/img/* ${OT_STATICHOME}/img
 
 /bin/ls -1 *.ot > ../_tmp/all.list
 _svn t ls > ../_tmp/svn.list

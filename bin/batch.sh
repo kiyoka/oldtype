@@ -12,8 +12,8 @@ export GAUCHE_LOAD_PATH="$OT_HOME/Kahua/oldtype"
 # load configuration
 . ${OT_HOME}/config.sh
 
-if [ "$OT_EDITHOME" = "" ] ; then
-  echo "Please environment variables OT_EDITHOME"
+if [ "$OT_SITE" = "" ] ; then
+  echo "Please environment variables OT_SITE"
   exit 1
 fi
 

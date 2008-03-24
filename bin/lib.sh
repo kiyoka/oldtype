@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ "$OT_SITE" = "" ] ; then
+  echo "Please environment variables OT_SITE"
+  exit 1
+fi
+
+export OT_EDITHOME=${OT_SITE}/tmp/oldtype
+export OT_STATICHOME=${OT_SITE}/static/oldtype
+
 _svn() {
     exit_on_error=$1 ; shift
     args=$*

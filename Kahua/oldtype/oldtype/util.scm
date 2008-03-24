@@ -78,8 +78,8 @@
 
 (define (oldtype:editpath)
   (string-append
-   (sys-getenv "OT_EDITHOME")
-   "/edit"))
+   (sys-getenv "OT_SITE")
+   "/tmp/oldtype/edit"))
 
 (define (oldtype:user-local)
   (sys-getenv "OT_USER_LOCAL"))

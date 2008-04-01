@@ -294,12 +294,39 @@
                      `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
            (p/ "!!Error : No argument ##(amazon URL) command")))
       
+      ;; timestamp
+      ((timestamp)
+       (if (< 0 len)
+           (let* ((_utc    (car arg))
+                  (d (time-utc->date
+                      (seconds->time
+                       (string->number
+                        _utc)))))
+             (text/ (string-append (date->string d "~Y-~m-~d ~I:~M ~p (~z)"))))
+           (p/ "!!Error : No argument ##(timestamp UTC) command")))
+
+      ;; timestamp
+      ((since)
+       (if (< 0 len)
+           (let1 _utc (car arg)
+                 (text/ 
+                  (format "(~a ago)"
+                          (string-append
+                           (how-long-since 
+                            (string->number
+                             _utc))))))
+           (p/ "!!Error : No argument ##(since UTC) command")))
+
       ;; download link oldtype-mode.el source code
       ((download-el)
        (a/ (@/ (href (string-append (oldtype:static-base-path) "oldtype-mode.el")))
            "[Download oldtype-mode.el now]"))
       (else
        `(p/ ,(format "!!Error : no such macro \"~a\"!!" command))))))
+
+
+(define (oldtype:timeago seconds)
+  (format "~d" (/ seconds 60)))
 
 
 (define (oldtype:gen-page-path wikiname)
@@ -345,14 +372,14 @@
          (filter (lambda (x) (= 0 (modulo (car x) 2)))  alist)
          (filter (lambda (x) (= 1 (modulo (car x) 2)))  alist))))
 
-(define (oldtype:get-fqdn)
-  (assq-ref (oldtype:kahua-app-args) 'fqdn))
+(define (oldtype:get-arguments sym)
+  (assq-ref (oldtype:kahua-app-args) sym))
 
 (define (oldtype:hatena-bookmarks wikiname)
   (let1 path (if (string=? wikiname "index")
                  "/"
                  (oldtype:gen-page-path wikiname))
         (node-set/
-         (a/ (@/ (href (string-append "http://b.hatena.ne.jp/entry/http://" (oldtype:get-fqdn) path)))
+         (a/ (@/ (href (string-append "http://b.hatena.ne.jp/entry/http://" (oldtype:get-arguments 'fqdn) path)))
              (img/ (@/ (src "http://d.hatena.ne.jp/images/b_entry_de.gif"))))
-         (img/ (@/ (src (string-append "http://b.hatena.ne.jp/entry/image/http://" (oldtype:get-fqdn) path)))))))
+         (img/ (@/ (src (string-append "http://b.hatena.ne.jp/entry/image/http://" (oldtype:get-arguments 'fqdn) path)))))))

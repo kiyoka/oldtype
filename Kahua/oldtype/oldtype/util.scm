@@ -107,7 +107,8 @@
 ;; str:
 ;;   "2007-09-25T12:54:09.955196Z"
 ;; result:
-;;   ((nanosecond . 0) (second . 9) (minute . 54) (hour . 12) (day . 25) (month . 9) (year . 2007) (zone-offset . 0))
+;;   ((nanosecond . 0) (second . 9) (minute . 54) (hour . 12) (day . 25) (month . 9) (year . 2007) (zone-offset . 0) (utc . 1190724849))
+;;   
 (define (oldtype:date-string->date-alist str)
   (let* ((splitted (map string->number (string-split str #/[TZ.\-:]/)))
          (date-object
@@ -128,12 +129,13 @@
       (day         . ,(date-day date-object))
       (month       . ,(date-month date-object))
       (year        . ,(date-year date-object))
-      (zone-offset . ,(date-zone-offset date-object)))))
+      (zone-offset . ,(date-zone-offset date-object))
+      (utc         . ,(time->seconds (date->time-utc date-object))))))
+
 
 ;;=================================================
 ;; parse svn log
 ;;
-
 ;;
 ;; result format:
 ;;   (
@@ -217,8 +219,17 @@
 ;;  )
 (define (oldtype:parse-svninfo port)
   (define (date-string-as-current-locale str)
-    (date->string (string->date str "~Y-~m-~dT~H:~M:~S")
-                  "~1 ~3 (UTC)"))
+    (let* ((date-str (string-append (car (string-split str ".")) " +0000"))
+           (utc      (date->time-utc (string->date date-str "~Y-~m-~dT~H:~M:~S ~z"))))
+      (date->string (time-utc->date utc)
+                    "~Y-~m-~d ~I:~M ~p (~z)")))
+  (define (utc-as-current-locale str)
+    (number->string
+     (time->seconds
+      (date->time-utc
+       (string->date 
+        (string-append (car (string-split str ".")) " +0000")
+        "~Y-~m-~dT~H:~M:~S ~z")))))
   (let1 sxml
         (ssax:xml->sxml port '())
         (map
@@ -231,6 +242,8 @@
              (commit_revision    . ,(fourth x))
              (commit_author      . ,(fifth x))
              (commit_date        . ,(date-string-as-current-locale 
+                                     (sixth x)))
+             (commit_utc         . ,(utc-as-current-locale 
                                      (sixth x)))
              ))
          (zip

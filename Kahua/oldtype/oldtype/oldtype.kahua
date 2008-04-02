@@ -77,9 +77,6 @@
   
 ;; utility : internal sxml format to highger-order-tag
 (define (sxml->higher-order-tag wikiname sxmls page-src)
-  (define _nbsp "\u00a0")
-  (define (space->nbsp string)
-    (regexp-replace-all #/ / string _nbsp))
   (let1 is-w3m (eq? 'w3m (oldtype-user-agent))
         (div/
          (node-set
@@ -109,6 +106,13 @@
                                                      (td/ "committer")
                                                      (td/ (assq-ref param 'committer)))
                                                     (tr/
+                                                     (td/ "commit date")
+                                                     (td/ (string-append (oldtype:utc->date-string (assq-ref param 'commit-utc))
+                                                                         (oldtype:space->nbsp (oldtype:utc->ago-string (assq-ref param 'commit-utc))))))
+                                                    (tr/
+                                                     (td/ "commit revision")
+                                                     (td/ (assq-ref param 'rev)))
+                                                    (tr/
                                                      (td/ "original-src")
                                                      (td/ (assq-ref param 'orig)))
                                                     (tr/
@@ -137,7 +141,7 @@
                                              ((3)  (oldtype:icon-image 'new3))
                                              ((4)  (oldtype:icon-image 'new4))
                                              (else (if is-w3m
-                                                       (space->nbsp "  ")
+                                                       (oldtype:space->nbsp "  ")
                                                        (oldtype:icon-image 'new5))))))))
                                (_rest
                                 (node-set (rec (cdr arg)))))
@@ -168,7 +172,7 @@
                                                                (size 80)
                                                                (type "text")
                                                                (value (assq-ref param 'orig))))
-                                                      (space->nbsp "  ")
+                                                      (oldtype:space->nbsp "  ")
                                                       (input/ (@/
                                                                (type "button")
                                                                (value "Submit")
@@ -191,18 +195,18 @@
                               ((pre-ul1)     `(,@(span/ 
                                                   (oldtype:icon-image 'ul1)            (node-set (rec arg)))))
                               ((pre-ul2)     `(,@(span/
-                                                  _nbsp
+                                                  (oldtype:space->nbsp " ")
                                                   (oldtype:icon-image 'ul2)            (node-set (rec arg)))))
                               ((pre-ul3)     `(,@(span/
-                                                  _nbsp _nbsp
+                                                  (oldtype:space->nbsp "  ")
                                                   (oldtype:icon-image 'ul3)            (node-set (rec arg)))))
                               ((pre-ol1)     `(,@(span/
                                                   (oldtype:icon-image 'ol1)            (node-set (rec arg)))))
                               ((pre-ol2)     `(,@(span/
-                                                  _nbsp
+                                                  (oldtype:space->nbsp " ")
                                                   (oldtype:icon-image 'ol2)            (node-set (rec arg)))))
                               ((pre-ol3)     `(,@(span/ 
-                                                  _nbsp _nbsp
+                                                  (oldtype:space->nbsp "  ")
                                                   (oldtype:icon-image 'ol3)            (node-set (rec arg)))))
                               ((h1)          `(,@(h1/ (@/ (id "h1"))                   (node-set (rec arg)))))
                               ((h2)          `(,@(h2/ (@/ (id "h2"))                   (node-set (rec arg)))))
@@ -235,7 +239,7 @@
              ((other . rest)
               (cons
                (if string?
-                   (space->nbsp other)
+                   (oldtype:space->nbsp other)
                    other)
                (rec rest)))))))))
 

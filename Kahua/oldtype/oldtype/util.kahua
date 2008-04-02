@@ -14,6 +14,10 @@
 (define (oldtype:static-image-path)
   (string-append "/kahua/" (kahua-worker-type) "/staticimg/"))
 
+(define (oldtype:space->nbsp string)
+  (define _nbsp "\u00a0")
+  (regexp-replace-all #/ / string _nbsp))
+
 
 ;; <!-- SiteSearch Google -->
 ;; <form method="get" action="http://www.google.co.jp/custom" target="_top">
@@ -219,6 +223,32 @@
      `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
     
 
+;;
+;; Convert utc seconds to "2008-03-20 09:36 PM (+0900)"
+;;
+(define (oldtype:utc->date-string utc)
+  (if utc
+      (let1 d (time-utc->date
+               (seconds->time
+                utc))
+            (string-append (date->string d "~Y-~m-~d ~I:~M ~p (~z)")))
+      "*NoDateInformation*"))
+
+;;
+;; Convert utc seconds to "    (10 seconds ago)"
+;;
+(define (oldtype:utc->ago-string utc)
+  (if utc
+      (string-append
+       (format "~18,,,' @a"
+               (string-append
+                "("
+                (how-long-since utc)
+                " ago)")))
+      "*NoDateInformation*"))
+      
+
+
 (define (oldtype:format-macro expr)
   (let ((command (car expr))
         (arg  ;; symbol list to string list.
@@ -297,12 +327,8 @@
       ;; timestamp
       ((timestamp)
        (if (< 0 len)
-           (let* ((_utc    (car arg))
-                  (d (time-utc->date
-                      (seconds->time
-                       (string->number
-                        _utc)))))
-             (text/ (string-append (date->string d "~Y-~m-~d ~I:~M ~p (~z)"))))
+           (let1 _utc (car arg)
+                 (text/ (oldtype:utc->date-string (string->number _utc))))
            (p/ "!!Error : No argument ##(timestamp UTC) command")))
 
       ;; timestamp
@@ -310,11 +336,8 @@
        (if (< 0 len)
            (let1 _utc (car arg)
                  (text/ 
-                  (format "(~a ago)"
-                          (string-append
-                           (how-long-since 
-                            (string->number
-                             _utc))))))
+                  (oldtype:space->nbsp
+                   (oldtype:utc->ago-string (string->number _utc)))))
            (p/ "!!Error : No argument ##(since UTC) command")))
 
       ;; download link oldtype-mode.el source code

@@ -157,6 +157,8 @@
 ;;          (committer   . SYMBOL_OF_COMMIT_USER)
 ;;          (lineno      . LINENO)
 ;;          (latest-rate . NUMBER)
+;;          (rev         . COMMIT_REVISION_NUMBER)
+;;          (commit-utc  . COMMIT_UTC_SECONDS)
 ;;        )
 ;;        (TAG
 ;;           "string" "string" "string"
@@ -199,6 +201,15 @@
                                             top
                                             (car ann-of-line)))
                                       '((index . 5))))
+                     (rev         (if ann-of-line
+                                      (car ann-of-line)
+                                      #f))
+                     (info-of-line  (if rev
+                                        (assq-ref top rev)
+                                        #f))
+                     (commit-utc    (if info-of-line
+                                        (assq-ref (assq-ref (car info-of-line) 'date) 'utc)
+                                        0))
                      (latest-rate (assq-ref line-alist 'index)))
 
                 (let1 _
@@ -218,7 +229,10 @@
                                                    ""))
                              (committer     . ,(if ann-of-line
                                                    (assq-ref (cadr ann-of-line) 'user)
-                                                   'oldtype)))
+                                                   'oldtype))
+                             (rev           . ,rev)
+                             (commit-utc    . ,commit-utc)
+                             )
                             ,@(rec (sxml:content sxml) hctx)))
                          ((a)
                           (let ((param (cadr sxml))

@@ -81,7 +81,7 @@
       (input/ 
        (@/ (type "hidden")
            (name "domains")
-           (value "oldtype.sumibi.org")))
+           (value (oldtype:get-arguments 'fqdn))))
       (label/
        (@/ (for "sbi")
            (style "display: none"))
@@ -121,16 +121,16 @@
       (input/
        (@/ (type "radio")
            (name "sitesearch")
-           (value "oldtype.sumibi.org")
+           (value (oldtype:get-arguments 'fqdn))
            (checked "")
            (id "ss1")))
       (label/
        (@/ (for "ss1")
-           (title"検索 oldtype.sumibi.org"))
+           (title (string-append "検索 " (oldtype:get-arguments 'fqdn))))
        (font/
         (@/ (size "-1")
             (color "#000000"))
-        "oldtype.sumibi.org")))))
+        (oldtype:get-arguments 'fqdn))))))
    (input/
     (@/ (type "hidden") (name "client") (value "pub-5721837636688174")))
    (input/
@@ -144,7 +144,9 @@
    (input/
     (@/ (type "hidden")
         (name "cof")
-        (value "GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://oldtype.sumibi.org/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://oldtype.sumibi.org/;LP:1;FORID:1")))
+        (value (format "GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://~a/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://~a/;LP:1;FORID:1"
+                       (oldtype:get-arguments 'fqdn)
+                       (oldtype:get-arguments 'fqdn)))))
    (input/
     (@/ (type "hidden") (name "hl")     (value "ja")))))
 
@@ -231,7 +233,7 @@
       (let1 d (time-utc->date
                (seconds->time
                 utc))
-            (string-append (date->string d "~Y-~m-~d ~I:~M ~p (~z)")))
+            (string-append (date->string d "~Y-~m-~d ~H:~M (~z)")))
       "*NoDateInformation*"))
 
 ;;
@@ -240,7 +242,7 @@
 (define (oldtype:utc->ago-string utc)
   (if utc
       (string-append
-       (format "~18,,,' @a"
+       (format "~16,,,' @a"
                (string-append
                 "("
                 (how-long-since utc)

@@ -316,14 +316,17 @@
 
       ((amazon)
        (if (< 0 len)
-           (let1 _asin (car arg)
-                 (if (#/^[0-9a-zA-Z]+$/ _asin)
-                     (a/
-                      (@/ (href (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" _asin)))
-                      (img/
-                       (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
-                           (alt _asin))))
-                     `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
+           (let* ((_asin (car arg))
+                  (_asin (if (#/^[0-9]+$/ _asin)
+                             (format "~10,,,'0@a" _asin)
+                             _asin)))
+             (if (#/^[0-9a-zA-Z]+$/ _asin)
+                 (a/
+                  (@/ (href (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" _asin)))
+                  (img/
+                   (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
+                       (alt _asin))))
+                 `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
            (p/ "!!Error : No argument ##(amazon URL) command")))
       
       ;; timestamp

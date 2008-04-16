@@ -48,8 +48,7 @@
           'w3m)
          (else
           #t))))
-
-
+  
 ;; utility : internal sxml format to barcode link
 (define (sxml->barcode sxmls page-src)
   (if (eq? 'w3m (oldtype-user-agent))
@@ -128,6 +127,7 @@
                                                                 (string-append orig "\n"))
                                                             (string-append orig "\n")))
                                                       page-src)))
+                                                   ""
                                                    )))))
                                          (node-set
                                           (list
@@ -244,8 +244,8 @@
                (rec rest)))))))))
 
 
-(define (standard-page wikiname barcode nodes)
-  (html/ (head/ (title/ wikiname)
+(define (standard-page wikiname barcode nodes first-line)
+  (html/ (head/ (title/ (string-append wikiname first-line))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/prototype.js"))      (type "text/javascript")))
@@ -284,27 +284,32 @@
                 *oldtype-version*))))
 
 
+(define (oldtype-first-line page-src)
+  (car 
+   (filter
+    (lambda (x)
+      (not (#/^[ ]*$/ x)))
+    page-src)))
+
+
 (define (show-page/page wikiname)
   (let1 sexp (oldtype:load-sexp (kahua-site-root) wikiname)
-        (standard-page
-         wikiname
-         (if sexp
-             (sxml->barcode
-              (car (assq-ref sexp 'sxml))
-              (car (assq-ref sexp 'src)))
-             (br/))
-         (if sexp
-             (sxml->higher-order-tag
-              wikiname
-              (car (assq-ref sexp 'sxml))
-              (car (assq-ref sexp 'src)))
-             (div/
-              (p/
-               (@/ (class "center"))
-               (strong/
-                (@/ (class "caption"))
-                "This wikipage was not found.")))))))
-
+        (let ((sxml (car (assq-ref sexp 'sxml)))
+              (src  (car (assq-ref sexp 'src))))
+          (standard-page
+           wikiname
+           (if sexp
+               (sxml->barcode sxml src)
+               (br/))
+           (if sexp
+               (sxml->higher-order-tag wikiname sxml src)
+               (div/
+                (p/
+                 (@/ (class "center"))
+                 (strong/
+                  (@/ (class "caption"))
+                  "This wikipage was not found."))))
+           (oldtype-first-line src)))))
 
 
 (define-entry (show-page wikiname)

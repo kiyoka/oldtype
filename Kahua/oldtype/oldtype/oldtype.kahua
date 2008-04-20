@@ -53,25 +53,25 @@
 (define (sxml->barcode sxmls page-src)
   (if (eq? 'w3m (oldtype-user-agent))
       (br/)
-      (node-set/
-       (text/ "Click to jump:")
-       (map/
-         (lambda (x)
-           (let ((name  (car x))
-                 (param (cadr x)))
-             (case name
-               ((div)
-                (let ((latest-rate (assq-ref param 'latest-rate))
-                      (id          (assq-ref param 'lineno)))
-                  (a/ (@/ (href  (format "#~d" id)))
-                      (case latest-rate
-                        ((0)  (oldtype:icon-image 'vline0))
-                        ((1)  (oldtype:icon-image 'vline1))
-                        ((2)  (oldtype:icon-image 'vline2))
-                        ((3)  (oldtype:icon-image 'vline3))
-                        ((4)  (oldtype:icon-image 'vline4))
-                        (else (oldtype:icon-image 'vline5)))))))))
-         sxmls))))
+      (map/
+       (lambda (x)
+         (let ((name  (car x))
+               (param (cadr x)))
+           (case name
+             ((div)
+              (let ((latest-rate (assq-ref param 'latest-rate))
+                    (id          (assq-ref param 'lineno)))
+                (a/ (@/ (href  (format "#~d" id))
+                        (title "Click to jump")
+                        (class "help"))
+                    (case latest-rate
+                      ((0)  (oldtype:icon-image 'vline0))
+                      ((1)  (oldtype:icon-image 'vline1))
+                      ((2)  (oldtype:icon-image 'vline2))
+                      ((3)  (oldtype:icon-image 'vline3))
+                      ((4)  (oldtype:icon-image 'vline4))
+                      (else (oldtype:icon-image 'vline5)))))))))
+       sxmls)))
 
   
 ;; utility : internal sxml format to highger-order-tag
@@ -126,23 +126,39 @@
                                                             (b/ (@/ (class "here"))
                                                                 (string-append orig "\n"))
                                                             (string-append orig "\n")))
-                                                      page-src)))
-                                                   ""
-                                                   )))))
+                                                      page-src))))
+                                                  ""
+                                                  ))))
                                          (node-set
-                                          (list
-                                           (if is-w3m
-                                               (text/ "info")
-                                               (oldtype:icon-image 'info))
-                                           (case (assq-ref param 'latest-rate)
-                                             ((0)  (oldtype:icon-image 'new0))
-                                             ((1)  (oldtype:icon-image 'new1))
-                                             ((2)  (oldtype:icon-image 'new2))
-                                             ((3)  (oldtype:icon-image 'new3))
-                                             ((4)  (oldtype:icon-image 'new4))
-                                             (else (if is-w3m
-                                                       (oldtype:space->nbsp "  ")
-                                                       (oldtype:icon-image 'new5))))))))
+                                          (let ((date-message (string-append
+                                                               (oldtype:utc->ago-string (assq-ref param 'commit-utc)) "  "
+                                                               "date:"
+                                                               (oldtype:utc->date-string (assq-ref param 'commit-utc))))
+                                                (person-message (symbol->string (assq-ref param 'committer))))
+                                            (list
+                                             (span/ (@/ (title date-message)
+                                                        (class "help"))
+                                                    (case (assq-ref param 'latest-rate)
+                                                      ((0)  (oldtype:icon-image 'new0))
+                                                      ((1)  (oldtype:icon-image 'new1))
+                                                      ((2)  (oldtype:icon-image 'new2))
+                                                      ((3)  (oldtype:icon-image 'new3))
+                                                      ((4)  (oldtype:icon-image 'new4))
+                                                      (else (if is-w3m
+                                                                (oldtype:space->nbsp "  ")
+                                                                (oldtype:icon-image 'new5)))))
+                                             (let1 committer-str (symbol->string (assq-ref param 'committer))
+                                                   (a/ (@/ (href
+                                                            (oldtype:gen-page-path committer-str)))
+                                                       (span/
+                                                        (@/ (class "help")
+                                                            (title person-message))
+                                                        (img/
+                                                         (@/ 
+                                                          (class "icon")
+                                                          (src
+                                                           (string-append
+                                                            (oldtype:static-image-path) "../img/" committer-str ".png"))))))))))))
                                (_rest
                                 (node-set (rec (cdr arg)))))
                           (if is-w3m
@@ -154,8 +170,7 @@
                                           (class (format "new~d" (assq-ref param 'latest-rate)))
                                           (style "float: none;"))
                                          (div/ (@/ (style "position: absolute; left: 2em; font-size: small;"))
-                                               _first
-                                               (oldtype:expand-wiki-name (symbol->string (assq-ref param 'committer))))
+                                               _first)
                                          (if (oldtype:is-editable wikiname)
                                              (div/ (@/ (style "padding-left:  5em;")
                                                        (onDblClick (format "otEditStart( ~a );" lineno)))
@@ -245,13 +260,17 @@
 
 
 (define (standard-page wikiname barcode nodes first-line)
-  (html/ (head/ (title/ (string-append wikiname first-line))
+  (html/ (head/ (title/ (string-append wikiname " / " first-line))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
+                (link/ (@/ (rel "stylesheet") (type "text/css")
+                           (href (string-append "/kahua/" (kahua-worker-type) "/import/tooltips.css"))))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/prototype.js"))      (type "text/javascript")))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/scriptaculous.js"))  (type "text/javascript")))
+                (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/tooltips.js"))       (type "text/javascript")))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/oldtype.js"))               (type "text/javascript"))))
          (body/
+          (@/ (onload "setup_tooltips();"))
           (div/ (@/ (class "header"))
                 (div/ (@/ (style "float: left;"))
                       (if (eq? 'w3m (oldtype-user-agent))
@@ -288,7 +307,9 @@
   (car 
    (filter
     (lambda (x)
-      (not (#/^[ ]*$/ x)))
+      (not (or
+            (#/^[ ]*$/ x)
+            (#/^[ ]*##/ x))))
     page-src)))
 
 

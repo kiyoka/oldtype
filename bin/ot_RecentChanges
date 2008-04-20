@@ -12,6 +12,8 @@ if [ -z "${lst}" ] ; then
     exit 0;
 fi
 
+echo "RecentChanges of OldType contents." >  ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
+echo "----"                               >> ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
 _svn t --xml info ${lst} | ${OT_HOME}/src/oldtype_svninfo shell | while read line
 do
   if [ "" != "${line}" ] ; then
@@ -19,7 +21,7 @@ do
       name=`basename ${name} .ot`
       echo "- ##(timestamp ${commit_utc}) ##(since ${commit_utc}): [[${name}]] by ([[${commit_author}]])"
   fi
-done | sort -r | head -${DISPLAY_LINES} > ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
+done | sort -r | head -${DISPLAY_LINES} >> ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
 if [ -s ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ]; then
   /bin/mv -f ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ${OT_EDITHOME}/edit/!RecentChanges.ot
 else

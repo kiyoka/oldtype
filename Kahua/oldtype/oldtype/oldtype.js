@@ -6,6 +6,7 @@ var timeToFocus   = 1000; // ms
 var slideTime     =  800; // ms
 var dropOutTime   = 1500; // ms
 
+// for In-place edit
 function otEditStart( bodyId ) {
     if( 'none' == $(bodyId + ':editarea').getStyle( 'display' )) {
 	new Effect.SlideDown( $(bodyId + ':editarea'), {duration:slideTime / 1000.0} );
@@ -25,3 +26,10 @@ function otEditEnd( bodyId ) {
     new Effect.DropOut( $(bodyId + ':editarea'), {duration:dropOutTime / 1000.0} );
 }
 
+// for tooltips.js
+function setup_tooltips( ) {
+    $$("body .help").each( function(input) {
+        new Tooltip(input, {backgroundColor: "#FC9", borderColor: "#C96", 
+                            textColor: "#000", textShadowColor: "#FFF"});
+    });
+}

@@ -36,6 +36,20 @@
        entrylist))))
 
 
+(define (output-blog-list save-filename entrylist)
+  (with-output-to-file save-filename
+    (lambda ()
+      (for-each
+       (lambda (filename)
+         (with-input-from-file (string-append (oldtype:editpath) "/" filename)
+           (lambda ()
+             (when (#/[.][0-9]+/ filename)
+               (display
+                (string-append "- [[" (oldtype:otpath->wikiname filename) "]]"))
+               (print (car (port->string-list (current-input-port))))))))
+       entrylist))))
+
+
 (define (main argv)
   (output-blog (string-append ot-blog ".ot")
                (cons
@@ -44,4 +58,6 @@
   (output-blog (string-append ot-blog ".past.ot")
                (cons
                 ot-blog-header
-                (drop (ot-blog-entrylist) ot-new-entry-limit))))
+                (drop (ot-blog-entrylist) ot-new-entry-limit)))
+  (output-blog-list (string-append ot-blog ".list.ot")
+                    (ot-blog-entrylist)))

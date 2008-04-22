@@ -123,7 +123,7 @@ pre, code {
 pre {
 	font-size: small;
 	line-height: 115%;
-	white-space: pre;
+	white-space: pre-wrap;
         width: 100%;
 	overflow: auto;
 	margin-left: 4em;
@@ -541,7 +541,7 @@ pre.verb {
         padding-bottom: 0.0em;
 	padding: 0.0em;
 	border: 0px inset #885;
-	white-space: pre; /* Netscape 4.x needs it */
+	white-space: pre-wrap;
 	margin-top:	0px;
 	margin-bottom:	0px;
 	margin-left:	2em;
@@ -553,7 +553,7 @@ pre.quote {
         margin-bottom: 0.0em;
 	margin: 0.0em;
 	border: 0px inset #885;
-	white-space: pre; /* Netscape 4.x needs it */
+	white-space: pre-wrap;
 	margin-top:	1px;
 	margin-bottom:	1px;
 	margin-left:	2em;

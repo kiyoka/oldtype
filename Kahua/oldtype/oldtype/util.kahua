@@ -160,7 +160,9 @@
      (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.pencil.png"))
                (alt "EDIT") (class "icon"))))
     ((logo)
-     (a/ (@/ (href "/"))
+     (a/ (@/ (href "/")
+             (class "help")
+             (title "Click here to open top page"))
          (img/ (@/ (src (string-append (oldtype:static-image-path) "oldtype_logo_small.png"))
                    (class "logo")
                    (alt "OldTypeLogo")))))
@@ -325,7 +327,9 @@
                   (@/ (href (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" _asin)))
                   (img/
                    (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
-                       (alt _asin))))
+                       (alt _asin)
+                       (class "help")
+                       (title "Click here to open amazon.co.jp"))))
                  `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
            (p/ "!!Error : No argument ##(amazon URL) command")))
       
@@ -408,6 +412,8 @@
                  "/"
                  (oldtype:gen-page-path wikiname))
         (node-set/
-         (a/ (@/ (href (string-append "http://b.hatena.ne.jp/entry/http://" (oldtype:get-arguments 'fqdn) path)))
+         (a/ (@/ (href (string-append "http://b.hatena.ne.jp/entry/http://" (oldtype:get-arguments 'fqdn) path))
+                 (class "help")
+                 (title (string-append "Click here to open the hatena bookmark page for this wiki-page.")))
              (img/ (@/ (src "http://d.hatena.ne.jp/images/b_entry_de.gif"))))
          (img/ (@/ (src (string-append "http://b.hatena.ne.jp/entry/image/http://" (oldtype:get-arguments 'fqdn) path)))))))

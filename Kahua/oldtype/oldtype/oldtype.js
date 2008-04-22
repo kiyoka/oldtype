@@ -33,7 +33,8 @@ function setup_tooltips( ) {
                             textColor: "#000", textShadowColor: "#FFF",
 			    maxWidth: 400,
 			    appearDuration: .15,
-			    hideDuration: .15
+			    hideDuration: .15,
+			    opacity: .85
 			   });
     });
 }

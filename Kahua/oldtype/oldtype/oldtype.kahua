@@ -131,10 +131,11 @@
                                                   ))))
                                          (node-set
                                           (let ((date-message (string-append
-                                                               (oldtype:utc->ago-string (assq-ref param 'commit-utc)) "  "
-                                                               "date:"
+                                                               "edited on "
+                                                               (oldtype:utc->ago-string (assq-ref param 'commit-utc)) "    / "
                                                                (oldtype:utc->date-string (assq-ref param 'commit-utc))))
-                                                (person-message (symbol->string (assq-ref param 'committer))))
+                                                (person-message (string-append
+                                                                 "edited by " (symbol->string (assq-ref param 'committer)))))
                                             (list
                                              (span/ (@/ (title date-message)
                                                         (class "help"))
@@ -279,9 +280,15 @@
                            (br/))
                           (text/ ""))
                       (oldtype:icon-image 'logo)
-                      (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))) "[RecentChanges]")
+                      (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
+                              (class "help")
+                              (title "Recent changes of This site"))
+                          "[RecentChanges]")
                       (text/ " ")
-                      (a/ (@/ (href (oldtype:gen-page-path "!AllPages")))      "[AllPages]")
+                      (a/ (@/ (href (oldtype:gen-page-path "!AllPages"))
+                              (class "help")
+                              (title "All wiki pages of This site"))
+                          "[AllPages]")
                       (text/ " ")
                       (span/ "(Late")
                       (oldtype:icon-image 'new4)

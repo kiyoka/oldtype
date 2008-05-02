@@ -7,7 +7,7 @@ export LANG=ja_JP.UTF-8
 export LC_CTYPE=ja_JP.UTF-8
 
 cd ${OT_EDITHOME}/edit
-lst="`svn ls --username ${OT_USER_BACKEND} --password ${OT_PASS_BACKEND} --no-auth-cache | grep -v '!RecentChanges.ot' | grep -v '!AllPages.ot' | awk '{ printf( \"%s@HEAD \", $0 ); }'`"
+lst="`svn ls --username ${OT_USER_BACKEND} --password ${OT_PASS_BACKEND} --no-auth-cache | egrep -v '^!RecentChanges.ot' | egrep -v '^!AllPages.ot' | egrep -v '^_.*' | awk '{ printf( \"%s@HEAD \", $0 ); }'`"
 if [ -z "${lst}" ] ; then
     exit 0;
 fi

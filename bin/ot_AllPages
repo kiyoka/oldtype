@@ -7,5 +7,5 @@ export LC_CTYPE=ja_JP.UTF-8
 
 cd ${OT_EDITHOME}/edit
 _svn t ls > /tmp/svn.ls
-cat /tmp/svn.ls | sed 's/.ot$//' | awk '{ printf( "- [[%s]]\n", $0 ); }' > ${OT_EDITHOME}/edit/!AllPages.ot.tmp
+cat /tmp/svn.ls | egrep -v '^_.*' | sed 's/.ot$//' | awk '{ printf( "- [[%s]]\n", $0 ); }' > ${OT_EDITHOME}/edit/!AllPages.ot.tmp
 /bin/mv -f ${OT_EDITHOME}/edit/!AllPages.ot.tmp ${OT_EDITHOME}/edit/!AllPages.ot

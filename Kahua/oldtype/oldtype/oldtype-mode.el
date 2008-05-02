@@ -607,7 +607,9 @@ Buffer string between BEG and END are replaced with URL."
 	  (_url_file-pattern
 	   "\\(http://[^\t \n]+\\|.+html?\\)")
 	  (_url_amazon-pattern
-	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+[0-9A-Z]+\\)\\(.*\\)"))
+	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z]\\)\\(.*\\)")
+	  (_url_youtube-pattern
+	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_]+\\)\\(.*\\)"))
 
       (let ((cur    (point))
 	    (str    (buffer-substring-no-properties (point) (point-at-eol))))
@@ -674,6 +676,18 @@ Buffer string between BEG and END are replaced with URL."
 	    (delete-region (match-beginning 1) (match-end 3))
 	    (goto-char (match-beginning 1))
 	    (insert (format "##(amazon %s)  %s" asin title))))
+	 ;; http://www.youtube.com/watch ...  youtube-command
+	 ((string-match      (concat "^" _url_youtube-pattern) str)
+	  (re-search-forward             _url_youtube-pattern (point-at-eol) t)
+	  (let* ((video (match-string 2))
+		 (url   (match-string 0))
+		 (title (if (boundp 'w3m-version)
+			    (or (w3m-arrived-title url)
+				"NoTitle")
+			  "NoTitle")))
+	    (delete-region (match-beginning 1) (match-end 3))
+	    (goto-char (match-beginning 1))
+	    (insert (format "##(youtube %s)  %s" video title))))
 	 ;; http://host/path/of/contents... anchor-keyword
 	 ((string-match      (concat "^" _url_file-pattern) str)
 	  (re-search-forward             _url_file-pattern (point-at-eol) t)

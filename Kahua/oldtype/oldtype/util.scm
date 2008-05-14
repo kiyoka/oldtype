@@ -50,7 +50,8 @@
           oldtype:get-pagelist
           oldtype:parse-log
           oldtype:parse-annotate
-          oldtype:parse-svninfo))
+          oldtype:parse-svninfo
+          oldtype:date-string->date-alist))
 (select-module oldtype.util)
 
 (load "oldtype/version.kahua")
@@ -132,71 +133,6 @@
       (zone-offset . ,(date-zone-offset date-object))
       (utc         . ,(time->seconds (date->time-utc date-object))))))
 
-
-;;=================================================
-;; parse svn log
-;;
-;;
-;; result format:
-;;   (
-;;     revision  alist
-;;    (154        ( (user . kiyoka) (date . <date>-value) (date-str . "2007-09-25T12:54:09.955196Z")))
-;;    (153        ( (user . kiyoka) (date . <date>-value) (date-str . "2007-09-25T12:19:35.838490Z")))
-;;                .
-;;                .
-;;   )
-(define (oldtype:parse-log logfile)
-  (let1 sxml
-        (with-input-from-file logfile
-          (lambda ()
-            (ssax:xml->sxml (current-input-port) '())))
-        
-        (map
-         (lambda (x)
-           `(
-             ,(string->number (first x))
-             (
-              (user     . ,(string->symbol (second x)))
-              (date     . ,(oldtype:date-string->date-alist (third x)))
-              (date-str . ,(third x)))))
-         (zip
-          ((sxpath "//log/logentry/@revision/text()") sxml)
-          ((sxpath "//log/logentry/author/text()") sxml)
-          ((sxpath "//log/logentry/date/text()") sxml)))))
-
-;; 
-;; result format:
-;;  (
-;;   (
-;;     revision aliat
-;;    (140      ((user . kiyoka) (str . "* What is OldType")))
-;;    (142      ((user . kiyoka) (str . "- [[OldType]]")))
-;;    (143      ((user . kiyoka) (str . "- OldType development blog is [[@username:blog]]")))
-;;          .
-;;          .
-;;          .
-;;   )
-;;  )
-(define (oldtype:parse-annotate annfile)
-  (reverse
-   (with-input-from-file annfile
-     (lambda ()
-       (let loop ((lst '()))
-         (cond
-          ((eof-object? (peek-char (current-input-port)))
-           lst)
-          (else
-           (let (
-                 (rev  (string-trim-both (read-string 6)))
-                 (user (string-trim-both (read-string 12)))
-                 (text (next-token '() '(#\newline *eof*)))
-                 (_    (read-char)))
-             (loop (cons `(
-                           ,(string->number rev)
-                           (
-                            (user . ,(string->symbol user))
-                            (str  . ,text)))
-                         lst))))))))))
 
 ;; 
 ;; result format:

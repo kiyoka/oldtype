@@ -41,6 +41,7 @@
   (export <oldtype-timeline>
           load
           serialize
+          oldtype-timeline:unserialize
           ))
 (select-module oldtype.timeline)
 
@@ -64,6 +65,16 @@
   `((revision   . ,(revision-of self))
     (committer  . ,(committer-of self))
     (utc        . ,(utc-of self))))
+
+;;
+;; serialize <oldtype-log>
+;;
+(define-method oldtype-log:unserialize (sexp)
+  (make <oldtype-log>
+    :revision       (assq-ref sexp 'revision)
+    :committer      (assq-ref sexp 'committer)
+    :utc            (assq-ref sexp 'utc)))
+
 
 (define-class <oldtype-timeline> ()
   (;; Customization parameters -----------------------
@@ -151,8 +162,9 @@
 ;;
 ;; access <oldtype-log> by revision no
 ;;
-(define-method oldtype-timeline:log-ref ((self <oldtype-timeline>) rev)
+(define-method log-ref ((self <oldtype-timeline>) rev)
   (assq-ref (log-of self) rev))
+
 
 ;;
 ;; load log-file and ann-file to <oldtype-timeline> object
@@ -183,7 +195,7 @@
            (map
             (lambda (a-list)
               (let1 rev (assq-ref a-list 'revision)
-                    (oldtype-timeline:log-ref self rev)))
+                    (log-ref self rev)))
             ann)))
 
     ;; building text information
@@ -217,5 +229,26 @@
                     (vector->list (annotation-of self))))
     (text       . ,(vector->list (text-of self)))))
 
+
+;;
+;; serialize <oldtype-timeline>
+;;
+(define-method oldtype-timeline:unserialize (sexp)
+  (make <oldtype-timeline>
+    :name       (assq-ref sexp 'name)
+    :revision   (assq-ref sexp 'revision)
+    :log        (map
+                 (lambda (x)
+                   (cons
+                    (car x)
+                    (oldtype-log:unserialize (cdr x))))
+                 (assq-ref sexp 'log))
+    :annotation (list->vector
+                 (map
+                  (lambda (x)
+                    (oldtype-log:unserialize x))
+                  (assq-ref sexp 'annotation)))
+    :text       (list->vector
+                 (assq-ref sexp 'text))))
 
 (provide "oldtype/timeline")

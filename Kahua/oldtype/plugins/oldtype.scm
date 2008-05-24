@@ -14,4 +14,6 @@
 (allow-module oldtype.util)
 (allow-module oldtype.kahualib)
 (allow-module oldtype.pasttime)
+(allow-module oldtype.page)
+(allow-module oldtype.timeline)
 (allow-module rfc.uri)

@@ -7,14 +7,15 @@ all: log.txt ann.txt
 	gosh -I ../Kahua/oldtype ./oldtype_to sxml      ${OTSAMPLE} > out.sxml
 	gosh -I ../Kahua/oldtype ./oldtype_to plain     ${OTSAMPLE} > out.txt
 
+test: log.txt ann.txt
+	gosh -I ../Kahua/oldtype test.scm  ${OTSAMPLE} log.txt ann.txt > test.log
+
 log.txt:
 	svn --xml log ../ > log.txt
 
 ann.txt:
 	svn ann ${OTSAMPLE} > ann.txt
 
-test:
-	@cat ${OTSAMPLE} | gosh -I ../lib test.scm
 
 svninfo:
 	svn --xml info ${OTSAMPLE} > info.xml

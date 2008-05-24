@@ -144,114 +144,60 @@
 ;; [SXML] -> [SEXP for Kahua], parsed sxml to internal format.
 ;; 
 ;; [intenal format is SXML like]
-;; '(
-;;    (top
-;;     '((420   ( (user . "user") (date <date>) ))
-;;       (313   ( (user . "user") (date <date>) ))
-;;       (234   ( (user . "user") (date <date>) ))
-;;       ( 51   ( (user . "user") (date <date>) ))
-;;       ( 20   ( (user . "user") (date <date>) ))))
-;;    (sxml
-;;      ((div
-;;        ( (orig        . "ORIGINAL WIKI STRING")
-;;          (committer   . SYMBOL_OF_COMMIT_USER)
-;;          (lineno      . LINENO)
-;;          (latest-rate . NUMBER)
-;;          (rev         . COMMIT_REVISION_NUMBER)
-;;          (commit-utc  . COMMIT_UTC_SECONDS)
-;;        )
-;;        (TAG
-;;           "string" "string" "string"
-;;           (wiki-macro MACRONAME args)
-;;           (wiki-name  WIKINAME)
-;;           (TAG ..... )
-;;        )
+;;  (
+;;    (div
+;;      ((lineno      . LINENO))
+;;      (TAG
+;;         "string" "string" "string"
+;;         (wiki-macro MACRONAME args)
+;;         (wiki-name  WIKINAME)
+;;         (TAG ..... )
 ;;      )
-;;      (div
-;;        .
-;;        .
-;;      )
-;;    ))
+;;    )
+;;    (div
+;;      .
+;;      .
+;;    )
 ;;  )
 ;;
 ;;  TAG is h1, h2, h3, h4, p, pre ...
 ;;
 ;; 
-(define (oldtype:sxml->internal sxmls log ann original-src)
-  (define (get-top-revisions log ann)
-    (if ann
-        (top-revisions log ann)
-        '()))
-  (define (sxml->internal sxml top)
-    (let rec
-        ((sxmls sxmls)
-         (hctx '())) ;;headings context
-      (match sxmls
-             (()  '())
-             ((('wiki-macro . expr) . rest)
-              (cons `(wiki-macro ,@expr)
-                    (rec rest hctx)))
-             (((and (name . _) sxml) . rest) ;; generic node
-              (let* ((lineno      (assq 'lineno (sxml:aux-list-u sxml)))
-                     (ann-of-line (if (and lineno ann (get-ann-by-lineno ann (second lineno)))
-                                      (get-ann-by-lineno ann (second lineno))
-                                      #f))
-                     (line-alist  (if ann-of-line
-                                      (car (assq-ref
-                                            top
-                                            (car ann-of-line)))
-                                      '((index . 5))))
-                     (rev         (if ann-of-line
-                                      (car ann-of-line)
-                                      #f))
-                     (info-of-line  (if rev
-                                        (assq-ref top rev)
-                                        #f))
-                     (commit-utc    (if info-of-line
-                                        (assq-ref (assq-ref (car info-of-line) 'date) 'utc)
-                                        0))
-                     (latest-rate (assq-ref line-alist 'index)))
+(define (oldtype:sxml->internal sxmls)
+  (let rec
+      ((sxmls sxmls)
+       (hctx '())) ;;headings context
+    (match sxmls
+           (()  '())
+           ((('wiki-macro . expr) . rest)
+            (cons `(wiki-macro ,@expr)
+                  (rec rest hctx)))
+           (((and (name . _) sxml) . rest) ;; generic node
+            (let* ((lineno      (assq 'lineno (sxml:aux-list-u sxml))))
+              (let1 _
+                    `(,name ,@(cond ((sxml:attr-list-node sxml) => list)
+                                    (else '()))
+                            ,@(rec (sxml:content sxml) hctx))
+                    (cons
+                     (case name
+                       ((div)
+                        `(div
+                          (,(if lineno
+                                `(lineno  . ,(second lineno))
+                                `()))
+                          ,@(rec (sxml:content sxml) hctx)))
+                       ((a)
+                        (let ((param (cadr sxml))
+                              (_rest (cddr sxml)))
+                          `(a
+                            ,param
+                            ,@(rec _rest hctx))))
+                       (else
+                        _))
+                     (rec rest hctx)))))
+           ((other . rest)
+            (cons other (rec rest hctx))))))
 
-                (let1 _
-                      `(,name ,@(cond ((sxml:attr-list-node sxml) => list)
-                                      (else '()))
-                              ,@(rec (sxml:content sxml) hctx))
-                      (cons
-                       (case name
-                         ((div)
-                          `(div
-                            (,(if lineno
-                                  `(lineno  . ,(second lineno))
-                                  `())
-                             (latest-rate   . ,latest-rate)
-                             (orig          . ,(if ann-of-line
-                                                   (assq-ref (cadr ann-of-line) 'str)
-                                                   ""))
-                             (committer     . ,(if ann-of-line
-                                                   (assq-ref (cadr ann-of-line) 'user)
-                                                   'oldtype))
-                             (rev           . ,rev)
-                             (commit-utc    . ,commit-utc)
-                             )
-                            ,@(rec (sxml:content sxml) hctx)))
-                         ((a)
-                          (let ((param (cadr sxml))
-                                (_rest (cddr sxml)))
-                            `(a
-                              ,param
-                              ,@(rec _rest hctx))))
-                         (else
-                          _))
-                       (rec rest hctx)))))
-             ((other . rest)
-              (cons other (rec rest hctx))))))
-
-  (let ((top (get-top-revisions log ann)))
-    `(
-      (sxml ,(sxml->internal sxmls top))
-      (top  ,top)
-      (src  ,(port->string-list
-              (open-input-string original-src))))))
 
 ;; 
 ;; [SXML] -> [SXML], expanding wiki-name and wiki-macro nodes.

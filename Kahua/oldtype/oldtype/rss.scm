@@ -1,5 +1,5 @@
 ;;;
-;;; wiliki/rss - an ad-hoc RSS generation routine for WiLiKi
+;;; oldtype/rss - an ad-hoc RSS generation routine for WiLiKi
 ;;;
 ;;;  Copyright (c) 2000-2003 Shiro Kawai, All rights reserved.
 ;;;
@@ -23,48 +23,70 @@
 ;;;  OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 ;;;  IN THE SOFTWARE.
 ;;;
-;;;  $Id: rss.scm,v 1.9 2007-05-02 13:02:44 shirok Exp $
+;;;  $Id: $
 ;;;
+;;;
+;;; Modified by kiyoka to implement OldType rss generator.
+;;; I renamed namespace of wiliki- 'oldtype-' to avoid collision of
+;;; installation.
 
 ;; In future, this might be rewritten to use proper XML framework.
 ;; for now, I use an ad-hoc approach.
 
-(define-module wiliki.rss
-  (use wiliki.db)
+(define-module oldtype.rss
   (use util.list)
   (use text.html-lite)
-  (extend wiliki)
-  (export rss-page))
-(select-module wiliki.rss)
+  (extend oldtype))
+(select-module oldtype.rss)
 
-;; API
-(define (rss-page)
-  (rss-format (take* (wiliki-db-recent-changes) 15)))
-
-(define (rss-format entries)
-  (let* ((self (wiliki))
-         (full-url (full-script-path-of self)))
+;;
+;; generate RSS content.
+;;
+;; header:
+;;   (
+;;     (url   . TITLE-OF-RSS)
+;;     (title . TITLE-OF-RSS)
+;;     (desc  . DESCRIPTION-OF-RSS)
+;;   )
+;; entries:
+;;   (
+;;     ;; entry No.1
+;;     (
+;;       (url    . FULL-URL)
+;;       (utc    . GENERATE-DATE)
+;;       (title  . TITLE)
+;;     )
+;;     ;; entry No.2
+;;     .
+;;   .
+;;   .
+;;  )
+;;
+(define (rss-format header entries)
+  (let* (
+         (title (assq-ref header 'title))
+         (url   (assq-ref header 'url)))
     `("Content-type: text/xml\n\n"
-      "<?xml version=\"1.0\" encoding=\"" ,(output-charset) "\" ?>\n"
+      "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
       "<rdf:RDF
        xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"
        xmlns=\"http://purl.org/rss/1.0/\"
        xmlns:dc=\"http://purl.org/dc/elements/1.1/\"
       >\n"
       ,(rdf-channel
-        full-url
-        (rdf-title (title-of self))
-        (rdf-link  full-url)
-        (rdf-description (description-of self))
+        url
+        (rdf-title title)
+        (rdf-link  url)
+        (rdf-description desc)
         (rdf-items-seq
-         (map (lambda (entry) (rdf-li (url-full "~a" (cv-out (car entry)))))
-              entries)))
+         (map (lambda (entry) (rdf-li (assq-ref entry 'title))
+              entries))))
       ,(map (lambda (entry)
-              (let1 url (url-full "~a" (cv-out (car entry)))
-                (rdf-item url
-                          (rdf-title (car entry))
-                          (rdf-link url)
-                          (dc-date  (cdr entry)))))
+              (let1 url (assq-ref entry 'url)
+                    (rdf-item url
+                              (rdf-title (assq-ref entry 'url))
+                              (rdf-link url)
+                              (dc-date   (assq-ref entry 'utc)))))
             entries)
       "</rdf:RDF>\n")))
 
@@ -98,4 +120,4 @@
   (rdf-simple-1 "dc:date"
                 (sys-strftime "%Y-%m-%dT%H:%M:%S+00:00" (sys-gmtime secs))))
 
-(provide "wiliki/rss")
+(provide "oldtype/rss")

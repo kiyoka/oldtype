@@ -37,7 +37,8 @@
 (use oldtype.parse)
 (use oldtype.format)
 (use oldtype.util)
-
+(use oldtype.page)
+(use oldtype.timeline)
 
 
 (define (oldtype:sxml->html sxml ot-path)
@@ -140,20 +141,11 @@
 	  (open-input-string converted-str)))
     (case type
       ('internal
-       (receive (log ann) (parse-log-and-annotate rest)
-         (let* (
-                (sxml             (oldtype-parse input-port))
-                (internal-sexp    (oldtype:sxml->internal sxml log ann converted-str)))
-           (if #f
-               (begin
-                 (use slib)
-                 (require 'pretty-print)
-                 (pretty-print internal-sexp))
-               (begin
-                 (write internal-sexp))))))
+       (let1 oldtype-page   (parse (make <oldtype-page>) input-port (car rest) (cadr rest))
+             (pretty-print-sexp (serialize oldtype-page))))
       ('sxml
        (let1 sxml (oldtype-parse input-port)
-             (write sxml)))
+             (pretty-print-sexp sxml)))
       ('html
        (let* (
               (sxml           (oldtype-parse input-port))

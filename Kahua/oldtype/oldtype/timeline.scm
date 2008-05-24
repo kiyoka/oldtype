@@ -39,9 +39,9 @@
   (use util.list)
   (use oldtype.util)
   (export <oldtype-timeline>
-          load
+          parse
           serialize
-          oldtype-timeline:unserialize
+          deserialize
           ))
 (select-module oldtype.timeline)
 
@@ -52,24 +52,22 @@
                 :init-value 1)
    ;; committer
    (committer   :accessor committer-of   :init-keyword :committer
-                :init-value "nobody")
+                :init-value "none")
    ;; utc
    (utc         :accessor utc-of         :init-keyword :utc
                 :init-value 0)
    ))
 
-;;
-;; serialize <oldtype-log>
-;;
+
 (define-method serialize ((self <oldtype-log>))
   `((revision   . ,(revision-of self))
     (committer  . ,(committer-of self))
     (utc        . ,(utc-of self))))
 
 ;;
-;; serialize <oldtype-log>
+;; deserialize <oldtype-log>
 ;;
-(define-method oldtype-log:unserialize (sexp)
+(define-method deserialize ((dummy <oldtype-log>) sexp)
   (make <oldtype-log>
     :revision       (assq-ref sexp 'revision)
     :committer      (assq-ref sexp 'committer)
@@ -80,7 +78,7 @@
   (;; Customization parameters -----------------------
    ;; page name (utf-8)
    (name        :accessor name-of        :init-keyword :name
-                :init-value "nobody")
+                :init-value "none")
    ;; latest revision no
    (revision    :accessor revision-of    :init-keyword :revision
                 :init-value 0)
@@ -167,9 +165,9 @@
 
 
 ;;
-;; load log-file and ann-file to <oldtype-timeline> object
+;; parse log-file and ann-file to <oldtype-timeline> object
 ;;
-(define-method load ((self <oldtype-timeline>) log-file ann-file)
+(define-method parse ((self <oldtype-timeline>) log-file ann-file)
   (let ((log (oldtype:parse-log log-file))
         (ann (oldtype:parse-annotate ann-file)))
 
@@ -211,9 +209,7 @@
 
     self))
 
-;;
-;; serialize <oldtype-timeline>
-;;
+
 (define-method serialize ((self <oldtype-timeline>))
   `((name       . ,(name-of self))
     (revision   . ,(revision-of self))
@@ -224,16 +220,16 @@
                        (serialize (cdr x))))
                     (log-of self)))
     (annotation . ,(map
-                    (lambda (x)
-                      (serialize x))
+                    serialize
                     (vector->list (annotation-of self))))
     (text       . ,(vector->list (text-of self)))))
+
 
 
 ;;
 ;; serialize <oldtype-timeline>
 ;;
-(define-method oldtype-timeline:unserialize (sexp)
+(define-method deserialize ((dummy <oldtype-timeline>) sexp)
   (make <oldtype-timeline>
     :name       (assq-ref sexp 'name)
     :revision   (assq-ref sexp 'revision)
@@ -241,14 +237,15 @@
                  (lambda (x)
                    (cons
                     (car x)
-                    (oldtype-log:unserialize (cdr x))))
+                    (deserialize (make <oldtype-log>) (cdr x))))
                  (assq-ref sexp 'log))
     :annotation (list->vector
                  (map
                   (lambda (x)
-                    (oldtype-log:unserialize x))
+                    (deserialize (make <oldtype-log>) x))
                   (assq-ref sexp 'annotation)))
     :text       (list->vector
                  (assq-ref sexp 'text))))
+
 
 (provide "oldtype/timeline")

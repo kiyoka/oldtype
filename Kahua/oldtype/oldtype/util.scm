@@ -51,7 +51,8 @@
           oldtype:parse-log
           oldtype:parse-annotate
           oldtype:parse-svninfo
-          oldtype:date-string->date-alist))
+          oldtype:date-string->date-alist
+          pretty-print-sexp))
 (select-module oldtype.util)
 
 (load "oldtype/version.kahua")
@@ -190,5 +191,38 @@
           ((sxpath "//info/entry/commit/author/text()") sxml)
           ((sxpath "//info/entry/commit/date/text()") sxml)
           ))))
+
+;;
+;; imported from this URL ( written by bizen )
+;;    http://practical-scheme.net/wiliki/wiliki.cgi?Gauche%3APrettyPrint
+;; 
+(define (pretty-print-sexp s)
+  (define (do-indent level)
+    (dotimes (_ level) (write-char #\space)))
+  (define (pp-parenl)
+    (write-char #\())
+  (define (pp-parenr)
+    (write-char #\)))
+  (define (pp-atom e prefix)
+    (when prefix (write-char #\space))
+    (write e))
+  (define (pp-list s level prefix)
+    (and prefix (do-indent level))
+    (pp-parenl)
+    (let loop ((s s)
+               (prefix #f))
+      (if (null? s)
+          (pp-parenr)
+          (let1 e (car s)
+            (if (list? e)
+                (begin (and prefix (newline))
+                       (pp-list e (+ level 1) prefix))
+                (pp-atom e prefix))
+            (loop (cdr s) #t)))))
+  (if (list? s)
+      (pp-list s 0 #f)
+      (write s))
+  (newline))
+
 
 (provide "oldtype/util")

@@ -34,6 +34,7 @@
 
 (define-module oldtype.page
   (use util.list)
+  (use oldtype.log)
   (use oldtype.timeline)
   (use oldtype.parse)
   (use oldtype.format)
@@ -42,6 +43,11 @@
           serialize
           deserialize
           parse
+          name
+          sxml-of
+          timeline-of
+          ago
+          date
           ))
 
 
@@ -85,6 +91,13 @@
     :name      (assq-ref internal-data 'name)
     :sxml      (assq-ref internal-data 'sxml)
     :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))))
+  
 
+(define-method ago ((self <oldtype-page>) lineno)
+  (ago (log-by-lineno (timeline-of self) lineno)))
 
+(define-method date ((self <oldtype-page>) lineno)
+  (date (log-by-lineno (timeline-of self) lineno)))
+
+  
 (provide "oldtype/page")

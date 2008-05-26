@@ -16,4 +16,5 @@
 (allow-module oldtype.pasttime)
 (allow-module oldtype.page)
 (allow-module oldtype.timeline)
+(allow-module oldtype.log)
 (allow-module rfc.uri)

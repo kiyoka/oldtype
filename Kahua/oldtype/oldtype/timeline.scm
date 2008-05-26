@@ -38,40 +38,17 @@
   (use sxml.sxpath)
   (use util.list)
   (use oldtype.util)
+  (use oldtype.log)
+  (use gauche.sequence)
   (export <oldtype-timeline>
           parse
           serialize
           deserialize
+          log-by-lineno
+          rank-by-revision
+          rank-by-lineno
           ))
 (select-module oldtype.timeline)
-
-(define-class <oldtype-log> ()
-  (;; Customization parameters -----------------------
-   ;; revision
-   (revision    :accessor revision-of    :init-keyword :revision
-                :init-value 1)
-   ;; committer
-   (committer   :accessor committer-of   :init-keyword :committer
-                :init-value "none")
-   ;; utc
-   (utc         :accessor utc-of         :init-keyword :utc
-                :init-value 0)
-   ))
-
-
-(define-method serialize ((self <oldtype-log>))
-  `((revision   . ,(revision-of self))
-    (committer  . ,(committer-of self))
-    (utc        . ,(utc-of self))))
-
-;;
-;; deserialize <oldtype-log>
-;;
-(define-method deserialize ((dummy <oldtype-log>) sexp)
-  (make <oldtype-log>
-    :revision       (assq-ref sexp 'revision)
-    :committer      (assq-ref sexp 'committer)
-    :utc            (assq-ref sexp 'utc)))
 
 
 (define-class <oldtype-timeline> ()
@@ -82,7 +59,7 @@
    ;; latest revision no
    (revision    :accessor revision-of    :init-keyword :revision
                 :init-value 0)
-   ;; (REVISION . <oldtype-log>) alist in page ( sorted by REVISION order by newer)
+   ;; (REVISION . <oldtype-log>) alist in page ( sorted by REVISION order by newer )
    (log         :accessor log-of         :init-keyword :log
                 :init-value '())
    ;; vector of <oldtype-log> in page
@@ -160,7 +137,7 @@
 ;;
 ;; access <oldtype-log> by revision no
 ;;
-(define-method log-ref ((self <oldtype-timeline>) rev)
+(define-method log-by-revision ((self <oldtype-timeline>) rev)
   (assq-ref (log-of self) rev))
 
 
@@ -174,15 +151,16 @@
     ;; building log information
     (set! (log-of self)
           (sort
-           (map
-            (lambda (a-list)
+           (map-with-index
+            (lambda (i a-list)
               (let1 rev (assq-ref a-list 'revision)
                     (cons
                      rev
                      (make <oldtype-log>
                        :revision rev
                        :committer (assq-ref a-list 'committer)
-                       :utc (assq-ref a-list 'utc)))))
+                       :utc (assq-ref a-list 'utc)
+                       :rank i))))
             log)
            (lambda (a b)
              (> (car a) (car b)))))
@@ -193,7 +171,7 @@
            (map
             (lambda (a-list)
               (let1 rev (assq-ref a-list 'revision)
-                    (log-ref self rev)))
+                    (log-by-revision self rev)))
             ann)))
 
     ;; building text information
@@ -246,6 +224,21 @@
                   (assq-ref sexp 'annotation)))
     :text       (list->vector
                  (assq-ref sexp 'text))))
+
+
+;; access <oldtype-log> by lineno
+;;
+(define-method log-by-lineno ((self <oldtype-timeline>) lineno)
+  (ref (annotation-of self) (- lineno 1) #f))
+
+
+;; latest ranking by revision
+;;
+(define-method rank-by-lineno ((self <oldtype-timeline>) lineno)
+  (let1 log (log-by-lineno self lineno)
+        (if log
+            (rank-of log)
+            0)))
 
 
 (provide "oldtype/timeline")

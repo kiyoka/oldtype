@@ -38,6 +38,7 @@
   (use sxml.sxpath)
   (use text.parse)
   (use file.util)
+  (use oldtype.pasttime)
   (export oldtype:otpath->wikiname
           oldtype:otpath->basename
           oldtype:version
@@ -48,10 +49,10 @@
           oldtype:user-local
           oldtype:user-backend
           oldtype:get-pagelist
-          oldtype:parse-log
-          oldtype:parse-annotate
           oldtype:parse-svninfo
           oldtype:date-string->date-alist
+          oldtype:utc->date-string
+          oldtype:utc->ago-string
           pretty-print-sexp))
 (select-module oldtype.util)
 
@@ -223,6 +224,31 @@
       (pp-list s 0 #f)
       (write s))
   (newline))
+
+
+;;
+;; Convert utc seconds to "2008-03-20 09:36 PM (+0900)"
+;;
+(define (oldtype:utc->date-string utc)
+  (if utc
+      (let1 d (time-utc->date
+               (seconds->time
+                utc))
+            (string-append (date->string d "~Y-~m-~d ~H:~M (~z)")))
+      "*NoDateInformation*"))
+
+;;
+;; Convert utc seconds to "    (10 seconds ago)"
+;;
+(define (oldtype:utc->ago-string utc)
+  (if utc
+      (string-append
+       (format "~16,,,' @a"
+               (string-append
+                "("
+                (how-long-since utc)
+                " ago)")))
+      "*NoDateInformation*"))
 
 
 (provide "oldtype/util")

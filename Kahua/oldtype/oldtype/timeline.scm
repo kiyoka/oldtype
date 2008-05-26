@@ -47,6 +47,7 @@
           log-by-lineno
           rank-by-revision
           rank-by-lineno
+          text-by-lineno
           ))
 (select-module oldtype.timeline)
 
@@ -239,6 +240,12 @@
         (if log
             (rank-of log)
             0)))
+
+
+;; access <oldtype-log> by lineno
+;;
+(define-method text-by-lineno ((self <oldtype-timeline>) lineno)
+  (ref (text-of self) (- lineno 1) #f))
 
 
 (provide "oldtype/timeline")

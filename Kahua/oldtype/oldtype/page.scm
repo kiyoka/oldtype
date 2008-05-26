@@ -46,8 +46,11 @@
           name
           sxml-of
           timeline-of
-          ago
-          date
+          get-ago
+          get-date
+          get-committer
+          get-rank
+          get-text
           ))
 
 
@@ -93,11 +96,19 @@
     :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))))
   
 
-(define-method ago ((self <oldtype-page>) lineno)
-  (ago (log-by-lineno (timeline-of self) lineno)))
+(define-method get-ago ((self <oldtype-page>) lineno)
+  (get-ago (log-by-lineno (timeline-of self) lineno)))
 
-(define-method date ((self <oldtype-page>) lineno)
-  (date (log-by-lineno (timeline-of self) lineno)))
+(define-method get-date ((self <oldtype-page>) lineno)
+  (get-date (log-by-lineno (timeline-of self) lineno)))
 
-  
+(define-method get-committer ((self <oldtype-page>) lineno)
+  (symbol->string (committer-of (log-by-lineno (timeline-of self) lineno))))
+
+(define-method get-rank ((self <oldtype-page>) lineno)
+  (rank-of (log-by-lineno (timeline-of self) lineno)))
+
+(define-method get-text ((self <oldtype-page>) lineno)
+  (text-by-lineno (timeline-of self) lineno))
+
 (provide "oldtype/page")

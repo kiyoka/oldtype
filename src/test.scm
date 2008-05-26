@@ -107,20 +107,20 @@
       (test "ago string of lineno 1 <oldtype-timeline>"
             "  (2 months ago)" 
             (lambda ()
-              (ago (log-by-lineno oldtype-timeline 1))))
+              (get-ago (log-by-lineno oldtype-timeline 1))))
       (test "ago string of lineno 1 <oldtype-page>"
             "  (2 months ago)"
             (lambda ()
-              (ago oldtype-page 1)))
+              (get-ago oldtype-page 1)))
       
       (test "date string of lineno 1 <oldtype-timeline>"
             "2008-03-20 21:36 (+0900)"
             (lambda ()
-              (date (log-by-lineno oldtype-timeline 1))))
+              (get-date (log-by-lineno oldtype-timeline 1))))
       (test "date string of lineno 1 <oldtype-page>"
             "2008-03-20 21:36 (+0900)"
             (lambda ()
-              (date oldtype-page 1)))
+              (get-date oldtype-page 1)))
 
       (test "rank value of lineno 1 <oldtype-timeline>"
             0
@@ -131,5 +131,29 @@
             (lambda ()
               (rank-by-lineno oldtype-timeline 2)))
 
+      (test "date,ago,rank,committer of lineno 1 <oldtype-page>"
+            '((date  . "2008-03-20 21:36 (+0900)")
+              (ago   . "  (2 months ago)")
+              (rank  . 0)
+              (committer . "kiyoka"))
+            (lambda ()
+              `(
+                (date      . ,(get-date      oldtype-page 1))
+                (ago       . ,(get-ago       oldtype-page 1))
+                (rank      . ,(get-rank      oldtype-page 1))
+                (committer . ,(get-committer oldtype-page 1)))))
+
+      (test "text of lineno 1 <oldtype-page>"
+            "* UnitTest用のサンプルファイル"
+            (lambda ()
+              (get-text oldtype-page 1)))
+      
+      (test "text of lineno 2 <oldtype-page>"
+            ""
+            (lambda ()
+              (get-text oldtype-page 2)))
+
+      
       (test-end)
+
       )))

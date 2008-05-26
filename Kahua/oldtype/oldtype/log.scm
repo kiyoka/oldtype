@@ -40,9 +40,11 @@
           parse
           serialize
           deserialize
-          ago
-          date
+          get-ago
+          get-date
           rank-of
+          committer-of
+          revision-of
           ))
 (select-module oldtype.log)
 
@@ -80,10 +82,10 @@
     :utc            (assq-ref sexp 'utc)
     :rank           (assq-ref sexp 'rank)))
 
-(define-method ago ((self <oldtype-log>))
+(define-method get-ago ((self <oldtype-log>))
   (oldtype:utc->ago-string (utc-of self)))
 
-(define-method date ((self <oldtype-log>))
+(define-method get-date ((self <oldtype-log>))
   (oldtype:utc->date-string (utc-of self)))
 
 (provide "oldtype/log")

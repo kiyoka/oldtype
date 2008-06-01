@@ -39,21 +39,23 @@
   (use oldtype.parse)
   (use oldtype.format)
   (use oldtype.util)
+  (use gauche.sequence)
   (export <oldtype-page>
           serialize
           deserialize
           parse
-          name
+          name-of
           sxml-of
           timeline-of
+          get-revision
           get-ago
           get-date
           get-committer
           get-rank
+          get-rank-list
           get-text
+          get-text-list
           ))
-
-
 (select-module oldtype.page)
 
 
@@ -96,6 +98,9 @@
     :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))))
   
 
+(define-method get-revision ((self <oldtype-page>) lineno)
+  (revision-of (log-by-lineno (timeline-of self) lineno)))
+
 (define-method get-ago ((self <oldtype-page>) lineno)
   (get-ago (log-by-lineno (timeline-of self) lineno)))
 
@@ -108,7 +113,16 @@
 (define-method get-rank ((self <oldtype-page>) lineno)
   (rank-of (log-by-lineno (timeline-of self) lineno)))
 
+(define-method get-rank-list ((self <oldtype-page>))
+  (map
+   (lambda (log)
+     (rank-of log))
+   (annotation-of (timeline-of self))))
+
 (define-method get-text ((self <oldtype-page>) lineno)
   (text-by-lineno (timeline-of self) lineno))
+
+(define-method get-text-list ((self <oldtype-page>))
+  (vector->list (text-of (timeline-of self))))
 
 (provide "oldtype/page")

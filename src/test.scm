@@ -11,8 +11,6 @@
 (use oldtype.log)
 (use oldtype.timeline)
 (use oldtype.page)
-(use slib)
-(require 'pretty-print)
 (use gauche.test)                                                     
 
 
@@ -46,17 +44,17 @@
               (test "serialized == DATA        "
                     '((name . "none") (revision . 8208)
                       (log
-                       (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 0))
-                       (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 1))
-                       (8091 (revision . 8091) (committer . kiyoka) (utc . 1205842976) (rank . 2))
-                       (7924 (revision . 7924) (committer . kiyoka) (utc . 1205421544) (rank . 3))
-                       (7920 (revision . 7920) (committer . kiyoka) (utc . 1205419584) (rank . 4))
+                       (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
+                       (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 5))
+                       (8091 (revision . 8091) (committer . kiyoka) (utc . 1205842976) (rank . 5))
+                       (7924 (revision . 7924) (committer . kiyoka) (utc . 1205421544) (rank . 5))
+                       (7920 (revision . 7920) (committer . kiyoka) (utc . 1205419584) (rank . 5))
                        (7919 (revision . 7919) (committer . kiyoka) (utc . 1205418381) (rank . 5))
-                       (7870 (revision . 7870) (committer . kiyoka) (utc . 1205336331) (rank . 6))
-                       (7811 (revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 7)))
+                       (7870 (revision . 7870) (committer . kiyoka) (utc . 1205336331) (rank . 5))
+                       (7811 (revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 5)))
                       (annotation
-                       ((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 0))
-                       ((revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 7)))
+                       ((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
+                       ((revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 5)))
                       (text "* UnitTest用のサンプルファイル" ""))
                     (lambda () (serialize deserialized)))
               (test "serialized == deserialized" serialized (lambda () (serialize deserialized)))))
@@ -70,21 +68,20 @@
                      (div
                       ((lineno . 1))
                       (h2 "UnitTest用のサンプルファイル" "\n")))
-                    (timeline
-                     (name . "none") (revision . 8208)
-                     (log
-                      (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 0))
-                      (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 1))
-                      (8091 (revision . 8091) (committer . kiyoka) (utc . 1205842976) (rank . 2))
-                      (7924 (revision . 7924) (committer . kiyoka) (utc . 1205421544) (rank . 3))
-                      (7920 (revision . 7920) (committer . kiyoka) (utc . 1205419584) (rank . 4))
-                      (7919 (revision . 7919) (committer . kiyoka) (utc . 1205418381) (rank . 5))
-                      (7870 (revision . 7870) (committer . kiyoka) (utc . 1205336331) (rank . 6))
-                      (7811 (revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 7)))
-                     (annotation
-                      ((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 0))
-                      ((revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 7)))
-                     (text "* UnitTest用のサンプルファイル" "")))
+                    (timeline (name . "none") (revision . 8208)
+                              (log
+                               (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
+                               (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 5))
+                               (8091 (revision . 8091) (committer . kiyoka) (utc . 1205842976) (rank . 5))
+                               (7924 (revision . 7924) (committer . kiyoka) (utc . 1205421544) (rank . 5))
+                               (7920 (revision . 7920) (committer . kiyoka) (utc . 1205419584) (rank . 5))
+                               (7919 (revision . 7919) (committer . kiyoka) (utc . 1205418381) (rank . 5))
+                               (7870 (revision . 7870) (committer . kiyoka) (utc . 1205336331) (rank . 5))
+                               (7811 (revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 5)))
+                              (annotation
+                               ((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
+                               ((revision . 7811) (committer . kiyoka) (utc . 1205239814) (rank . 5)))
+                              (text "* UnitTest用のサンプルファイル" "")))
                   (lambda () (serialize oldtype-page)))
 
             (test "serialized == deserialized" serialized (lambda () 
@@ -100,7 +97,7 @@
       (test-section "oldtype-timeline")
       (set! oldtype-timeline (timeline-of oldtype-page))
       (test "log of lineno 1"
-            '((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 0))            
+            '((revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))            
             (lambda ()
               (serialize (log-by-lineno oldtype-timeline 1))))
 
@@ -123,18 +120,18 @@
               (get-date oldtype-page 1)))
 
       (test "rank value of lineno 1 <oldtype-timeline>"
-            0
+            4
             (lambda ()
               (rank-by-lineno oldtype-timeline 1)))
       (test "rank value of lineno 2 <oldtype-timeline>"
-            7
+            5
             (lambda ()
               (rank-by-lineno oldtype-timeline 2)))
 
       (test "date,ago,rank,committer of lineno 1 <oldtype-page>"
             '((date  . "2008-03-20 21:36 (+0900)")
               (ago   . "  (2 months ago)")
-              (rank  . 0)
+              (rank  . 4)
               (committer . "kiyoka"))
             (lambda ()
               `(
@@ -152,6 +149,11 @@
             ""
             (lambda ()
               (get-text oldtype-page 2)))
+
+      (test "rank-list of <oldtype-page>"
+            '(4 5)
+            (lambda ()
+              (get-rank-list oldtype-page)))
 
       
       (test-end)

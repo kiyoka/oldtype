@@ -45,9 +45,10 @@
           serialize
           deserialize
           log-by-lineno
-          rank-by-revision
           rank-by-lineno
           text-by-lineno
+          annotation-of
+          text-of
           ))
 (select-module oldtype.timeline)
 
@@ -142,18 +143,57 @@
   (assq-ref (log-of self) rev))
 
 
+
+;;
+;; result:
+;;  revision numbers in page.
+;; example:
+;;     revision . rank
+;;   '((420     . 0)
+;;     (313     . 1)
+;;     (234     . 2)
+;;     (51      . 3)
+;;     (20      . 4))
+(define (calc-revision-alist log ann)
+  ;; like...
+  ;;   '(420 
+  ;;     313 
+  ;;     234 
+  ;;      51 
+  ;;      20)
+  (if (and log ann)
+      (let* ((revision-list
+              (reverse (sort
+                        (delete-duplicates (map
+                                            (lambda (alist)
+                                              (assq-ref alist 'revision))
+                                            ann)))))
+             ;; ( 532 234 ) will be padding zeros ( 0 0 0 0 532 234 )
+             (revision-list-more5-element
+              (if (<= (+ 1 oldtype:rank-limit) (length revision-list))
+                  revision-list
+                  (append
+                   (make-list (- (+ 1 oldtype:rank-limit) (length revision-list)) 0)
+                   revision-list))))
+        (map-with-index
+         (lambda (index x)
+           (cons x index))
+         revision-list-more5-element))
+      '()))
+
+
 ;;
 ;; parse log-file and ann-file to <oldtype-timeline> object
 ;;
 (define-method parse ((self <oldtype-timeline>) log-file ann-file)
-  (let ((log (oldtype:parse-log log-file))
-        (ann (oldtype:parse-annotate ann-file)))
+  (let* ((log (oldtype:parse-log log-file))
+         (ann (oldtype:parse-annotate ann-file))
+         (revision-alist (calc-revision-alist log ann)))
 
-    ;; building log information
     (set! (log-of self)
           (sort
-           (map-with-index
-            (lambda (i a-list)
+           (map
+            (lambda (a-list)
               (let1 rev (assq-ref a-list 'revision)
                     (cons
                      rev
@@ -161,7 +201,9 @@
                        :revision rev
                        :committer (assq-ref a-list 'committer)
                        :utc (assq-ref a-list 'utc)
-                       :rank i))))
+                       :rank (if (assq-ref revision-alist rev)
+                                 (assq-ref revision-alist rev)
+                                 oldtype:rank-limit)))))
             log)
            (lambda (a b)
              (> (car a) (car b)))))
@@ -233,7 +275,7 @@
   (ref (annotation-of self) (- lineno 1) #f))
 
 
-;; latest ranking by revision
+;; latest ranking by lineno
 ;;
 (define-method rank-by-lineno ((self <oldtype-timeline>) lineno)
   (let1 log (log-by-lineno self lineno)

@@ -80,48 +80,6 @@
                  (else seed)))
              `(x ,@(oldtype-parse-string line))
              '())))
-  
-;;
-;; result:
-;;  revision-no . alist
-;;   '((420   ( (user . "user") (date <date>) ))
-;;     (313   ( (user . "user") (date <date>) ))
-;;     (234   ( (user . "user") (date <date>) ))
-;;     ( 51   ( (user . "user") (date <date>) ))
-;;     ( 20   ( (user . "user") (date <date>) )))
-(define (top-revisions log ann)
-  ;; latest-rate is from 0 to 4. 5 or more larger is 5.
-  (define (calc-latest-rate index rev-list)
-    (let1 len (length rev-list)
-          (if (< 6 len)
-              index
-              (+ index (- 6 len)))))
-  (cond
-   ((and log ann)
-    (let (
-          (rev-list
-           ;; like...
-           ;;   '(420 
-           ;;     313 
-           ;;     234 
-           ;;      51 
-           ;;      20)
-           (reverse (sort
-                     (delete-duplicates (map
-                                         (cut car <>)
-                                         ann))))))
-      (map-with-index
-       (lambda (index x)
-         (list
-          x
-          (append
-           (list
-            (cons 'index (calc-latest-rate index rev-list)))
-           (car (assq-ref log x))
-           (car (assq-ref ann x)))))
-       rev-list)))
-   (else
-    '())))
 
 
 ;;

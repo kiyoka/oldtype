@@ -30,6 +30,7 @@
 (define-module oldtype.kahualib
   (use srfi-1)
   (use file.util)
+  (use oldtype.page)
   (export 
    oldtype:load-sexp
    ))
@@ -38,15 +39,15 @@
 ;;=================================================
 ;; Utility for OldType Application on Kahua
 ;;
-
-
-(define (oldtype:load-sexp _site-root wikiname)
+(define (oldtype:load-page _site-root wikiname)
   (define (gen-sexp-filename)
     (string-append _site-root "/tmp/oldtype/_out/" wikiname ".sexp"))
   (if (file-exists? (gen-sexp-filename))
       (with-input-from-file (gen-sexp-filename)
         (lambda ()
-          (read (current-input-port))))
+          (deserialize
+           (make <oldtype-page>)
+           (read (current-input-port)))))
       #f))
 
 

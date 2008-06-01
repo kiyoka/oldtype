@@ -43,6 +43,7 @@
           oldtype:otpath->basename
           oldtype:version
           oldtype:site-url
+          oldtype:rank-limit
           oldtype:otpath->wikiname
           oldtype:get-string-of-today
           oldtype:editpath
@@ -64,6 +65,7 @@
 ;;
 (define oldtype:version  *oldtype-version*)
 (define oldtype:site-url "http://sourceforge.jp/projects/oldtype/")
+(define oldtype:rank-limit 5)
 
 ;;=================================================
 ;; Utility for OldType

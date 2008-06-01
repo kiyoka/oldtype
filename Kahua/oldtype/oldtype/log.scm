@@ -37,14 +37,14 @@
   (use util.list)
   (use oldtype.util)
   (export <oldtype-log>
-          parse
           serialize
           deserialize
           get-ago
           get-date
-          rank-of
-          committer-of
           revision-of
+          committer-of
+          utc-of
+          rank-of
           ))
 (select-module oldtype.log)
 

@@ -32,7 +32,7 @@
   (use file.util)
   (use oldtype.page)
   (export 
-   oldtype:load-sexp
+   oldtype:load-page
    ))
 (select-module oldtype.kahualib)
 

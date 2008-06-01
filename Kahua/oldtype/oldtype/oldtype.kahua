@@ -326,14 +326,14 @@
           (br/))))
 
 
-(define (oldtype-first-line page-src)
+(define (oldtype-first-line oldtype-page)
   (car 
    (filter
     (lambda (x)
       (not (or
             (#/^[ ]*$/ x)
             (#/^[ ]*##/ x))))
-    (get-text-list page-src))))
+    (get-text-list oldtype-page))))
 
 
 (define (show-page/page wikiname)
@@ -351,7 +351,9 @@
                (strong/
                 (@/ (class "caption"))
                 "This wikipage was not found."))))
-         (oldtype-first-line oldtype-page))))
+         (if oldtype-page
+             (oldtype-first-line oldtype-page)
+             ""))))
 
 
 (define-entry (show-page wikiname)

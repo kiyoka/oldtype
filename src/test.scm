@@ -38,11 +38,11 @@
 
       (test-section "oldtype-timeline")
       (let1 oldtype-timeline 
-            (parse (make <oldtype-timeline>) log-file ann-file)
+            (parse (make <oldtype-timeline> :name "Test") log-file ann-file)
             (let* ((serialized     (serialize oldtype-timeline))
                    (deserialized   (deserialize (make <oldtype-timeline>) serialized)))
               (test "serialized == DATA        "
-                    '((name . "none") (revision . 8208)
+                    '((name . "Test") (revision . 8208)
                       (log
                        (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
                        (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 5))
@@ -60,15 +60,15 @@
               (test "serialized == deserialized" serialized (lambda () (serialize deserialized)))))
 
       (test-section "oldtype-page")
-      (set! oldtype-page (parse (make <oldtype-page>) input-port log-file ann-file))
+      (set! oldtype-page (parse (make <oldtype-page> :name "Test") input-port log-file ann-file))
       (let1 serialized     (serialize oldtype-page)
             (test "serialized == DATA        "
-                  '((name . "none")
+                  '((name . "Test")
                     (sxml
                      (div
                       ((lineno . 1))
                       (h2 "UnitTest用のサンプルファイル" "\n")))
-                    (timeline (name . "none") (revision . 8208)
+                    (timeline (name . "Test") (revision . 8208)
                               (log
                                (8208 (revision . 8208) (committer . kiyoka) (utc . 1206016615) (rank . 4))
                                (8205 (revision . 8205) (committer . kiyoka) (utc . 1206012635) (rank . 5))

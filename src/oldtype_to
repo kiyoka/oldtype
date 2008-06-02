@@ -126,6 +126,9 @@
 	 (input-file (if (> 1 (length _))
                          (display-help)
                          (cadr _)))
+         (wikiname (regexp-replace #/.ot$/
+                                   (sys-basename input-file)
+                                   ""))
          (type (string->symbol (car _)))
          (rest (cddr _))
 
@@ -141,7 +144,7 @@
 	  (open-input-string converted-str)))
     (case type
       ('internal
-       (let1 oldtype-page   (parse (make <oldtype-page>) input-port (car rest) (cadr rest))
+       (let1 oldtype-page   (parse (make <oldtype-page> :name wikiname) input-port (car rest) (cadr rest))
              (pretty-print-sexp (serialize oldtype-page))))
       ('sxml
        (let1 sxml (oldtype-parse input-port)

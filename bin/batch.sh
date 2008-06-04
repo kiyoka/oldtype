@@ -28,7 +28,7 @@ if [ "$OT_USER_LOCAL" = "" ] ; then
 fi
 
 function task () {
-  ${OT_HOME}/bin/convert_all.sh &&
+  ${OT_HOME}/bin/convert.sh &&
   ${OT_HOME}/bin/ot_AllPages &&
   ${OT_HOME}/bin/ot_RecentChanges &&
   ${OT_HOME}/command/blog &&

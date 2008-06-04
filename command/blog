@@ -55,9 +55,18 @@
                (cons
                 ot-blog-header
                 (take (ot-blog-entrylist) ot-new-entry-limit)))
-  (output-blog (string-append ot-blog ".past.ot")
-               (cons
-                ot-blog-header
-                (drop (ot-blog-entrylist) ot-new-entry-limit)))
   (output-blog-list (string-append ot-blog ".list.ot")
-                    (ot-blog-entrylist)))
+                    (ot-blog-entrylist))
+  (for-each
+   (lambda (x)
+     (let ((year_month (car x))
+           (entries    (cdr x)))
+       (output-blog (string-append ot-blog "." year_month ".ot")
+                    (cons
+                     ot-blog-header
+                     entries))))
+   (oldtype:grouping-blog-entries
+    (ot-blog-entrylist)))
+
+  (exit 0))
+

@@ -38,6 +38,7 @@
   (use sxml.sxpath)
   (use text.parse)
   (use file.util)
+  (use util.list)
   (use oldtype.pasttime)
   (export oldtype:otpath->wikiname
           oldtype:otpath->basename
@@ -54,6 +55,7 @@
           oldtype:date-string->date-alist
           oldtype:utc->date-string
           oldtype:utc->ago-string
+          oldtype:grouping-blog-entries
           pretty-print-sexp))
 (select-module oldtype.util)
 
@@ -251,6 +253,42 @@
                 (how-long-since utc)
                 " ago)")))
       "*NoDateInformation*"))
+
+;;
+;; grouping blog entry list by month
+;;
+;; arg:
+;;   ("kiyoka.2008_10_01.ot" "kiyoka.2008_10_03.ot" ...)
+;; 
+;; result:
+;;   (
+;;     (YEAR_MONTH LIST-OF-ENTRY)
+;;     (2008_10 ("kiyoka.2008_10_01.ot" "kiyoka.2008_10_03.ot" ...))
+;;     (2008_11 ("kiyoka.2008_11_02.ot" "kiyoka.2008_11_03.ot" ...))
+;;   )
+;;
+(define (oldtype:grouping-blog-entries entrylist)
+  (define (check-format str)
+    (#/^[^.]+[.][0-9]+_[0-9]+_[0-9]+/ str))
+
+  (let ((valid-entries
+         (filter
+          (lambda (name)
+            (check-format name))
+          entrylist))
+        (ht (make-hash-table 'string=?)))
+    (for-each
+     (lambda (name)
+       (let* ((lst (string-split name #/[._]/))
+              (str (string-append (second lst)  ;; year
+                                  "_"
+                                  (third  lst)) ;; month
+                   ))
+         (hash-table-push! ht
+                           str
+                           name)))
+     valid-entries)
+    (hash-table->alist ht)))
 
 
 (provide "oldtype/util")

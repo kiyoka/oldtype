@@ -62,10 +62,4 @@ do
   fi
 done
 
-# commit
-
-if [ "${OT_MASTER}" = "t" ] ; then
-    _svn t commit -m backend_process
-fi
-
 popd

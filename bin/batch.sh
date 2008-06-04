@@ -31,8 +31,9 @@ function task () {
   ${OT_HOME}/bin/convert_all.sh &&
   ${OT_HOME}/bin/ot_AllPages &&
   ${OT_HOME}/bin/ot_RecentChanges &&
-  ${OT_HOME}/command/blog
-  #${OT_HOME}/command/mypage
+  ${OT_HOME}/command/blog &&
+  ${OT_HOME}/bin/add.sh &&
+  ${OT_HOME}/bin/commit.sh
   #run-parts ${OT_HOME}/hook
   sleep 5
 }

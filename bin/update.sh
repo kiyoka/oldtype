@@ -22,44 +22,7 @@ _oldtype_to() {
 pushd . >& /dev/null
 
 cd        ${OT_EDITHOME}
-# update
-_svn t update
 
-cd        ${OT_EDITHOME}/edit/
-mkdir -p  ${OT_EDITHOME}/_out
-mkdir -p  ${OT_EDITHOME}/_tmp
-
-# copy images
-mkdir -p  ${OT_STATICHOME}/img
-/bin/cp -f ${OT_EDITHOME}/img/* ${OT_STATICHOME}/img
-
-/bin/ls -1 *.ot > ../_tmp/all.list
-_svn t ls > ../_tmp/svn.list
-
-filelist=`cat ../_tmp/all.list ../_tmp/svn.list | sort | uniq -d`
-locallist=`cat ../_tmp/all.list ../_tmp/svn.list | sort | uniq -u`
-_svn t log --xml "..@HEAD" > ../_tmp/tmp.log
-
-for f in $locallist;
-do
-  base=`basename ${f} .ot`
-  echo "[" ${base} "]"
-  _oldtype_to internal "${base}.ot" ../_out/${base}.sexp
-done
-
-for f in $filelist;
-do
-  base=`basename ${f} .ot`
-  if [ "${base}.ot" -nt ../_out/${base}.sexp ] ; then
-      echo "[" ${base} "]"
-      _svn t ann "${f}@HEAD" > ../_tmp/tmp.ann
-      if [ "$?" != "0" ] ; then
-	  msg="Warning: [ ${f} ] svn ann  command failed..."
-	  echo ${msg}
-	  logger "OldType: ${msg}"
-      fi
-      _oldtype_to internal "${base}.ot" ../_out/${base}.sexp     ../_tmp/tmp.log ../_tmp/tmp.ann
-  fi
-done
+  _svn t update
 
 popd

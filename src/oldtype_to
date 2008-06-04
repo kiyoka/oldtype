@@ -144,8 +144,9 @@
 	  (open-input-string converted-str)))
     (case type
       ('internal
-       (let1 oldtype-page   (parse (make <oldtype-page> :name wikiname) input-port (car rest) (cadr rest))
-             (pretty-print-sexp (serialize oldtype-page))))
+       (when (< 1 (length rest))
+         (let1 oldtype-page   (parse (make <oldtype-page> :name wikiname) input-port (car rest) (cadr rest))
+               (pretty-print-sexp (serialize oldtype-page)))))
       ('sxml
        (let1 sxml (oldtype-parse input-port)
              (pretty-print-sexp sxml)))

@@ -5,7 +5,7 @@
 . ${OT_HOME}/bin/lib.sh
 
 pushd . >& /dev/null
-cd        ${OT_EDITHOME}
+cd        ${OT_EDITHOME}/edit/
 
 # commit
 if [ "${OT_MASTER}" = "t" ] ; then

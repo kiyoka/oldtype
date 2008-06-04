@@ -21,10 +21,6 @@ _oldtype_to() {
 
 pushd . >& /dev/null
 
-cd        ${OT_EDITHOME}
-# update
-_svn t update
-
 cd        ${OT_EDITHOME}/edit/
 mkdir -p  ${OT_EDITHOME}/_out
 mkdir -p  ${OT_EDITHOME}/_tmp

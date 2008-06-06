@@ -1,8 +1,6 @@
 * UnitTest用のサンプルファイル
-- start
-- [[Entry1]]
 ----
-- [[Entry2]]
-- end
-
-
+*** start
+*** [[Entry1]]
+*** [[Entry2]]
+*** end

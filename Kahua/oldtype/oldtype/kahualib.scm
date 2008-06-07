@@ -1,5 +1,5 @@
 ;;;
-;;; oldtype/kahualib.scm - oldtype utility for kahua application
+;;; oldtype/core.scm - oldtype core api for kahua apps and batch programs.
 ;;;
 ;;;  Copyright (c) 2003-2006 Kiyoka Nishiyama, All rights reserved.
 ;;;
@@ -27,28 +27,61 @@
 ;;;
 ;;;
 
-(define-module oldtype.kahualib
+(define-module oldtype.core
   (use srfi-1)
   (use file.util)
+  (use oldtype.log)
+  (use oldtype.timeline)
   (use oldtype.page)
+  (use oldtype.rss)
   (export 
    oldtype:load-page
+   oldtype:pages->rss-string
    ))
-(select-module oldtype.kahualib)
+(select-module oldtype.core)
 
-;;=================================================
-;; Utility for OldType Application on Kahua
-;;
+
 (define (oldtype:load-page _site-root wikiname)
-  (define (gen-sexp-filename)
+  (define (gen-sexp-filename1)
     (string-append _site-root "/tmp/oldtype/_out/" wikiname ".sexp"))
-  (if (file-exists? (gen-sexp-filename))
-      (with-input-from-file (gen-sexp-filename)
-        (lambda ()
-          (deserialize
-           (make <oldtype-page>)
-           (read (current-input-port)))))
-      #f))
+  (define (gen-sexp-filename2)
+    (string-append "./" wikiname ".sexp"))
+  (let1 filename (cond
+                  ((file-exists? (gen-sexp-filename1))
+                   (gen-sexp-filename1))
+                  ((file-exists? (gen-sexp-filename2))
+                   (gen-sexp-filename2))
+                  (else
+                   #f))
+        (if filename
+            (with-input-from-file filename
+              (lambda ()
+                (deserialize
+                 (make <oldtype-page>)
+                 (read (current-input-port)))))
+            #f)))
 
 
-(provide "oldtype/kahualib")
+;;
+;; args:
+;;   ( <oldtype-page> <oldtype-page> <oldtype-page> ... )
+;; return:
+;;   rss content string
+;:
+(define (oldtype:pages->rss-string base-url top-page pages)
+  (let ((header
+         `((url   . ,(string-append base-url (name-of top-page)))
+           (title . ,(append (car (get-text-list top-page))))
+           (desc  . ,(append (car (get-text-list top-page))))))
+        (entries
+         (map
+          (lambda (p)
+            (let1 latest-log (get-latest-log (timeline-of p))
+                  `((url   . ,(string-append base-url (name-of p)))
+                    (utc   . ,(utc-of latest-log))
+                    (title . ,(append (car (get-text-list p)))))))
+          pages)))
+    (rss-format header entries)))
+
+
+(provide "oldtype/core")

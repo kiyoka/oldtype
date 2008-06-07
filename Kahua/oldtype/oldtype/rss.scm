@@ -35,8 +35,11 @@
 
 (define-module oldtype.rss
   (use util.list)
+  (use text.tree)
   (use text.html-lite)
-  (extend oldtype))
+  (export 
+   rss-format
+   ))
 (select-module oldtype.rss)
 
 ;;
@@ -65,30 +68,32 @@
 (define (rss-format header entries)
   (let* (
          (title (assq-ref header 'title))
-         (url   (assq-ref header 'url)))
-    `("Content-type: text/xml\n\n"
-      "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
-      "<rdf:RDF
+         (url   (assq-ref header 'url))
+         (desc  (assq-ref header 'desc)))
+    (tree->string
+     `("Content-type: text/xml\n\n"
+       "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
+       "<rdf:RDF
        xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"
        xmlns=\"http://purl.org/rss/1.0/\"
        xmlns:dc=\"http://purl.org/dc/elements/1.1/\"
       >\n"
-      ,(rdf-channel
-        url
-        (rdf-title title)
-        (rdf-link  url)
-        (rdf-description desc)
-        (rdf-items-seq
-         (map (lambda (entry) (rdf-li (assq-ref entry 'title))
-              entries))))
-      ,(map (lambda (entry)
-              (let1 url (assq-ref entry 'url)
-                    (rdf-item url
-                              (rdf-title (assq-ref entry 'url))
-                              (rdf-link url)
-                              (dc-date   (assq-ref entry 'utc)))))
-            entries)
-      "</rdf:RDF>\n")))
+       ,(rdf-channel
+         url
+         (rdf-title       title)
+         (rdf-link        url)
+         (rdf-description desc)
+         (rdf-items-seq
+          (map (lambda (entry) (rdf-li (assq-ref entry 'title)))
+               entries)))
+       ,(map (lambda (entry)
+               (let1 url (assq-ref entry 'url)
+                     (rdf-item url
+                               (rdf-title (assq-ref entry 'title))
+                               (rdf-link url)
+                               (dc-date   (assq-ref entry 'utc)))))
+             entries)
+       "</rdf:RDF>\n"))))
 
 ;; NB: these should be implemented within xml framework
 (define (rdf-channel about . content)

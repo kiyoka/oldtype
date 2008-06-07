@@ -12,7 +12,7 @@
 (allow-module oldtype.parse)
 (allow-module oldtype.format)
 (allow-module oldtype.util)
-(allow-module oldtype.kahualib)
+(allow-module oldtype.core)
 (allow-module oldtype.pasttime)
 (allow-module oldtype.log)
 (allow-module oldtype.timeline)

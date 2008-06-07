@@ -41,13 +41,15 @@
   (use oldtype.log)
   (use gauche.sequence)
   (export <oldtype-timeline>
+          annotation-of
           parse
           serialize
           deserialize
           log-by-lineno
           rank-by-lineno
           text-by-lineno
-          annotation-of
+          log-by-revision
+          get-latest-log
           text-of
           ))
 (select-module oldtype.timeline)
@@ -142,7 +144,8 @@
 (define-method log-by-revision ((self <oldtype-timeline>) rev)
   (assq-ref (log-of self) rev))
 
-
+(define-method get-latest-log ((self <oldtype-timeline>))
+  (log-by-revision self (revision-of self)))
 
 ;;
 ;; result:
@@ -226,8 +229,14 @@
             ann)))
 
     ;; latest revision no
-    (set! (revision-of self) (caar (log-of self)))
-
+    (set! (revision-of self) 
+          (first
+           (reverse
+            (sort
+             (map
+              car
+              revision-alist)))))
+    
     self))
 
 

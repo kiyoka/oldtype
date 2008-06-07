@@ -55,6 +55,7 @@
           get-rank-list
           get-text
           get-text-list
+          get-rss-entry-pages
           ))
 (select-module oldtype.page)
 
@@ -124,5 +125,43 @@
 
 (define-method get-text-list ((self <oldtype-page>))
   (vector->list (text-of (timeline-of self))))
+
+
+(define-method _get-rss-lineno-list ((self <oldtype-page>))
+  (filter
+   (lambda (x)
+     x)
+   (map-with-index
+    (lambda (index str)
+      (if (and
+           (#/\[\[.+\]\]/ str)
+           (or
+            (#/^\*{1,3} / str)
+            (#/^\-{1,3} / str)
+            (#/^\#{1,3} / str)))
+          (+ index 1)
+          #f))
+    (get-text-list self))))
+
+
+(define-method get-rss-entry-pages ((self <oldtype-page>))
+  (filter
+   (lambda (x)
+     x)
+   (map
+    (lambda (lineno)
+      (let* ((m (rxmatch #/\[\[(.+)\]\]/
+                         (get-text self lineno)))
+             (wikiname
+              (if m
+                  (rxmatch-substring m 1)
+                  #f)))
+        (if m
+            (cons
+             lineno
+             wikiname)
+            #f)))
+    (_get-rss-lineno-list self))))
+
 
 (provide "oldtype/page")

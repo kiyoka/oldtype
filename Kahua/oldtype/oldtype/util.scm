@@ -272,10 +272,12 @@
     (#/^[^.]+[.][0-9]+_[0-9]+_[0-9]+/ str))
 
   (let ((valid-entries
-         (filter
-          (lambda (name)
-            (check-format name))
-          entrylist))
+         (reverse
+          (sort
+           (filter
+            (lambda (name)
+              (check-format name))
+            entrylist))))
         (ht (make-hash-table 'string=?)))
     (for-each
      (lambda (name)

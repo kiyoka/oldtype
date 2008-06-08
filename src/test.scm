@@ -280,54 +280,20 @@
               (get-rss-entry-pages oldtype-page)))
 
       (test "oldtype-page list for RSS"
-            '(
-              ("Entry1" (revision . 13304) (committer . kiyoka) (utc . 1212675369) (rank . 5))
-              ("Entry2" (revision . 13334) (committer . kiyoka) (utc . 1212756234) (rank . 4)))
+            '(("Entry1" "Entry1の1行目" ((revision . 13304) (committer . kiyoka) (utc . 1212675369) (rank . 5)))
+              ("Entry2" "Entry2の1行目" ((revision . 13334) (committer . kiyoka) (utc . 1212756234) (rank . 4))))
             (lambda ()
               (map
                (lambda (x)
                  (let* ((page (oldtype:load-page "" (cdr x)))
                         (timeline (timeline-of page)))
-                   (cons
-                    (name-of page)
-                    (serialize 
-                     (log-by-revision timeline (revision-of timeline))))))
+                   `(
+                     ,(name-of page)
+                     ,(car (get-text-list page))
+                     ,(serialize 
+                       (get-latest-log timeline)))))
                (get-rss-entry-pages oldtype-page))))
-      
-      (test "generating RSS content."
-            "Content-type: text/xml
 
-<?xml version=\"1.0\" encoding=\"utf-8\" ?>
-<rdf:RDF
-       xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"
-       xmlns=\"http://purl.org/rss/1.0/\"
-       xmlns:dc=\"http://purl.org/dc/elements/1.1/\"
-      >
-<channel rdf:about=\"http://for.example.com/Test\"><title>* UnitTest用のサンプルファイル</title>
-<link>http://for.example.com/Test</link>
-<description>* UnitTest用のサンプルファイル</description>
-<items><rdf:Seq><rdf:li rdf:resource=\"Entry1の1行目\" />
-<rdf:li rdf:resource=\"Entry2の1行目\" />
-</rdf:Seq></items>
-
-</channel>
-<item rdf:about=\"http://for.example.com/Entry1\"><title>Entry1の1行目</title>
-<link>http://for.example.com/Entry1</link>
-<dc:date>2008-06-05T14:16:09+00:00</dc:date>
-</item>
-<item rdf:about=\"http://for.example.com/Entry2\"><title>Entry2の1行目</title>
-<link>http://for.example.com/Entry2</link>
-<dc:date>2008-06-06T12:43:54+00:00</dc:date>
-</item>
-</rdf:RDF>
-"
-            (lambda ()
-              (oldtype:pages->rss-string "http://for.example.com/"
-                                         oldtype-page
-                                         (map
-                                          (lambda (x)
-                                            (oldtype:load-page "" (cdr x)))
-                                          (get-rss-entry-pages oldtype-page)))))
       (test-end)
 
       )))

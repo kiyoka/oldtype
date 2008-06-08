@@ -112,6 +112,7 @@
                       (string-append orig "\n")))
                 (get-text-list oldtype-page)))))
             ""
+            #f
             ))))
    nodeset))
 
@@ -273,12 +274,15 @@
                  (rec rest)))))))))
 
 
-(define (standard-page wikiname barcode nodes first-line)
+(define (standard-page wikiname barcode nodes first-line rss-flag)
   (html/ (head/ (title/ (string-append wikiname " / " first-line))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/import/tooltips.css"))))
+                (when/ rss-flag
+                       (link/ (@/ (rel "alternate") (type "application/rss+xml")
+                                  (href (string-append "/get-rss/" wikiname )))))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/prototype.js"))      (type "text/javascript")))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/scriptaculous.js"))  (type "text/javascript")))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/tooltips.js"))       (type "text/javascript")))
@@ -286,35 +290,39 @@
          (body/
           (@/ (onload "setup_tooltips();"))
           (div/ (@/ (class "header"))
-                (div/ (@/ (style "float: left;"))
-                      (if (eq? 'w3m (oldtype-user-agent))
-                          (div/
-                           (format " ;; (oldtype-openfile \"~a\" 1)" wikiname)
-                           (br/))
-                          (text/ ""))
-                      (oldtype:icon-image 'logo)
-                      (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
-                              (class "help")
-                              (title "Recent changes of This site"))
-                          "[RecentChanges]")
-                      (text/ " ")
-                      (a/ (@/ (href (oldtype:gen-page-path "!AllPages"))
-                              (class "help")
-                              (title "All wiki pages of This site"))
-                          "[AllPages]")
-                      (text/ " ")
-                      (span/ "(Late")
-                      (oldtype:icon-image 'new4)
-                      (oldtype:icon-image 'new3)
-                      (oldtype:icon-image 'new2)
-                      (oldtype:icon-image 'new1)
-                      (oldtype:icon-image 'new0)
-                      (span/ "Latest)")
-                      (span/ (@/ (class "forw3m"))))
-                (div/
-                 (oldtype:google-searchbox)))
+                (if (eq? 'w3m (oldtype-user-agent))
+                    (div/
+                     (format " ;; (oldtype-openfile \"~a\" 1)" wikiname)
+                     (br/))
+                    (text/ ""))
+                (oldtype:icon-image 'logo)
+                (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
+                        (class "help")
+                        (title "Recent changes of This site"))
+                    "[RecentChanges]")
+                (text/ " ")
+                (a/ (@/ (href (oldtype:gen-page-path "!AllPages"))
+                        (class "help")
+                        (title "All wiki pages of This site"))
+                    "[AllPages]")
+                (text/ " ")
+                (span/ "(Late")
+                (oldtype:icon-image 'new4)
+                (oldtype:icon-image 'new3)
+                (oldtype:icon-image 'new2)
+                (oldtype:icon-image 'new1)
+                (oldtype:icon-image 'new0)
+                (span/ "Latest)")
+                (span/ (@/ (class "forw3m"))))
           (br/)
-          (h1/ wikiname  " "  (oldtype:hatena-bookmarks wikiname))
+          (h1/
+           wikiname
+           " "
+           (a/ (@/ (href (oldtype:gen-rss-path wikiname))
+                   (class "help")
+                   (title "This is RSS feed URL"))
+               (oldtype:icon-image 'rss))
+           (oldtype:hatena-bookmarks wikiname))
           barcode
           (hr/)
           nodes
@@ -353,14 +361,55 @@
                 "This wikipage was not found."))))
          (if oldtype-page
              (oldtype-first-line oldtype-page)
-             ""))))
+             "")
+         (not (null? (get-rss-entry-pages oldtype-page))))))
 
 
 (define-entry (show-page wikiname)
   (let ((wikiname (or wikiname "index")))
     (show-page/page wikiname)))
 
-;
-; initialization
-;
+
+;; define elements for RSS 2.0
+(define-elements channel rss description lastBuildDate docs generator item pubDate)
+
+;; get-rss entry
+(define (gen-rss/ base-url index-page entry-pages)
+  (let1 wikiname (name-of index-page)
+        (rss/ (@/ (version "2.0"))
+              (channel/
+               (title/                (string-append wikiname "::" (oldtype-first-line index-page)))
+               (link/                 (string-append base-url "show-page/" wikiname))
+               (description/          (oldtype-first-line index-page))
+               (lastBuildDate/        (oldtype:utc->date-string (sys-time)))
+               (docs/                 "http://blogs.law.harvard.edu/tech/rss")
+               (generator/            (string-append "OldType version " *oldtype-version*))
+               (map/
+                (lambda (e)
+                  (item/
+                   (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
+                   (link/             (string-append base-url "show-page/" (name-of e)))
+                   (pubDate/          (oldtype:utc->date-string
+                                       (utc-of
+                                        (get-latest-log
+                                         (timeline-of e)))))))
+                entry-pages)
+               ))))
+
+(define-entry (get-rss wikiname)
+  (let1 oldtype-page (oldtype:load-page (kahua-site-root) wikiname)
+        (when/ oldtype-page
+               (gen-rss/ 
+                (format "http://~a/" (oldtype:get-arguments 'fqdn))
+                oldtype-page
+                         (filter-map
+                          (lambda (x)
+                            (oldtype:load-page (kahua-site-root) (cdr x)))
+                          (get-rss-entry-pages oldtype-page))))))
+
+
+;;
+;; initialization
+;;
 (initialize-main-proc show-page)
+(initialize-main-proc get-rss)

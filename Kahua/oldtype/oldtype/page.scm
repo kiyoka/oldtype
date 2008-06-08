@@ -150,7 +150,7 @@
      x)
    (map
     (lambda (lineno)
-      (let* ((m (rxmatch #/\[\[(.+)\]\]/
+      (let* ((m (rxmatch #/\[\[([^\]]+)\]\]/
                          (get-text self lineno)))
              (wikiname
               (if m

@@ -45,7 +45,6 @@
           oldtype:version
           oldtype:site-url
           oldtype:rank-limit
-          oldtype:otpath->wikiname
           oldtype:get-string-of-today
           oldtype:editpath
           oldtype:user-local

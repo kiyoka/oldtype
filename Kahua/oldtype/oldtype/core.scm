@@ -33,7 +33,6 @@
   (use oldtype.log)
   (use oldtype.timeline)
   (use oldtype.page)
-  (use oldtype.rss)
   (export 
    oldtype:load-page
    oldtype:pages->rss-string
@@ -60,28 +59,6 @@
                  (make <oldtype-page>)
                  (read (current-input-port)))))
             #f)))
-
-
-;;
-;; args:
-;;   ( <oldtype-page> <oldtype-page> <oldtype-page> ... )
-;; return:
-;;   rss content string
-;:
-(define (oldtype:pages->rss-string base-url top-page pages)
-  (let ((header
-         `((url   . ,(string-append base-url (name-of top-page)))
-           (title . ,(append (car (get-text-list top-page))))
-           (desc  . ,(append (car (get-text-list top-page))))))
-        (entries
-         (map
-          (lambda (p)
-            (let1 latest-log (get-latest-log (timeline-of p))
-                  `((url   . ,(string-append base-url (name-of p)))
-                    (utc   . ,(utc-of latest-log))
-                    (title . ,(append (car (get-text-list p)))))))
-          pages)))
-    (rss-format header entries)))
 
 
 (provide "oldtype/core")

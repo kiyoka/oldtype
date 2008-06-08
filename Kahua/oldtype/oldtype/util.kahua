@@ -223,6 +223,9 @@
     ((cancel)
      (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.cancel_round.png"))
                (alt "[X]") (class "icon"))))
+    ((rss)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.rss.png"))
+               (alt "RSS") (class "icon"))))
     (else
      `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
     
@@ -338,6 +341,10 @@
 (define (oldtype:gen-page-path wikiname)
   (string-append
    "/show-page/" wikiname))
+
+(define (oldtype:gen-rss-path wikiname)
+  (string-append
+   "/get-rss/" wikiname))
 
 (define (oldtype:expand-wiki-name name)
   (let1 url-name

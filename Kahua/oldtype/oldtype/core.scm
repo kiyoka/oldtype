@@ -35,7 +35,6 @@
   (use oldtype.page)
   (export 
    oldtype:load-page
-   oldtype:pages->rss-string
    ))
 (select-module oldtype.core)
 

@@ -50,6 +50,7 @@
           text-by-lineno
           log-by-revision
           get-latest-log
+          get-latest-lines
           text-of
           ))
 (select-module oldtype.timeline)
@@ -58,20 +59,23 @@
 (define-class <oldtype-timeline> ()
   (;; Customization parameters -----------------------
    ;; page name (utf-8)
-   (name        :accessor name-of        :init-keyword :name
-                :init-value "none")
+   (name          :accessor name-of          :init-keyword :name
+                  :init-value "none")
    ;; latest revision no
-   (revision    :accessor revision-of    :init-keyword :revision
-                :init-value 0)
+   (revision      :accessor revision-of      :init-keyword :revision
+                  :init-value 0)
    ;; (REVISION . <oldtype-log>) alist in page ( sorted by REVISION order by newer )
-   (log         :accessor log-of         :init-keyword :log
-                :init-value '())
+   (log            :accessor log-of          :init-keyword :log
+                  :init-value '())
    ;; vector of <oldtype-log> in page
-   (annotation  :accessor annotation-of  :init-keyword :annotation
-                :init-value '())
+   (annotation    :accessor annotation-of    :init-keyword :annotation
+                  :init-value '())
    ;; vector of text in page
-   (text        :accessor text-of        :init-keyword :text
-                :init-value '())
+   (text          :accessor text-of          :init-keyword :text
+                  :init-value '())
+   ;; distribution of revision
+   (distribution  :accessor distribution-of  :init-keyword :distribution
+                  :init-value '())
    ))
 
 ;;=================================================
@@ -146,6 +150,10 @@
 
 (define-method get-latest-log ((self <oldtype-timeline>))
   (log-by-revision self (revision-of self)))
+
+(define-method get-latest-lines ((self <oldtype-timeline>))
+  (assq-ref (distribution-of self)
+            (revision-of self)))
 
 ;;
 ;; result:
@@ -236,7 +244,17 @@
              (map
               car
               revision-alist)))))
-    
+
+    ;; distribution of revision
+    (set! (distribution-of self)
+          (let1 ht (make-hash-table 'eq?)
+                (map-with-index
+                 (lambda (index a-list)
+                   (let1 rev (assq-ref a-list 'revision)
+                         (hash-table-push! ht rev (+ 1 index))))
+                 ann)
+                (hash-table->alist ht)))
+
     self))
 
 
@@ -252,7 +270,8 @@
     (annotation . ,(map
                     serialize
                     (vector->list (annotation-of self))))
-    (text       . ,(vector->list (text-of self)))))
+    (text       . ,(vector->list (text-of self)))
+    (distribution . ,(distribution-of self))))
 
 
 
@@ -275,7 +294,8 @@
                     (deserialize (make <oldtype-log>) x))
                   (assq-ref sexp 'annotation)))
     :text       (list->vector
-                 (assq-ref sexp 'text))))
+                 (assq-ref sexp 'text))
+    :distribution (assq-ref sexp 'distribution)))
 
 
 ;; access <oldtype-log> by lineno

@@ -104,7 +104,11 @@
                        ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3))
                        ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3))
                        ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3)))
-                      (text "* UnitTest用のサンプルファイル" "----" "*** start" "*** [[Entry1]]" "*** [[Entry2]]" "*** end"))
+                      (text "* UnitTest用のサンプルファイル" "----" "*** start" "*** [[Entry1]]" "*** [[Entry2]]" "*** end")
+                      (distribution
+                       (8208 1)
+                       (13317 6 5 4 3)
+                       (13304 2)))
                     (lambda () (serialize deserialized)))
               (test "serialized == deserialized" serialized (lambda () (serialize deserialized)))))
 
@@ -195,7 +199,11 @@
                                ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3))
                                ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3))
                                ((revision . 13317) (committer . kiyoka) (utc . 1212711085) (rank . 3)))
-                              (text "* UnitTest用のサンプルファイル" "----" "*** start" "*** [[Entry1]]" "*** [[Entry2]]" "*** end")))
+                              (text "* UnitTest用のサンプルファイル" "----" "*** start" "*** [[Entry1]]" "*** [[Entry2]]" "*** end")
+                              (distribution
+                               (8208 1)
+                               (13317 6 5 4 3)
+                               (13304 2))))
                   (lambda () (serialize oldtype-page)))
 
             (test "serialized == deserialized" serialized (lambda () 
@@ -294,6 +302,11 @@
                        (get-latest-log timeline)))))
                (get-rss-entry-pages oldtype-page))))
 
+      (test "lines of latest revision in Test.ot"
+            '(6 5 4 3)
+            (lambda ()
+              (get-latest-lines oldtype-timeline)))
+            
       (test-end)
 
       )))

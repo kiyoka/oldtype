@@ -44,20 +44,22 @@
     (string-append _site-root "/tmp/oldtype/_out/" wikiname ".sexp"))
   (define (gen-sexp-filename2)
     (string-append "./" wikiname ".sexp"))
-  (let1 filename (cond
-                  ((file-exists? (gen-sexp-filename1))
-                   (gen-sexp-filename1))
-                  ((file-exists? (gen-sexp-filename2))
-                   (gen-sexp-filename2))
-                  (else
-                   #f))
-        (if filename
-            (with-input-from-file filename
-              (lambda ()
-                (deserialize
-                 (make <oldtype-page>)
-                 (read (current-input-port)))))
-            #f)))
+  (if (not wikiname)
+      #f
+      (let1 filename (cond
+                      ((file-exists? (gen-sexp-filename1))
+                       (gen-sexp-filename1))
+                      ((file-exists? (gen-sexp-filename2))
+                       (gen-sexp-filename2))
+                      (else
+                       #f))
+            (if filename
+                (with-input-from-file filename
+                  (lambda ()
+                    (deserialize
+                     (make <oldtype-page>)
+                     (read (current-input-port)))))
+                #f))))
 
 
 (provide "oldtype/core")

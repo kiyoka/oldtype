@@ -20,6 +20,7 @@
 (use util.list)
 (use util.match)
 (use gauche.sequence)
+(use rfc.uri)
 
 (define page-template
   (kahua:make-xml-template
@@ -362,7 +363,9 @@
          (if oldtype-page
              (oldtype-first-line oldtype-page)
              "")
-         (not (null? (get-rss-entry-pages oldtype-page))))))
+         (if oldtype-page
+             (get-rss-entry-pages oldtype-page)
+             #f))))
 
 
 (define-entry (show-page wikiname)
@@ -375,26 +378,39 @@
 
 ;; get-rss entry
 (define (gen-rss/ base-url index-page entry-pages)
-  (let1 wikiname (name-of index-page)
-        (rss/ (@/ (version "2.0"))
-              (channel/
-               (title/                (string-append wikiname "::" (oldtype-first-line index-page)))
-               (link/                 (string-append base-url "show-page/" wikiname))
-               (description/          (oldtype-first-line index-page))
-               (lastBuildDate/        (oldtype:utc->date-string (sys-time)))
-               (docs/                 "http://blogs.law.harvard.edu/tech/rss")
-               (generator/            (string-append "OldType version " *oldtype-version*))
-               (map/
-                (lambda (e)
-                  (item/
-                   (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
-                   (link/             (string-append base-url "show-page/" (name-of e)))
-                   (pubDate/          (oldtype:utc->date-string
-                                       (utc-of
-                                        (get-latest-log
-                                         (timeline-of e)))))))
-                entry-pages)
-               ))))
+  (let ((wikiname       (name-of index-page))
+        (build-date-utc (last
+                         (sort
+                          (map
+                           (lambda (e)
+                             (utc-of
+                              (get-latest-log
+                               (timeline-of e))))
+                           entry-pages)))))
+    (rss/ (@/ (version "2.0"))
+          (channel/
+           (title/                (string-append wikiname "::" (oldtype-first-line index-page)))
+           (link/                 (string-append base-url "show-page/" wikiname))
+           (description/          (oldtype-first-line index-page))
+           (lastBuildDate/        (oldtype:utc->date-string build-date-utc))
+           (docs/                 "http://blogs.law.harvard.edu/tech/rss")
+           (generator/            (string-append "OldType version " *oldtype-version*))
+           (map/
+            (lambda (e)
+              (let* ((timeline (timeline-of e))
+                     (lineno   (- (last (get-latest-lines timeline)) 5)))
+                (item/
+                 (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
+                 (link/             (string-append base-url "show-page/" (uri-encode-string (name-of e))
+                                                   (if (< 1 lineno)
+                                                       (string-append "#" (number->string lineno))
+                                                       "")))
+                 (pubDate/          (oldtype:utc->date-string
+                                     (utc-of
+                                      (get-latest-log timeline)))))))
+            entry-pages)
+           ))))
+
 
 (define-entry (get-rss wikiname)
   (let1 oldtype-page (oldtype:load-page (kahua-site-root) wikiname)
@@ -412,4 +428,4 @@
 ;; initialization
 ;;
 (initialize-main-proc show-page)
-(initialize-main-proc get-rss)
+

@@ -53,6 +53,7 @@
           oldtype:parse-svninfo
           oldtype:date-string->date-alist
           oldtype:utc->date-string
+          oldtype:utc->RFC822-date-string
           oldtype:utc->ago-string
           oldtype:grouping-blog-entries
           pretty-print-sexp))
@@ -239,6 +240,13 @@
                 utc))
             (string-append (date->string d "~Y-~m-~d ~H:~M (~z)")))
       "*NoDateInformation*"))
+
+;;
+;; Convert utc seconds to "2008-03-20T18:36:00+00:00" RFC822
+;;
+(define (oldtype:utc->RFC822-date-string utc)
+  (sys-strftime "%Y-%m-%dT%H:%M:%S+00:00" (sys-gmtime utc)))
+
 
 ;;
 ;; Convert utc seconds to "    (10 seconds ago)"

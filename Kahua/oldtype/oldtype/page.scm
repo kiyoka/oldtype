@@ -33,6 +33,7 @@
 ;;
 
 (define-module oldtype.page
+  (use srfi-1)
   (use util.list)
   (use oldtype.log)
   (use oldtype.timeline)
@@ -145,23 +146,19 @@
 
 
 (define-method get-rss-entry-pages ((self <oldtype-page>))
-  (filter
-   (lambda (x)
-     x)
-   (map
-    (lambda (lineno)
-      (let* ((m (rxmatch #/\[\[([^\]]+)\]\]/
-                         (get-text self lineno)))
-             (wikiname
-              (if m
-                  (rxmatch-substring m 1)
-                  #f)))
-        (if m
-            (cons
-             lineno
-             wikiname)
-            #f)))
-    (_get-rss-lineno-list self))))
+  (filter-map
+   (lambda (lineno)
+     (let* ((m (rxmatch #/\[\[([^\]|]+)\]\]/ (get-text self lineno)))
+            (wikiname
+             (if m
+                 (rxmatch-substring m 1)
+                 #f)))
+       (if m
+           (cons
+            lineno
+            wikiname)
+           #f)))
+   (_get-rss-lineno-list self)))
 
 
 (provide "oldtype/page")

@@ -306,7 +306,13 @@
             '(6 5 4 3)
             (lambda ()
               (get-latest-lines oldtype-timeline)))
-            
+
+      (test "The page that doesn't have RSS data."
+            '()
+            (lambda ()
+              (get-rss-entry-pages 
+               (oldtype:load-page "" "Entry1"))))
+
       (test-end)
 
       )))

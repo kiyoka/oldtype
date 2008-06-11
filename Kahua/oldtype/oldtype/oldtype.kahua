@@ -369,7 +369,7 @@
 
 
 ;; define elements for RSS 2.0
-(define-elements channel rss description lastBuildDate docs generator item pubDate)
+(define-elements channel rss description lastBuildDate docs generator item pubDate author)
 
 ;; get-rss entry
 (define (gen-rss/ base-url index-page entry-pages)
@@ -399,13 +399,15 @@
                      (lineno   (- (last (get-latest-lines timeline)) 5)))
                 (item/
                  (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
+                 (description/      (oldtype-first-line e))
                  (link/             (string-append base-url "show-page/" (uri-encode-string (name-of e))
                                                    (if (< 1 lineno)
                                                        (string-append "#" (number->string lineno))
                                                        "")))
                  (pubDate/          (oldtype:utc->RFC822-date-string
                                      (utc-of
-                                      (get-latest-log timeline)))))))
+                                      (get-latest-log timeline))))
+                 (author/           (committer-of (get-latest-log timeline))))))
             entry-pages)
            ))))
 

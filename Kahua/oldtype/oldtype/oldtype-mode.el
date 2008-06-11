@@ -28,6 +28,9 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.5]
+;;     1. Fixed bug: [return] key breaks japanese input method UI.
+;;
 ;;   [0.0.4]
 ;;     1. Added image displaying feature for ##(amazon  asincode)  command.
 ;;     2. Added image displaying feature for ##(youtube videocode) command.
@@ -749,7 +752,6 @@ Buffer string between BEG and END are replaced with URL."
   (local-set-key "\C-c\C-c" 'oldtype-fix-wysiwyg-object)
   (local-set-key "\C-c,"    'oldtype-fix-wysiwyg-object)
   (local-set-key "\C-cl"    'oldtype-insert-images)
-  (local-set-key [return]   'oldtype-open-alink)
   (local-set-key "\C-m"     'oldtype-open-alink)
   (local-set-key "\C-ca"    'oldtype-open-allpages)
   (local-set-key "\C-c/"    'oldtype-grep)

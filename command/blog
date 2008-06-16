@@ -64,9 +64,8 @@
        (output-blog (string-append ot-blog "." year_month ".ot")
                     (cons
                      ot-blog-header
-                     entries))))
+                     (reverse entries)))))
    (oldtype:grouping-blog-entries
     (ot-blog-entrylist)))
 
   (exit 0))
-

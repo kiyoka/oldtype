@@ -157,10 +157,11 @@
          (display   (oldtype:sxml->html expanded-sxml input-file))))
       ('plain
        (let* (
-              (tree           (oldtype:format-line-plainly converted-str)))
-         (for-each
-          print
-          tree)))
+              (sxml           (oldtype-parse input-port))
+              (sexp           (oldtype:oldtype-page->plain-text sxml)))
+         (print
+          (tree->string
+           sexp))))
       (else
        (cerr (format "Unsupported type. [~a]" (symbol->string type)))
        (exit 1))))

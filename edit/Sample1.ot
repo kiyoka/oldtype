@@ -1,0 +1,62 @@
+* OldType Wiki書式サンプル
+
+** WikiName
+[[Sample2]]は存在するページです。
+[[存在しないページ]]です。
+
+** 外部リンク
+[[http://www.sumibi.org/|Sumibi.org ローマ字を日本語に変換できる無料サイト]]
+[http://www.sumibi.org/ Sumibi.org]へのリンク
+http://www.sumibi.org/
+http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg
+
+** 見出し
+
+* 1番目
+** 2番目
+*** 3番目
+
+** リスト
+
+- 1番目
+-- 2番目
+--- 3番目
+
+** 番号付きリスト
+
+# 1番目
+## 2番目
+### 3番目
+
+** パラグラフ
+行頭から開始します。
+
+** 整形済みテキスト
+ 行頭にスペースが1文字入っています。
+
+** 整形済みテキスト(ターミナルやプログラムコード用)
+!行頭に ! が1文字入っています。
+
+** 水平線
+----
+
+** 画像の埋め込み
+##(img ../img/kiyoka.sasami_face48.png)
+
+##(img http://farm2.static.flickr.com/1041/611353730_691b8e1771_m.jpg)
+
+** Webサイトのサムネイル埋め込み
+##(thumb http://www.google.co.jp/)
+
+** YouTube動画の埋め込み
+##(youtube ysEVYwa-vHM) iPhoneのようなマルチタッチインターフェースの研究者ジェフ・ハン氏のデモ動画。
+
+** Amazon書籍画像の埋め込み
+##(amazon 4873113482)  Amazon.co.jp： プログラミングGauche: Kahuaプロジェクト,川合 史朗: 本
+
+** TODO,DONEアイコンの埋め込み
+!##(todo)
+##(todo)
+!##(done)
+##(done)
+

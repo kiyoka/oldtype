@@ -51,8 +51,8 @@
   (export oldtype:sxml->internal
           oldtype:expand-page
           oldtype:format-line-plainly
-          )
-  )
+          oldtype:oldtype-page->plain-text
+  ))
 (select-module oldtype.format)
 
 
@@ -64,6 +64,95 @@
 ;; Passes a list of heading string stack.
 (define (oldtype:calculate-heading-id headings)
   (string-append "H-" (number->string (hash headings) 36)))
+
+
+(define (oldtype:wikiname->plain wikiname)
+  (let1 m (#/[|](.+)/ wikiname)
+        (if m
+            (rxmatch-substring m 1)
+            wikiname)))
+
+(define (oldtype:wiki-macro->plain expr)
+  (let ((command (car expr))
+        (arg  ;; symbol list to string list.
+         (map
+          (lambda (x)
+            (if (number? x)
+                (number->string x)
+                (symbol->string x)))
+          (cdr expr)))
+        (len (length (cdr expr))))
+    (case command
+      ((img)        "[img] ")
+      ((todo)       "[TODO] ")
+      ((done)       "[DONE] ")
+      ((youtube)    "[YouTube] ")
+      ((thumb)
+       (if (< 0 len)
+           (let1 _url (car arg)
+                 (string-append "[Thumb " _url "] "))
+           "!!Error : No argument ##(thumb URL) command"))
+      ((amazon)
+       (if (< 0 len)
+           (let* ((_asin (car arg))
+                  (_asin (if (#/^[0-9]+$/ _asin)
+                             (format "~10,,,'0@a" _asin)
+                             _asin)))
+             (if (#/^[0-9a-zA-Z]+$/ _asin)
+                 (format "[Amazon ~a] " _asin)
+                 (format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin)))
+           "!!Error : No argument ##(amazon URL) command"))
+      ;; timestamp
+      ((timestamp)   "[timestamp] ")
+      ;; since
+      ((since)       "[since] ")
+      ;; download link oldtype-mode.el source code
+      ((download-el) "[Download oldtype-mode.el now]")
+      (else
+       (format "!!Error : no such macro \"~a\"!!" command)))))
+
+
+(define (oldtype:oldtype-page->plain-text sxmls)
+  (let rec
+      ((sxmls sxmls))
+    (match sxmls
+           (()  '())
+           (((and (name . _) sxml) . rest) ;; generic node
+            (let1 arg (cdr sxml)
+                  (cons
+                   (case name
+                     ((div)
+                      (let* ((param (car arg)) ;; param is assoc-list
+                             (lineno (assq-ref param 'lineno)))
+                        (rec (cdr arg))))
+                     ((a)
+                      (let1 param (car arg) ;; param is assoc-list
+                            (rec (cdr arg))))
+                     ((p-normal)    (rec arg))
+                     ((pre-quote)   (rec arg))
+                     ((pre-verb)    (rec arg))
+                     ((pre-ul1)     (cons "- "     (rec arg)))
+                     ((pre-ul2)     (cons "-- "    (rec arg)))
+                     ((pre-ul3)     (cons "--- "   (rec arg)))
+                     ((pre-ol1)     (cons "# "     (rec arg)))
+                     ((pre-ol2)     (cons "## "    (rec arg)))
+                     ((pre-ol3)     (cons "### "   (rec arg)))
+                     ((h1)          (cons "[] "    (rec (cdr arg))))
+                     ((h2)          (cons "* "     (rec (cdr arg))))
+                     ((h3)          (cons "** "    (rec (cdr arg))))
+                     ((h4)          (cons "*** "   (rec (cdr arg))))
+                     ((h5)          (cons "**** "  (rec (cdr arg))))
+                     ((h6)          (cons "***** " (rec (cdr arg))))
+                     ((wiki-macro)  (oldtype:wiki-macro->plain arg))
+                     ((wiki-name)   (oldtype:wikiname->plain (car arg)))
+                     ((hr)          (list "----\n"))
+                     (else
+                      (format "!!Error : no such tag \"~a\"!!" name)))
+                   (rec rest))))
+           ((other . rest)
+            (cons other (rec rest))))))
+
+
 
 ;; utility : strips wiki markup and returns a plaintext line.
 (define (oldtype:format-line-plainly line)

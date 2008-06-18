@@ -180,10 +180,6 @@
               ((string-null? line)               '(null))
               ((string=? "----" line)            '(hr))
               ((string-prefix? "!" line)         `(open-single-verb . ,line))
-              ((string=? "{{{" line)             '(open-verb))
-              ((string=? "<<<" line)             '(open-quote))
-              ((and (string=? ">>>" line)
-                    (memq 'blockquote ctx))      '(close-quote))
               ((string-prefix? " " line)         `(pre . ,line))
               ((rxmatch #/^(\*{1,}) / line)      => (cut cons 'heading <>))
               ((rxmatch #/^(-) / line)           => (cut cons 'ul1 <>))
@@ -211,7 +207,7 @@
     (let loop ((tok tok) (seed seed) (p '()))
       (case (token-type tok)
         ((eof)  (reverse! seed))
-        ((null) (block (next-token ctx) ctx seed))
+        ((null) (block (next-token ctx) ctx (cons `(div (@@ (lineno ,line-no)) (p-normal "\n")) seed)))
         ((hr)   (block (next-token ctx) ctx (cons `(div (@@ (lineno ,line-no)) (hr)) seed)))
         ((open-single-verb)
          (single-verb tok ctx (>> block ctx seed)))
@@ -242,7 +238,8 @@
           `(div (@@ (lineno ,line-no))
                 (pre-verb 
                  ,@(expand-tab 
-                    (string-drop (token-value tok) 1))))))
+                    (string-drop (token-value tok) 1))
+                 "\n"))))
 
   ;; Verbatim
   (define (verb ctx cont)
@@ -443,21 +440,10 @@
               (r    '()))
       (cond ((eof-object? line)
              (if (null? r) line (string-concatenate-reverse r)))
-            (verbatim
-             (when (string=? "}}}" line) (set! verbatim #f))
-             line)
-            ((string-prefix? ";;" line)
-             (rec (getline) r))
-            ((string=? "{{{" line)
-             (if (null? r)
-               (begin (set! verbatim #t) line)
-               (begin (ungetline line) (string-concatenate-reverse r))))
-            ((string-prefix? "~" line)
-             (rec (getline) (cons (string-drop line 1) r)))
             (else
              (if (null? r)
-               (rec (getline) (cons line r))
-               (begin (ungetline line) (string-concatenate-reverse r))))
+                 (rec (getline) (cons line r))
+                 (begin (ungetline line) (string-concatenate-reverse r))))
             )))
   )
 

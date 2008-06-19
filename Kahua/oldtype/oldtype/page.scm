@@ -73,6 +73,9 @@
    ;; <oldtype-timeline> in page 
    (timeline    :accessor timeline-of    :init-keyword :timeline
                 :init-value '())
+   ;; vector of text in page
+   (plain       :accessor plain-of       :init-keyword :plain
+                :init-value '())
    ))
 
 
@@ -83,6 +86,11 @@
   (set! (sxml-of self)
         (oldtype:sxml->internal
          (oldtype-parse wiki-port)))
+  (set! (plain-of self)
+        (list->vector
+         (string-split 
+          (oldtype:sxml->plain-text (sxml-of self))
+          #\newline)))
   self)
 
 
@@ -90,15 +98,17 @@
   `(
     (name     . ,(name-of     self))
     (sxml     . ,(sxml-of     self))
-    (timeline . ,(serialize (timeline-of self)))))
-
+    (timeline . ,(serialize (timeline-of self)))
+    (plain    . ,(vector->list (plain-of self)))))
+                  
 
 (define-method deserialize ((dummy <oldtype-page>) internal-data)
   (make <oldtype-page>
     :name      (assq-ref internal-data 'name)
     :sxml      (assq-ref internal-data 'sxml)
-    :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))))
-  
+    :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))
+    :plain     (list->vector (assq-ref internal-data 'plain))))
+
 
 (define-method get-revision ((self <oldtype-page>) lineno)
   (revision-of (log-by-lineno (timeline-of self) lineno)))

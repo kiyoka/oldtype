@@ -158,7 +158,7 @@
       ('plain
        (let* (
               (sxml           (oldtype-parse input-port))
-              (sexp           (oldtype:oldtype-page->plain-text sxml)))
+              (sexp           (oldtype:sxml->plain-text sxml)))
          (print
           (tree->string
            sexp))))

@@ -51,8 +51,8 @@
   (export oldtype:sxml->internal
           oldtype:expand-page
           oldtype:format-line-plainly
-          oldtype:oldtype-page->plain-text
-  ))
+          oldtype:sxml->plain-text
+          ))
 (select-module oldtype.format)
 
 
@@ -112,45 +112,46 @@
        (format "!!Error : no such macro \"~a\"!!" command)))))
 
 
-(define (oldtype:oldtype-page->plain-text sxmls)
-  (let rec
-      ((sxmls sxmls))
-    (match sxmls
-           (()  '())
-           (((and (name . _) sxml) . rest) ;; generic node
-            (let1 arg (cdr sxml)
-                  (cons
-                   (case name
-                     ((div)
-                      (let* ((param (car arg)) ;; param is assoc-list
-                             (lineno (assq-ref param 'lineno)))
-                        (rec (cdr arg))))
-                     ((a)
-                      (let1 param (car arg) ;; param is assoc-list
-                            (rec (cdr arg))))
-                     ((p-normal)    (rec arg))
-                     ((pre-quote)   (rec arg))
-                     ((pre-verb)    (rec arg))
-                     ((pre-ul1)     (cons "- "     (rec arg)))
-                     ((pre-ul2)     (cons "-- "    (rec arg)))
-                     ((pre-ul3)     (cons "--- "   (rec arg)))
-                     ((pre-ol1)     (cons "# "     (rec arg)))
-                     ((pre-ol2)     (cons "## "    (rec arg)))
-                     ((pre-ol3)     (cons "### "   (rec arg)))
-                     ((h1)          (cons "[] "    (rec (cdr arg))))
-                     ((h2)          (cons "* "     (rec (cdr arg))))
-                     ((h3)          (cons "** "    (rec (cdr arg))))
-                     ((h4)          (cons "*** "   (rec (cdr arg))))
-                     ((h5)          (cons "**** "  (rec (cdr arg))))
-                     ((h6)          (cons "***** " (rec (cdr arg))))
-                     ((wiki-macro)  (oldtype:wiki-macro->plain arg))
-                     ((wiki-name)   (oldtype:wikiname->plain (car arg)))
-                     ((hr)          (list "----\n"))
-                     (else
-                      (format "!!Error : no such tag \"~a\"!!" name)))
-                   (rec rest))))
-           ((other . rest)
-            (cons other (rec rest))))))
+(define (oldtype:sxml->plain-text sxmls)
+  (tree->string
+   (let rec
+       ((sxmls sxmls))
+     (match sxmls
+            (()  '())
+            (((and (name . _) sxml) . rest) ;; generic node
+             (let1 arg (cdr sxml)
+                   (cons
+                    (case name
+                      ((div)
+                       (let* ((param (car arg)) ;; param is assoc-list
+                              (lineno (assq-ref param 'lineno)))
+                         (rec (cdr arg))))
+                      ((a)
+                       (let1 param (car arg) ;; param is assoc-list
+                             (rec (cdr arg))))
+                      ((p-normal)    (rec arg))
+                      ((pre-quote)   (rec arg))
+                      ((pre-verb)    (rec arg))
+                      ((pre-ul1)     (cons "- "     (rec arg)))
+                      ((pre-ul2)     (cons "-- "    (rec arg)))
+                      ((pre-ul3)     (cons "--- "   (rec arg)))
+                      ((pre-ol1)     (cons "# "     (rec arg)))
+                      ((pre-ol2)     (cons "## "    (rec arg)))
+                      ((pre-ol3)     (cons "### "   (rec arg)))
+                      ((h1)          (cons "[] "    (rec (cdr arg))))
+                      ((h2)          (cons "* "     (rec (cdr arg))))
+                      ((h3)          (cons "** "    (rec (cdr arg))))
+                      ((h4)          (cons "*** "   (rec (cdr arg))))
+                      ((h5)          (cons "**** "  (rec (cdr arg))))
+                      ((h6)          (cons "***** " (rec (cdr arg))))
+                      ((wiki-macro)  (oldtype:wiki-macro->plain arg))
+                      ((wiki-name)   (oldtype:wikiname->plain (car arg)))
+                      ((hr)          (list "----\n"))
+                      (else
+                       (format "!!Error : no such tag \"~a\"!!" name)))
+                    (rec rest))))
+            ((other . rest)
+             (cons other (rec rest)))))))
 
 
 

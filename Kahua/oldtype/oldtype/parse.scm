@@ -207,7 +207,7 @@
     (let loop ((tok tok) (seed seed) (p '()))
       (case (token-type tok)
         ((eof)  (reverse! seed))
-        ((null) (block (next-token ctx) ctx (cons `(div (@@ (lineno ,line-no)) (p-normal "\n")) seed)))
+        ((null) (block (next-token ctx) ctx (cons `(div (@@ (lineno ,line-no)) (p-normal " \n")) seed)))
         ((hr)   (block (next-token ctx) ctx (cons `(div (@@ (lineno ,line-no)) (hr)) seed)))
         ((open-single-verb)
          (single-verb tok ctx (>> block ctx seed)))

@@ -56,6 +56,7 @@
           get-rank-list
           get-text
           get-text-list
+          get-plain-list
           get-rss-entry-pages
           ))
 (select-module oldtype.page)
@@ -136,6 +137,9 @@
 
 (define-method get-text-list ((self <oldtype-page>))
   (vector->list (text-of (timeline-of self))))
+
+(define-method get-plain-list ((self <oldtype-page>))
+  (vector->list (plain-of self)))
 
 
 (define-method _get-rss-lineno-list ((self <oldtype-page>))

@@ -98,10 +98,7 @@
                (td/ (get-text oldtype-page lineno)))
               (tr/
                (td/ "lineno")
-               (td/ lineno))
-              (tr/
-               (td/ "EmacsLisp")
-               (td/ (format ";; (oldtype-openfile \"~a\" ~a)" (name-of oldtype-page) lineno))))
+               (td/ lineno)))
              (h2/ "Information of This Page.")
              (pre/
               (node-set
@@ -113,6 +110,7 @@
                       (string-append orig "\n")))
                 (get-text-list oldtype-page)))))
             ""
+            lineno
             ))))
    nodeset))
 
@@ -274,7 +272,7 @@
                  (rec rest)))))))))
 
 
-(define (standard-page wikiname barcode nodes first-line)
+(define (standard-page wikiname barcode nodes first-line . rest-arg)
   (html/ (head/ (title/ (string-append wikiname " / " first-line))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
@@ -291,7 +289,9 @@
           (div/ (@/ (class "header"))
                 (if (eq? 'w3m (oldtype-user-agent))
                     (div/
-                     (format " ;; (oldtype-openfile \"~a\" 1)" wikiname)
+                     (format " ;; (oldtype-openfile \"~a\" ~d)" wikiname (if (not (null? rest-arg))
+                                                                             (car rest-arg)
+                                                                             1))
                      (br/))
                     (text/ ""))
                 (oldtype:icon-image 'logo)
@@ -314,14 +314,17 @@
                 (span/ "Latest)")
                 (span/ (@/ (class "forw3m"))))
           (br/)
-          (h1/
-           wikiname
-           " "
-           (a/ (@/ (href (oldtype:gen-rss-path wikiname))
-                   (class "help")
-                   (title "This is RSS feed URL"))
-               (oldtype:icon-image 'rss))
-           (oldtype:hatena-bookmarks wikiname))
+          (h1/ wikiname
+               " "
+               (a/ (@/ (href (oldtype:gen-rss-path wikiname))
+                       (class "help")
+                       (title "This is RSS feed URL"))
+                   (oldtype:icon-image 'rss))
+               (a/ (@/ (href (oldtype:gen-plain-path wikiname))
+                       (class "help")
+                       (title "PLAIN TEXT"))
+                   (oldtype:icon-image 'plain))
+               (oldtype:hatena-bookmarks wikiname))
           barcode
           (hr/)
           nodes
@@ -340,7 +343,7 @@
       (not (or
             (#/^[ ]*$/ x)
             (#/^[ ]*##/ x))))
-    (get-text-list oldtype-page))))
+    (get-plain-list oldtype-page))))
 
 
 (define (show-page/page wikiname)
@@ -366,6 +369,19 @@
 (define-entry (show-page wikiname)
   (let ((wikiname (or wikiname "index")))
     (show-page/page wikiname)))
+
+
+(define-entry (show-plain wikiname)
+  (let* ((wikiname (or wikiname "index"))
+         (oldtype-page (oldtype:load-page (kahua-site-root) wikiname)))
+    (html/
+     (head/
+      (title/ (string-append wikiname)))
+     (body/
+      (pre/
+       (string-join
+        (get-plain-list oldtype-page)
+        "\n"))))))
 
 
 ;; define elements for RSS 2.0
@@ -399,7 +415,7 @@
                      (lineno   (- (last (get-latest-lines timeline)) 5)))
                 (item/
                  (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
-                 (description/      (oldtype-first-line e))
+                 (description/      (string-join (get-plain-list e) "<br>"))
                  (link/             (string-append base-url "show-page/" (uri-encode-string (name-of e))
                                                    (if (< 1 lineno)
                                                        (string-append "#" (number->string lineno))

@@ -1,7 +1,7 @@
 ;;;
-;;; oldtype/format.scm - format wiki pages (backward compatibility module)
+;;; oldtype/util.scm - util for OldType
 ;;;
-;;;  Copyright (c) 2003-2006 Shiro Kawai, All rights reserved.
+;;;  Copyright (c) 2008 Kiyoka Nishiyama, All rights reserved.
 ;;;
 ;;;  Permission is hereby granted, free of charge, to any person
 ;;;  obtaining a copy of this software and associated documentation
@@ -24,10 +24,6 @@
 ;;;  IN THE SOFTWARE.
 ;;;
 ;;; $Id: util.scm 199 2008-01-13 11:16:43Z kiyoka $
-;;;
-;;; Modified by kiyoka to implement OldType wiki formatter.
-;;; I renamed namespace of wiliki- 'oldtype-' to avoid collision of
-;;; installation.
 ;;;
 
 (define-module oldtype.util

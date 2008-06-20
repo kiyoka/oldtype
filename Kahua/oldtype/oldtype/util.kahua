@@ -225,7 +225,10 @@
                (alt "[X]") (class "icon"))))
     ((rss)
      (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.rss.png"))
-               (alt "RSS") (class "icon"))))
+               (alt "RSS"))))
+    ((plain)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.article_text.png"))
+               (alt "PLAIN"))))
     (else
      `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
     
@@ -345,6 +348,10 @@
 (define (oldtype:gen-rss-path wikiname)
   (string-append
    "/get-rss/" wikiname))
+
+(define (oldtype:gen-plain-path wikiname)
+  (string-append
+   "/show-plain/" wikiname))
 
 (define (oldtype:expand-wiki-name name)
   (let1 url-name

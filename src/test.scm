@@ -35,7 +35,7 @@
 	  (open-input-string converted-str)))
     (let ((oldtype-page #f)
           (oldtype-timeline #f)
-          (loaded        #?=(with-input-from-file "Test.sexp.master"
+          (loaded        (with-input-from-file "Test.sexp.master"
                            (lambda ()
                              (read)))))
 
@@ -76,11 +76,11 @@
               (serialize (log-by-lineno oldtype-timeline 1))))
 
       (test "ago string of lineno 1 <oldtype-timeline>"
-            "  (2 months ago)" 
+            "  (3 months ago)" 
             (lambda ()
               (get-ago (log-by-lineno oldtype-timeline 1))))
       (test "ago string of lineno 1 <oldtype-page>"
-            "  (2 months ago)"
+            "  (3 months ago)"
             (lambda ()
               (get-ago oldtype-page 1)))
       
@@ -104,7 +104,7 @@
 
       (test "date,ago,rank,committer of lineno 1 <oldtype-page>"
             '((date  . "2008-03-20 21:36 (+0900)")
-              (ago   . "  (2 months ago)")
+              (ago   . "  (3 months ago)")
               (rank  . 5)
               (committer . "kiyoka"))
             (lambda ()

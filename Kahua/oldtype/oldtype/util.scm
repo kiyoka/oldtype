@@ -238,11 +238,10 @@
       "*NoDateInformation*"))
 
 ;;
-;; Convert utc seconds to "2008-03-20T18:36:00+00:00" RFC822
+;; Convert utc seconds to RFC822 like "20 Mar 2008 18:36:00 +0000"
 ;;
 (define (oldtype:utc->RFC822-date-string utc)
-  (sys-strftime "%Y-%m-%dT%H:%M:%S+00:00" (sys-gmtime utc)))
-
+  (sys-strftime "%d %b %Y %H:%M:%S +0000" (sys-gmtime utc)))
 
 ;;
 ;; Convert utc seconds to "    (10 seconds ago)"

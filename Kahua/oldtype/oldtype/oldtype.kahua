@@ -385,7 +385,7 @@
 
 
 ;; define elements for RSS 2.0
-(define-elements channel rss description lastBuildDate docs generator item pubDate author)
+(define-elements channel rss description lastBuildDate docs generator item pubDate author guid atom:link)
 
 ;; get-rss entry
 (define (gen-rss/ base-url index-page entry-pages)
@@ -401,8 +401,13 @@
                                (get-latest-log
                                 (timeline-of e))))
                             entry-pages)))))
-    (rss/ (@/ (version "2.0"))
+    (rss/ (@/ (version "2.0")
+              (xmlns:atom "http://www.w3.org/2005/Atom"))
           (channel/
+           (atom:link/
+            (@/ (href (string-append base-url "get-rss/" wikiname))
+                (rel  "self")
+                (type "application/rss+xml")))
            (title/                (string-append wikiname "::" (oldtype-first-line index-page)))
            (link/                 (string-append base-url "show-page/" wikiname))
            (description/          (oldtype-first-line index-page))
@@ -412,18 +417,21 @@
            (map/
             (lambda (e)
               (let* ((timeline (timeline-of e))
-                     (lineno   (- (last (get-latest-lines timeline)) 5)))
+                     (lineno   (- (last (get-latest-lines timeline)) 5))
+                     (uri      
+                      (string-append base-url "show-page/" (uri-encode-string (name-of e))
+                                     (if (< 1 lineno)
+                                         (string-append "#" (number->string lineno))
+                                         ""))))
                 (item/
                  (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
-                 (description/      (string-join (get-plain-list e) "<br>"))
-                 (link/             (string-append base-url "show-page/" (uri-encode-string (name-of e))
-                                                   (if (< 1 lineno)
-                                                       (string-append "#" (number->string lineno))
-                                                       "")))
+                 (description/      (string-join (get-plain-list e) "\n"))
+                 (link/             uri)
+                 (guid/             uri)
                  (pubDate/          (oldtype:utc->RFC822-date-string
                                      (utc-of
                                       (get-latest-log timeline))))
-                 (author/           (committer-of (get-latest-log timeline))))))
+                 (author/       (committer-of (get-latest-log timeline))))))
             entry-pages)
            ))))
 
@@ -434,10 +442,10 @@
                (gen-rss/ 
                 (format "http://~a/" (oldtype:get-arguments 'fqdn))
                 oldtype-page
-                         (filter-map
-                          (lambda (x)
-                            (oldtype:load-page (kahua-site-root) (cdr x)))
-                          (get-rss-entry-pages oldtype-page))))))
+                (filter-map
+                 (lambda (x)
+                   (oldtype:load-page (kahua-site-root) (cdr x)))
+                 (get-rss-entry-pages oldtype-page))))))
 
 
 ;;

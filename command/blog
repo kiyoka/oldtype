@@ -31,10 +31,10 @@
              (when (#/[.][0-9]+/ filename)
                (begin
                  (display "----") (newline)
-                 (display 
-                  (string-append "* [[" (oldtype:otpath->wikiname filename) "]]"))
                  (newline)
-                 (newline)))
+                 (newline)
+                 (display 
+                  (string-append "* [[" (oldtype:otpath->wikiname filename) "]]"))))
              (for-each print (port->string-list (current-input-port))))))
        entrylist))))
 

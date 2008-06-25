@@ -343,6 +343,7 @@
    (filter
     (lambda (x)
       (not (or
+            (#/^----*$/ x)
             (#/^[ ]*$/ x)
             (#/^[ ]*##/ x))))
     (get-plain-list oldtype-page))))

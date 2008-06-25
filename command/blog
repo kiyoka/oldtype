@@ -29,9 +29,12 @@
          (with-input-from-file (string-append (oldtype:editpath) "/" filename)
            (lambda ()
              (when (#/[.][0-9]+/ filename)
-               (display "----") (newline)
-               (display 
-                (string-append "* [[" (oldtype:otpath->wikiname filename) "]]")))
+               (begin
+                 (display "----") (newline)
+                 (display 
+                  (string-append "* [[" (oldtype:otpath->wikiname filename) "]]"))
+                 (newline)
+                 (newline)))
              (for-each print (port->string-list (current-input-port))))))
        entrylist))))
 

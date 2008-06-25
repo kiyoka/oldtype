@@ -393,14 +393,17 @@
          (entry-pages    (if (null? entry-pages)
                              (list index-page)
                              entry-pages))
-         (build-date-utc (last
-                          (sort
-                           (map
-                            (lambda (e)
-                              (utc-of
-                               (get-latest-log
-                                (timeline-of e))))
-                            entry-pages)))))
+         (build-date-utc
+          (last
+           (sort
+            (map
+             (lambda (e)
+               (utc-of
+                (get-latest-log
+                 (timeline-of e))))
+             entry-pages))))
+         (build-date-utc
+          (- build-date-utc (* 60 5))))  ;; build date is 5 minutes ago from latest entry
     (rss/ (@/ (version "2.0")
               (xmlns:atom "http://www.w3.org/2005/Atom"))
           (channel/

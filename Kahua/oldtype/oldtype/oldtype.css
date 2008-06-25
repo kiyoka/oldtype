@@ -203,12 +203,12 @@ hr {
 	border-color: #8888bb;
 	border-style: dotted none none none;
 	border-width: thin;
-	height: 0px;
+	height: 1em;
 	width:  60em;
 }
 
 div.footer {
-	padding-top: 0.5em;
+	padding-top: 1.5em;
 	border-color: #8888bb;
 	border-style: dotted none none none;
 	border-width: 1px;

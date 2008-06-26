@@ -200,11 +200,13 @@ ul li {
 }
 
 hr {
+	margin-left: 0;
+	text-align: left;
 	border-color: #8888bb;
 	border-style: dotted none none none;
 	border-width: thin;
 	height: 1em;
-	width:  60em;
+	width:  80%;
 }
 
 div.footer {
@@ -631,9 +633,6 @@ pre.ol3 {
 }
 
 
-hr {
-	clear: both;
-}
 
 
 /*

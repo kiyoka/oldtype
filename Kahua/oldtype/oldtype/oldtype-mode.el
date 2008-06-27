@@ -676,7 +676,7 @@ Buffer string between BEG and END are replaced with URL."
 		  (insert "#(")
 		(insert "##("))
 	      (insert str)
-xo	      (insert end)
+	      (insert end)
 	      (goto-char pos))))
 	 ((equal ?< (char-after (point)))
 	  (if (oldtype-get-image (point))

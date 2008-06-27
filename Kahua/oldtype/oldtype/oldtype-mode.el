@@ -28,6 +28,10 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.6]
+;;     1. Improved URL to [URL|TITLE] conversion feature.  ( C-c C-c key )
+;;        oldtype-mode.el fetches remote title page and insert TITLE.
+;;
 ;;   [0.0.5]
 ;;     1. Fixed bug: [return] key breaks japanese input method UI.
 ;;
@@ -598,6 +602,30 @@ Buffer string between BEG and END are replaced with URL."
     (if (not found)
 	(newline))))
 
+
+;;
+;; [fetch command]
+;;   w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 URL
+;;       | awk '-F<' '/title_alt/ { print $2; }' | tail -1 | awk '-F"' '{ print $2; }'
+;;
+(defun oldtype-fetch-html-title (url)
+  (cond 
+   ((string-match "http://" url)
+    (with-temp-buffer
+      (shell-command 
+       (concat
+	(format "w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'%s\' |" url)
+	"awk \'-F\<\' \'/title_alt/ { print $2; }\' |"
+	"tail -1 |"
+	"awk \'-F\"\' \'{ print $2; }\'")
+       (current-buffer))
+      (replace-string "[" "<" nil (point-min) (point-max))
+      (replace-string "]" ">" nil (point-min) (point-max))
+      (buffer-substring-no-properties (point-min) (point-max))))
+   (t
+    "No Title")))
+
+
 (defun oldtype-mode-hookfunc ()
 
   (defun oldtype-fix-wysiwyg-object ()
@@ -648,7 +676,7 @@ Buffer string between BEG and END are replaced with URL."
 		  (insert "#(")
 		(insert "##("))
 	      (insert str)
-	      (insert end)
+xo	      (insert end)
 	      (goto-char pos))))
 	 ((equal ?< (char-after (point)))
 	  (if (oldtype-get-image (point))
@@ -672,36 +700,33 @@ Buffer string between BEG and END are replaced with URL."
 	  (re-search-forward             _url_amazon-pattern (point-at-eol) t)
 	  (let* ((asin  (match-string 2))
 		 (url   (match-string 0))
-		 (title (if (boundp 'w3m-version)
-			    (or (w3m-arrived-title url)
-				"NoTitle")
-			  "NoTitle")))
-	    (delete-region (match-beginning 1) (match-end 3))
-	    (goto-char (match-beginning 1))
+		 (s     (match-beginning 1))
+		 (e     (match-end 3))
+		 (title (oldtype-fetch-html-title url)))
+	    (delete-region s e)
+	    (goto-char s)
 	    (insert (format "##(amazon %s)  %s" asin title))))
 	 ;; http://www.youtube.com/watch ...  youtube-command
 	 ((string-match      (concat "^" _url_youtube-pattern) str)
 	  (re-search-forward             _url_youtube-pattern (point-at-eol) t)
 	  (let* ((video (match-string 2))
 		 (url   (match-string 0))
-		 (title (if (boundp 'w3m-version)
-			    (or (w3m-arrived-title url)
-				"NoTitle")
-			  "NoTitle")))
-	    (delete-region (match-beginning 1) (match-end 3))
-	    (goto-char (match-beginning 1))
+		 (s     (match-beginning 1))
+		 (e     (match-end 3))
+		 (title (oldtype-fetch-html-title url)))
+	    (delete-region s e)
+	    (goto-char s)
 	    (insert (format "##(youtube %s)  %s" video title))))
 	 ;; http://host/path/of/contents... anchor-keyword
 	 ((string-match      (concat "^" _url_file-pattern) str)
 	  (re-search-forward             _url_file-pattern (point-at-eol) t)
-	  (if (boundp 'w3m-version)
-	      (let* ((url   (match-string 1))
-		     (title (or (w3m-arrived-title url)
-				"NoTitle")))
-		(delete-region (match-beginning 1) (match-end 1))
-		(goto-char (match-beginning 1))
-		(insert (format "[[%s|%s]]" url title)))
-	    (message "OldType: Please install emacs-w3m.")))
+	  (let* ((url   (match-string 1))
+		 (s     (match-beginning 1))
+		 (e     (match-end 1))
+		 (title (oldtype-fetch-html-title url)))
+	    (delete-region s e)
+	    (goto-char s)
+	    (insert (format "[[%s|%s]]" url title))))
 	 (t
 	  (message "OldType: Please move cursor to [[URL|Name]]  or [[WikiName]] *.png  or  ##(... )  keywword.' "))))))
 

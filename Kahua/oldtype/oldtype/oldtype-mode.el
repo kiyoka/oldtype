@@ -617,7 +617,7 @@ Buffer string between BEG and END are replaced with URL."
 	(format "w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'%s\' |" url)
 	"awk \'-F\<\' \'/title_alt/ { print $2; }\' |"
 	"tail -1 |"
-	"awk \'-F\"\' \'{ print $2; }\'")
+	"awk \'-F\"\' \'{ printf(\"%s\", $2); }\'")
        (current-buffer))
       (replace-string "[" "<" nil (point-min) (point-max))
       (replace-string "]" ">" nil (point-min) (point-max))

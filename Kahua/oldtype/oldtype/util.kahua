@@ -333,6 +333,20 @@
       ((download-el)
        (a/ (@/ (href (string-append (oldtype:static-base-path) "oldtype-mode.el")))
            "[Download oldtype-mode.el now]"))
+
+      ;; input comment
+      ((comment)
+       (form/ (@/ (action "."))
+              (table/
+               (tr/ (th/ "Name:")
+                    (td/ (input/
+                          (@/ (type "text") (value "") (size 20)))))
+               (tr/ (th/ "Comment:")
+                    (td/ (input/
+                          (@/ (type "text") (value "") (size 120)))))
+               (tr/ (th/ "")
+                    (td/ (input/ (@/ (type "submit") (value "Add"))))))))
+                    
       (else
        `(p/ ,(format "!!Error : no such macro \"~a\"!!" command))))))
 

@@ -338,14 +338,16 @@
       ((comment)
        (form/ (@/ (action "."))
               (table/
-               (tr/ (th/ "Name:")
-                    (td/ (input/
-                          (@/ (type "text") (value "") (size 20)))))
-               (tr/ (th/ "Comment:")
-                    (td/ (input/
-                          (@/ (type "text") (value "") (size 120)))))
-               (tr/ (th/ "")
-                    (td/ (input/ (@/ (type "submit") (value "Add"))))))))
+               (tr/ (th/ "Post a comment"))
+               (tr/ (td/
+                     "Name:"
+                     (input/
+                      (@/ (type "text") (value "") (size 20)))))
+               (tr/ (td/
+                     (textarea/
+                      (@/ (cols 120) (rows 3)))))
+               (tr/ (td/
+                     (input/ (@/ (type "submit") (value "Submit comment"))))))))
                     
       (else
        `(p/ ,(format "!!Error : no such macro \"~a\"!!" command))))))

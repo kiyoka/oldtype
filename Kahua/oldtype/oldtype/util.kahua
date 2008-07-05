@@ -348,7 +348,11 @@
                       (@/ (cols 120) (rows 3)))))
                (tr/ (td/
                      (input/ (@/ (type "submit") (value "Submit comment"))))))))
-                    
+
+      ;; no listing to !RecentChanges
+      ((nolist)
+       (p/ ""))
+
       (else
        `(p/ ,(format "!!Error : no such macro \"~a\"!!" command))))))
 

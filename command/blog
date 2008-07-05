@@ -21,7 +21,7 @@
                            (oldtype:user-local)
                            "[.]([0-9]+)")))))
 
-(define (output-blog save-filename entrylist)
+(define (output-blog save-filename entrylist appendix)
   (with-output-to-file save-filename
     (lambda ()
       (for-each
@@ -36,7 +36,9 @@
                  (display 
                   (string-append "* [[" (oldtype:otpath->wikiname filename) "]]"))))
              (for-each print (port->string-list (current-input-port))))))
-       entrylist))))
+       entrylist)
+      (display appendix)
+      (newline))))
 
 
 (define (output-blog-list save-filename entrylist)
@@ -57,7 +59,8 @@
   (output-blog (string-append ot-blog ".ot")
                (cons
                 ot-blog-header
-                (take (ot-blog-entrylist) ot-new-entry-limit)))
+                (take (ot-blog-entrylist) ot-new-entry-limit))
+               "")
   (output-blog-list (string-append ot-blog ".list.ot")
                     (ot-blog-entrylist))
   (for-each
@@ -67,7 +70,8 @@
        (output-blog (string-append ot-blog "." year_month ".ot")
                     (cons
                      ot-blog-header
-                     (reverse entries)))))
+                     (reverse entries))
+                    "##(nolist)")))
    (oldtype:grouping-blog-entries
     (ot-blog-entrylist)))
 

@@ -19,7 +19,11 @@ do
   if [ "" != "${line}" ] ; then
       eval ${line}
       name=`basename ${name} .ot`
-      echo "- ##(timestamp ${commit_utc}) ##(since ${commit_utc}): [[${name}]] by ([[${commit_author}]])"
+      if `grep '##(nolist)' ${OT_EDITHOME}/edit/${name}.ot > /dev/null` ; then
+        status=0
+      else
+        echo "- ##(timestamp ${commit_utc}) ##(since ${commit_utc}): [[${name}]] by ([[${commit_author}]])"
+      fi
   fi
 done | sort -r | head -${DISPLAY_LINES} >> ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
 if [ -s ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp ]; then

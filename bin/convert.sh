@@ -51,7 +51,7 @@ function convert_p() {
   if [ "0" = $generated ] ; then
     diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
 #    echo diffs : ${diffs}
-    [ "0" != "${diffs}" ]
+    [ "0" != "${diffs}" -o ! -f ../_out/${base}.sexp ]
     status=$?
 #    echo status : ${status}
   else 

@@ -29,10 +29,10 @@ fi
 
 function task () {
   ${OT_HOME}/bin/update.sh &&
-  ${OT_HOME}/bin/convert.sh &&
   ${OT_HOME}/bin/ot_AllPages &&
   ${OT_HOME}/bin/ot_RecentChanges &&
   ${OT_HOME}/command/blog &&
+  ${OT_HOME}/bin/convert.sh &&
   ${OT_HOME}/bin/add.sh &&
   ${OT_HOME}/bin/commit.sh
   #run-parts ${OT_HOME}/hook

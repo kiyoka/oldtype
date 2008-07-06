@@ -43,12 +43,31 @@ do
   _oldtype_to internal "${base}.ot" ../_out/${base}.sexp
 done
 
+function convert_p() {
+  base=$1
+  echo "file is ${base}.ot"
+  echo ${base} | grep "!" > /dev/null
+  generated=$?
+  if [ "0" = $generated ] ; then
+    diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
+#    echo diffs : ${diffs}
+    [ "0" != "${diffs}" ]
+    status=$?
+#    echo status : ${status}
+  else 
+    [ "${base}.ot" -nt ../_out/${base}.sexp ]
+    status=$?
+#    echo status : ${status}
+  fi
+  return $status
+}
+
+
 for f in $filelist;
 do
   base=`basename ${f} .ot`
-  diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
-  ###echo "${base}.ot : diffs=${diffs}"
-  if [ "${base}.ot" -nt ../_out/${base}.sexp -o "0" != "${diffs}" ] ; then
+  convert_p ${base}
+  if [ "0" = "$?" ] ; then
       echo "[" ${base} "]"
       _svn t ann "${f}@HEAD" > ../_tmp/tmp.ann
       if [ "$?" != "0" ] ; then

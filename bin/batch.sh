@@ -36,7 +36,9 @@ function task () {
   ${OT_HOME}/bin/add.sh &&
   ${OT_HOME}/bin/commit.sh
   #run-parts ${OT_HOME}/hook
+  echo -n [info] sleep...
   sleep 5
+  echo wakeup
 }
 
 while :

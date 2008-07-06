@@ -46,7 +46,9 @@ done
 for f in $filelist;
 do
   base=`basename ${f} .ot`
-  if [ "${base}.ot" -nt ../_out/${base}.sexp ] ; then
+  diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
+  ###echo "${base}.ot : diffs=${diffs}"
+  if [ "${base}.ot" -nt ../_out/${base}.sexp -o "0" != "${diffs}" ] ; then
       echo "[" ${base} "]"
       _svn t ann "${f}@HEAD" > ../_tmp/tmp.ann
       if [ "$?" != "0" ] ; then

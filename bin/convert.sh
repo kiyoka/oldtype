@@ -45,7 +45,7 @@ done
 
 function convert_p() {
   base=$1
-  echo "file is ${base}.ot"
+# echo "file is ${base}.ot"
   echo ${base} | grep "!" > /dev/null
   generated=$?
   if [ "0" = $generated ] ; then

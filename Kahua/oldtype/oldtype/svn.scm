@@ -35,7 +35,6 @@
   (use text.parse)
   (use file.util)
   (use util.list)
-  (use oldtype.pasttime)
   (use gauche.process)
   (export init
           <svn-work>

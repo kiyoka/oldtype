@@ -69,10 +69,10 @@
                   :init-value '())
    ;; vector of <oldtype-log> in page
    (annotation    :accessor annotation-of    :init-keyword :annotation
-                  :init-value '())
+                  :init-value '#())
    ;; vector of text in page
    (text          :accessor text-of          :init-keyword :text
-                  :init-value '())
+                  :init-value '#())
    ;; distribution of revision
    (distribution  :accessor distribution-of  :init-keyword :distribution
                   :init-value '())

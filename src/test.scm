@@ -35,11 +35,16 @@
 	 (input-port
 	  (open-input-string converted-str)))
     (let ((oldtype-page #f)
+          (oldtype-page-no-timeline #f)
           (oldtype-timeline #f)
-          (loaded        (with-input-from-file "Test.sexp.master"
-                           (lambda ()
-                             (read)))))
-
+          (loaded
+           (with-input-from-file "Test.sexp.master"
+             (lambda ()
+               (read))))
+          (loaded-no-timeline
+           (with-input-from-file "Test.no-timeline.sexp.master"
+             (lambda ()
+               (read)))))
       (test-start "serialize,deserialize")
 
       (test-section "oldtype-timeline")
@@ -53,17 +58,25 @@
               (test "serialized == deserialized" serialized (lambda () (serialize deserialized)))))
 
       (test-section "oldtype-page")
-      (set! oldtype-page (parse (make <oldtype-page> :name "Test") input-port log-file ann-file))
+      (set! oldtype-page
+            (parse (make <oldtype-page> :name "Test") input-port log-file ann-file))
+      (port-seek input-port 0)
+      (set! oldtype-page-no-timeline
+            (parse (make <oldtype-page> :name "Test") input-port #f #f))
+
       (let1 serialized     (serialize oldtype-page)
-            (test "serialized == DATA        "
+            (test "serialized == DATA (1)  "
                   loaded
                   (lambda () (serialize oldtype-page)))
-
+            
             (test "serialized == deserialized" serialized (lambda () 
                                                             (serialize
                                                              (deserialize
                                                               (make <oldtype-page>)
-                                                              serialized)))))
+                                                              serialized))))
+            (test "serialized == DATA (2)  "
+                  loaded-no-timeline
+                  (lambda () (serialize oldtype-page-no-timeline))))
       (test-end)
 
 
@@ -186,16 +199,16 @@
             (test "status of wikiname (some changes)"
                   "M"
                   (lambda ()
-                    (sys-system (format "echo 'a' >> ~a/~a/~a" (get-fullpath work) "edit" "_kiyoka.ot"))
-                    (car (status work "_kiyoka"))))
-
+                    (sys-system (format "echo 'a' >> ~a/~a/~a" (get-fullpath work) "edit" "test.ot"))
+                    (car (status work "test"))))
+            
             (when
                 #f
               (test "commit from work"
                     #t
                     (lambda ()
                       (commit work)))))
-
+      
       (test-end)
       
       )))

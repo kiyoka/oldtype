@@ -81,10 +81,16 @@
    ))
 
 
+;; Parsing wiki format
+;;
+;;   In case of log-file or ann-file is #f, this function takes only parse action.
+;;
 (define-method parse ((self <oldtype-page>) wiki-port log-file ann-file)
   (let1 timeline (make <oldtype-timeline> :name (name-of self))
         (set! (timeline-of self)
-              (parse timeline log-file ann-file)))
+              (if (and log-file ann-file)
+                  (parse timeline log-file ann-file)
+                  timeline)))
   (set! (sxml-of self)
         (oldtype:sxml->internal
          (oldtype-parse wiki-port)))

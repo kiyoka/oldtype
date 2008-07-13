@@ -17,4 +17,5 @@
 (allow-module oldtype.log)
 (allow-module oldtype.timeline)
 (allow-module oldtype.page)
+(allow-module oldtype.svn)
 (allow-module rfc.uri)

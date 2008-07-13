@@ -12,6 +12,7 @@
 (use oldtype.timeline)
 (use oldtype.page)
 (use oldtype.core)
+(use oldtype.svn)
 (use gauche.test)                                                     
 (use util.list)
 
@@ -167,4 +168,34 @@
 
       (test-end)
 
+      (test-start "svn commit")
+
+      (let1 work
+            (make <svn-work> :url "http://genkan.sumibi.org/svn/newtype" :user "anonymous" :pass "anonymous" :basepath "/Users/kiyoka/work/tmp")
+            
+            (test "Initialize svn work directory"
+                  #t
+                  (lambda ()
+                    (string? (init work "123"))))
+
+            (test "status of wikiname (no changes)"
+                  #f
+                  (lambda ()
+                    (status work "_kiyoka")))
+
+            (test "status of wikiname (some changes)"
+                  "M"
+                  (lambda ()
+                    (sys-system (format "echo 'a' >> ~a/~a/~a" (get-fullpath work) "edit" "_kiyoka.ot"))
+                    (car (status work "_kiyoka"))))
+
+            (when
+                #f
+              (test "commit from work"
+                    #t
+                    (lambda ()
+                      (commit work)))))
+
+      (test-end)
+      
       )))

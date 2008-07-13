@@ -37,7 +37,11 @@
   (use util.list)
   (use gauche.process)
   (export init
+          commit
+          status
+          get-fullpath
           <svn-work>
+          ))
 (select-module oldtype.svn)
 
 
@@ -64,24 +68,46 @@
 
 (define-method init ((self <svn-work>) session-id)
   (set! (path-of self) session-id)
+  ;; /bin/rm if already exist
+  (call-with-input-process
+   (format "/bin/rm -rf ~a" (get-fullpath self))
+   (lambda (p)
+     (display (port->string p))))
   ;; mkdir 
   (make-directory* (get-fullpath self))
   ;; checkout
-  (co self))
+  (_co self))
 
 
-(define-method co ((self <svn-work>))
+
+(define-method _co ((self <svn-work>))
   (call-with-input-process
    (format "cd ~a ; svn co --no-auth-cache --username ~a --password ~a ~a/edit"
            (get-fullpath self)
            (user-of self) (pass-of self)
            (url-of self))
    (lambda (p)
-     (display (port->string p)))))
+     (let1 str (port->string-list p)
+           (display (port->string p))
+           (last str)))))
 
 
 (define-method get-fullpath ((self <svn-work>))
   (string-append (basepath-of self) "/" (path-of self)))
+
+
+(define-method status ((self <svn-work>) wikiname)
+  (call-with-input-process
+   (format "cd ~a ; svn status --non-interactive --no-auth-cache --username ~a --password ~a edit/~a"
+           (get-fullpath self)
+           (user-of self) (pass-of self)
+           (string-append wikiname ".ot"))
+   (lambda (p)
+     (let1 str (port->string p)
+           (display str)
+           (if (string= "" str)
+               #f
+               (string-split str #/[ ]+/))))))
 
 
 (define-method commit ((self <svn-work>))
@@ -90,8 +116,8 @@
            (get-fullpath self)
            (user-of self) (pass-of self))
    (lambda (p)
-     (display (port->string p)))))
-
+     (display (port->string p))))
+  #t)
 
 
 (provide "oldtype/svn")

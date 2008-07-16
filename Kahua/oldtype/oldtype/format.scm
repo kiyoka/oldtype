@@ -108,8 +108,16 @@
       ((since)       "[since] ")
       ;; download link oldtype-mode.el source code
       ((download-el) "[Download oldtype-mode.el now]")
+      ;; comment-data
+      ((comment-data)
+       (if (< 1 len)
+           (string-append (format "----< ~a >----" (uri-decode-string (car arg)))
+                          "\n"
+                          (uri-decode-string (cadr arg)))
+           (format "!!Error : comment-data format error for ##(comment-data user string) command")))
+      ;; else
       (else
-       (format "!!Error : no such macro \"~a\"!!" command)))))
+       (format "[~a]" command)))))
 
 
 (define (oldtype:sxml->plain-text sxmls)

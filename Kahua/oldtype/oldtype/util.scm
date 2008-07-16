@@ -43,6 +43,7 @@
           oldtype:rank-limit
           oldtype:get-string-of-today
           oldtype:editpath
+          oldtype:workpath
           oldtype:user-local
           oldtype:user-backend
           oldtype:get-pagelist
@@ -83,6 +84,11 @@
   (string-append
    (sys-getenv "OT_SITE")
    "/tmp/oldtype/edit"))
+
+(define (oldtype:workpath)
+  (string-append
+   (sys-getenv "OT_SITE")
+   "/tmp/work"))
 
 (define (oldtype:user-local)
   (sys-getenv "OT_USER_LOCAL"))

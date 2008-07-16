@@ -37,7 +37,7 @@ function task () {
   ${OT_HOME}/bin/commit.sh
   #run-parts ${OT_HOME}/hook
   echo -n [info] sleep...
-  sleep 5
+  sleep 1
   echo wakeup
 }
 

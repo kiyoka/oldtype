@@ -229,11 +229,34 @@
     ((plain)
      (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.article_text.png"))
                (alt "PLAIN"))))
+    ((comment)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.comment_blue.png"))
+               (alt "COMMENT"))))
+    ((double-comment)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.double_comment.png"))
+               (alt "DCOMMENT"))))
+    ((alert)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.stop_round.png"))
+               (alt "ALERT"))))
     (else
      `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
-    
 
-(define (oldtype:format-macro expr)
+
+(define (oldtype:add-comment oldtype-page name comment)
+  (apply append
+         (map
+          (lambda (str)
+            (if (#/##\(comment\)/ str)
+                `(
+                  ,(format "##(comment-data ~a ~a)"
+                           (uri-encode-string name)
+                           (uri-encode-string comment))
+                  ,str)
+                `(,str)))
+          (get-text-list oldtype-page))))
+
+
+(define (oldtype:format-macro expr oldtype-page)
   (let ((command (car expr))
         (arg  ;; symbol list to string list.
          (map
@@ -336,18 +359,70 @@
 
       ;; input comment
       ((comment)
-       (form/ (@/ (action "."))
-              (table/
-               (tr/ (th/ "Post a comment"))
-               (tr/ (td/
-                     "Name:"
-                     (input/
-                      (@/ (type "text") (value "") (size 20)))))
-               (tr/ (td/
-                     (textarea/
-                      (@/ (cols 120) (rows 3)))))
-               (tr/ (td/
-                     (input/ (@/ (type "submit") (value "Submit comment"))))))))
+       (form/cont/
+        (@@/ (cont
+              (entry-lambda (:keyword name comment)
+                (let1 nodes 
+                      (p/
+                       (oldtype:icon-image 'alert)
+                       "Error: commit action missed.")
+                      (if (or (> 1 (string-length name))
+                              (> 1 (string-length comment)))
+                          (set! nodes (p/
+                                       (oldtype:icon-image 'alert)
+                                       "Please input name and comment."))
+                          (let1 work (make <svn-work>
+                                       :url      (oldtype:get-arguments 'svn)
+                                       :user     (oldtype:get-arguments 'anon-user)
+                                       :pass     (oldtype:get-arguments 'anon-pass)
+                                       :basepath (oldtype:workpath))
+                                (init work (string-append
+                                            (number->string (sys-time))
+                                            "."
+                                            (number->string (random-integer 100))))
+                                (save-text-list work (name-of oldtype-page)
+                                                (oldtype:add-comment oldtype-page name comment))
+                                (let1 result (status work (name-of oldtype-page))
+                                      (when (string=? "M" (car result))
+                                        (begin
+                                          (commit work)
+                                          (set! nodes
+                                                (p/
+                                                 (oldtype:icon-image 'info)
+                                                 "Thank you! Your comment was registered.")))))))
+                      (standard-page
+                       (name-of oldtype-page)
+                       (br/)
+                       (div/
+                        nodes
+                        (p/ "Back to " (oldtype:expand-wiki-name (name-of oldtype-page))))
+                       ""
+                       1)))))
+        (table/ (@/ (class "comment"))
+                (tr/ (th/
+                      (oldtype:icon-image 'double-comment)
+                      "Post a comment"))
+                (tr/ (td/
+                      "Name:"
+                      (input/
+                       (@/ (type "text") (name "name") (value "") (size 20)))))
+                (tr/ (td/
+                      (textarea/
+                       (@/ (cols 120) (rows 3) (name "comment")))))
+                (tr/ (td/
+                      (input/ (@/ (type "submit") (value "Submit comment"))))))))
+      
+      ;; display comment
+      ((comment-data)
+       (if (> 2 len)
+           (p/ "!!Error : No argument ##(comment-data user str) command")
+           (table/ (@/ (class "comment"))
+                   (tr/ (th/
+                         (oldtype:icon-image 'comment)
+                         (uri-decode-string (car arg))))
+                   (tr/ (td/
+                         (pre/ (@/ (class "comment"))
+                               (uri-decode-string (cadr arg))))))))
 
       ;; no listing to !RecentChanges
       ((nolist)

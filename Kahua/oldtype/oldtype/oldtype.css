@@ -680,3 +680,15 @@ strong.notice {
     background-color: #3875d7;
     color: white;
 }
+
+pre.comment {
+	margin-left:	0.5em;
+	font-size:      medium;
+	padding-left:   0.5em;
+	margin-top:     1px;
+	margin-bottom:  1px;
+}
+
+table.comment {
+        width: 70%;
+}

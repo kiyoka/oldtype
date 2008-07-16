@@ -40,6 +40,7 @@
           commit
           status
           get-fullpath
+          save-text-list
           <svn-work>
           ))
 (select-module oldtype.svn)
@@ -106,7 +107,7 @@
      (let1 str (port->string p)
            (display str)
            (if (string= "" str)
-               #f
+               '("" "")
                (string-split str #/[ ]+/))))))
 
 
@@ -118,6 +119,16 @@
    (lambda (p)
      (display (port->string p))))
   #t)
+
+
+(define-method save-text-list ((self <svn-work>) wikiname text-list)
+  (with-output-to-file (format "~a/edit/~a.ot" (get-fullpath self) wikiname)
+    (lambda ()
+      (for-each
+       (lambda (str)
+         (display str)
+         (newline))
+       text-list))))
 
 
 (provide "oldtype/svn")

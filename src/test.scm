@@ -189,21 +189,23 @@
             (test "Initialize svn work directory"
                   #t
                   (lambda ()
-                    (string? (init work "123"))))
+                    (string? (init work (number->string (sys-time))))))
 
             (test "status of wikiname (no changes)"
-                  #f
+                  '("" "")
                   (lambda ()
                     (status work "_kiyoka")))
 
             (test "status of wikiname (some changes)"
                   "M"
                   (lambda ()
-                    (sys-system (format "echo 'a' >> ~a/~a/~a" (get-fullpath work) "edit" "test.ot"))
+                    (save-text-list work
+                                    "test"
+                                    '("UnitTest用ページ。" "----" "##(comment)"))
                     (car (status work "test"))))
             
             (when
-                #f
+                #t
               (test "commit from work"
                     #t
                     (lambda ()

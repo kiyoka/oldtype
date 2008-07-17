@@ -691,4 +691,5 @@ pre.comment {
 
 table.comment {
         width: 70%;
+	text-align: left;
 }

@@ -389,7 +389,7 @@
                                           (set! nodes
                                                 (p/
                                                  (oldtype:icon-image 'info)
-                                                 "Thank you! Your comment was registered.")))))))
+                                                 "Thank you! Your comment was registered. Please wait 3 minutes and back.")))))))
                       (standard-page
                        (name-of oldtype-page)
                        (br/)

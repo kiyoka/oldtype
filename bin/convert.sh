@@ -48,11 +48,15 @@ function convert_p() {
 # echo "file is ${base}.ot"
   echo ${base} | grep "!" > /dev/null
   generated=$?
-  if [ "0" = $generated ] ; then
+  if [ "0" = "$generated" ] ; then
     diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
 #    echo diffs : ${diffs}
     [ "0" != "${diffs}" -o ! -f ../_out/${base}.sexp ]
     status=$?
+
+    ## TODO: fix me ( Must implement !xxxxx.ot contents converttion check )
+    status=0
+
 #    echo status : ${status}
   else 
     [ "${base}.ot" -nt ../_out/${base}.sexp ]

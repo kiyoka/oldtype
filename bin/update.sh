@@ -29,6 +29,13 @@ cd        ${OT_EDITHOME}
 
 popd
 
-echo "[[info]] revision[$prev]=>[$curr]"
-[ "$prev" != "$curr" ]
-exit $?
+if [ "$1" = "1" ] ; then
+  echo "[[info]] force update"
+  # force option
+  status=0
+else
+  echo "[[info]] revision[$prev]=>[$curr]"
+  [ "$prev" != "$curr" ]
+  status=$?
+fi
+exit $status

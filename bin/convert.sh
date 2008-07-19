@@ -14,6 +14,7 @@ _oldtype_to() {
 
     if [ "$?" = "0" ] ; then
 	/bin/mv -f ../_out/${base}.sexp.tmp ../_out/${base}.sexp
+        /bin/cp -f ${src} ../_out/${base}.ot
     else
 	exit $?
     fi
@@ -45,23 +46,16 @@ done
 
 function convert_p() {
   base=$1
-# echo "file is ${base}.ot"
-  echo ${base} | grep "!" > /dev/null
-  generated=$?
-  if [ "0" = "$generated" ] ; then
-    diffs=`_svn t diff ${base}.ot | wc -l | awk '{ print $1; }'`
-#    echo diffs : ${diffs}
-    [ "0" != "${diffs}" -o ! -f ../_out/${base}.sexp ]
-    status=$?
-
-    ## TODO: fix me ( Must implement !xxxxx.ot contents converttion check )
+  status=1
+  if [ ! -f "../_out/${base}.ot" ] ; then
+    # doesn't exist yet
     status=0
-
-#    echo status : ${status}
-  else 
-    [ "${base}.ot" -nt ../_out/${base}.sexp ]
-    status=$?
-#    echo status : ${status}
+  else
+    diff "${base}.ot" "../_out/${base}.ot" > /dev/null
+    if [ "$?" != "0" ] ; then
+      # difference exist
+      status=0
+    fi     
   fi
   return $status
 }

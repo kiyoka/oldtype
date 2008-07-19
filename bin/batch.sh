@@ -28,16 +28,18 @@ if [ "$OT_USER_LOCAL" = "" ] ; then
 fi
 
 function task () {
+  echo [[info]] task start
   ${OT_HOME}/bin/update.sh &&
   ${OT_HOME}/bin/ot_AllPages &&
   ${OT_HOME}/bin/ot_RecentChanges &&
   ${OT_HOME}/command/blog &&
-  ${OT_HOME}/bin/convert.sh &&
   ${OT_HOME}/bin/add.sh &&
-  ${OT_HOME}/bin/commit.sh
+  ${OT_HOME}/bin/commit.sh &&
+  ${OT_HOME}/bin/update.sh &&
+  ${OT_HOME}/bin/convert.sh
   #run-parts ${OT_HOME}/hook
-  echo -n [info] sleep...
-  sleep 1
+  echo -n [[info]] sleep...
+  sleep 2
   echo wakeup
 }
 

@@ -23,6 +23,12 @@ pushd . >& /dev/null
 
 cd        ${OT_EDITHOME}
 
+  prev=`_svn t info   | grep Revision: | awk '{ print $2; }'`
   _svn t update
+  curr=`_svn t info   | grep Revision: | awk '{ print $2; }'`
 
 popd
+
+echo "[[info]] revision[$prev]=>[$curr]"
+[ "$prev" != "$curr" ]
+exit $?

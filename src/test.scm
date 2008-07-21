@@ -90,11 +90,11 @@
               (serialize (log-by-lineno oldtype-timeline 1))))
 
       (test "ago string of lineno 1 <oldtype-timeline>"
-            "  (3 months ago)" 
+            "  (4 months ago)" 
             (lambda ()
               (get-ago (log-by-lineno oldtype-timeline 1))))
       (test "ago string of lineno 1 <oldtype-page>"
-            "  (3 months ago)"
+            "  (4 months ago)"
             (lambda ()
               (get-ago oldtype-page 1)))
       
@@ -118,7 +118,7 @@
 
       (test "date,ago,rank,committer of lineno 1 <oldtype-page>"
             '((date  . "2008-03-20 21:36 (+0900)")
-              (ago   . "  (3 months ago)")
+              (ago   . "  (4 months ago)")
               (rank  . 5)
               (committer . "kiyoka"))
             (lambda ()
@@ -184,7 +184,7 @@
       (test-start "svn commit")
 
       (let1 work
-            (make <svn-work> :url "http://genkan.sumibi.org/svn/newtype" :user "anonymous" :pass "anonymous" :basepath "/Users/kiyoka/work/tmp")
+            (make <svn-work> :url "http://genkan.sumibi.org/svn/newtype" :user "kahua" :pass "kahua" :basepath "/Users/kiyoka/work/tmp")
             
             (test "Initialize svn work directory"
                   #t
@@ -194,14 +194,17 @@
             (test "status of wikiname (no changes)"
                   '("" "")
                   (lambda ()
-                    (status work "_kiyoka")))
+                    (begin
+                      (display (get-fullpath work))
+                      (newline)
+                      (status work "_kiyoka"))))
 
             (test "status of wikiname (some changes)"
                   "M"
                   (lambda ()
                     (save-text-list work
                                     "test"
-                                    '("UnitTest用ページ。" "----" "##(comment)"))
+                                    `("UnitTest用ページ。" ,(number->string (sys-time))))
                     (car (status work "test"))))
             
             (when
@@ -209,8 +212,8 @@
               (test "commit from work"
                     #t
                     (lambda ()
-                      (commit work)))))
-      
+                      (commit work)
+                      (remove work)))))
       (test-end)
       
       )))

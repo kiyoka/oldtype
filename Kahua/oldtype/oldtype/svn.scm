@@ -38,6 +38,7 @@
   (use gauche.process)
   (export init
           commit
+          remove
           status
           get-fullpath
           save-text-list
@@ -118,6 +119,12 @@
            (user-of self) (pass-of self))
    (lambda (p)
      (display (port->string p))))
+  #t)
+
+
+(define-method remove ((self <svn-work>))
+  ;; mkdir 
+  (remove-directory* (get-fullpath self))
   #t)
 
 

@@ -44,9 +44,17 @@ function task () {
   echo wakeup
 }
 
-force=1
+cnt=0
 while :
 do
-  task ${force}
-  force=0
+  if [ "${cnt}" = "0" ] ; then
+    task 1
+  else
+    task 0
+  fi
+
+  cnt=`expr ${cnt} + 1`
+  if [ "${cnt}" -gt "10" ] ; then
+    cnt=0
+  fi
 done

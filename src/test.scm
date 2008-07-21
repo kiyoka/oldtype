@@ -213,7 +213,7 @@
                     #t
                     (lambda ()
                       (commit work)
-                      (remove work)))))
+                      (clean work)))))
       (test-end)
       
       )))

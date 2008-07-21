@@ -386,6 +386,7 @@
                                       (when (string=? "M" (car result))
                                         (begin
                                           (commit work)
+                                          (clean work)
                                           (set! nodes
                                                 (p/
                                                  (oldtype:icon-image 'info)

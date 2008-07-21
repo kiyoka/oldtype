@@ -38,7 +38,7 @@
   (use gauche.process)
   (export init
           commit
-          remove
+          clean
           status
           get-fullpath
           save-text-list
@@ -122,7 +122,7 @@
   #t)
 
 
-(define-method remove ((self <svn-work>))
+(define-method clean ((self <svn-work>))
   ;; mkdir 
   (remove-directory* (get-fullpath self))
   #t)

@@ -28,6 +28,9 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.7]
+;;     1. Fixed bug: Added The '-' character to ASINCODE of amazon and VIDEOCODE of youtube.
+;;
 ;;   [0.0.6]
 ;;     1. Improved URL to [URL|TITLE] conversion feature.  ( C-c C-c key )
 ;;        oldtype-mode.el fetches remote title page and insert TITLE.
@@ -50,7 +53,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.0.4")
+(defconst oldtype-version "0.0.7")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -638,7 +641,7 @@ Buffer string between BEG and END are replaced with URL."
 	  (_url_file-pattern
 	   "\\(http://[^\t \n]+\\|.+html?\\)")
 	  (_url_amazon-pattern
-	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)\\(.*\\)")
+	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)[^0-9A-Z-]\\(.*\\)")
 	  (_url_youtube-pattern
 	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_-]+\\)\\(.*\\)"))
 

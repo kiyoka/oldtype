@@ -238,6 +238,15 @@
     ((alert)
      (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.stop_round.png"))
                (alt "ALERT"))))
+    ((face-ok)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.face_smile.gif"))
+               (alt "OK"))))
+    ((face-ng)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.face_ng.gif"))
+               (alt "NG"))))
+    ((face-surprise)
+     (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.face_surprise.gif"))
+               (alt "SURPRISE!"))))
     (else
      `(p/ ,(format "!!Error : no such icon-image \"~a\"!!" sym)))))
 
@@ -364,12 +373,12 @@
               (entry-lambda (:keyword name comment)
                 (let1 nodes 
                       (p/
-                       (oldtype:icon-image 'alert)
+                       (oldtype:icon-image 'face-surprise)
                        "Error: commit action missed.")
                       (if (or (> 1 (string-length name))
                               (> 1 (string-length comment)))
                           (set! nodes (p/
-                                       (oldtype:icon-image 'alert)
+                                       (oldtype:icon-image 'face-ng)
                                        "Please input name and comment."))
                           (let1 work (make <svn-work>
                                        :url      (oldtype:get-arguments 'svn)
@@ -389,7 +398,7 @@
                                           (clean work)
                                           (set! nodes
                                                 (p/
-                                                 (oldtype:icon-image 'info)
+                                                 (oldtype:icon-image 'face-ok)
                                                  "Thank you! Your comment was registered. Please wait 3 minutes and back.")))))))
                       (standard-page
                        (name-of oldtype-page)

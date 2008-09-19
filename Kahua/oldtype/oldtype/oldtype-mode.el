@@ -641,7 +641,7 @@ Buffer string between BEG and END are replaced with URL."
 	  (_url_file-pattern
 	   "\\(http://[^\t \n]+\\|.+html?\\)")
 	  (_url_amazon-pattern
-	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)[^0-9A-Z-]\\(.*\\)")
+	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)[^0-9A-Z-]?\\(.*\\)")
 	  (_url_youtube-pattern
 	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_-]+\\)\\(.*\\)"))
 

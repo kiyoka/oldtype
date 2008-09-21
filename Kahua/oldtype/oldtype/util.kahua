@@ -374,7 +374,7 @@
                 (let1 nodes 
                       (p/
                        (oldtype:icon-image 'face-surprise)
-                       "Error: commit action missed.")
+                       "Error: commit action failed.")
                       (if (or (> 1 (string-length name))
                               (> 1 (string-length comment)))
                           (set! nodes (p/
@@ -420,8 +420,12 @@
                       (textarea/
                        (@/ (cols 120) (rows 3) (name "comment")))))
                 (tr/ (td/
-                      (input/ (@/ (type "submit") (value "Submit comment"))))))))
-      
+                      (input/ (@/ (id "SubmitComment")
+                                  (type "submit")
+                                  (value "Submit comment")
+                                  (onClick "setTimeout( function () { $( 'SubmitComment' ).setAttribute( 'disabled', 'true' ); }, 300);")
+                                  )))))))
+
       ;; display comment
       ((comment-data)
        (if (> 2 len)

@@ -19,136 +19,74 @@
   (regexp-replace-all #/ / string _nbsp))
 
 
-;; <!-- SiteSearch Google -->
-;; <form method="get" action="http://www.google.co.jp/custom" target="_top">
-;; <table border="0" bgcolor="#ffffff">
-;; <tr><td nowrap="nowrap" valign="top" align="left" height="32">
-;; <a href="http://www.google.com/">
-;; <img src="http://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
-;; </td>
-;; <td nowrap="nowrap">
-;; <input type="hidden" name="domains" value="oldtype.sumibi.org"></input>
-;; <label for="sbi" style="display: none">検索用語を入力</label>
-;; <input type="text" name="q" size="20" maxlength="255" value="" id="sbi"></input>
-;; <label for="sbb" style="display: none">検索フォームを送信</label>
-;; <input type="submit" name="sa" value="検索" id="sbb"></input>
-;; </td></tr>
-;; <tr>
-;; <td>&nbsp;</td>
-;; <td nowrap="nowrap">
-;; <table>
-;; <tr>
-;; <td>
-;; <input type="radio" name="sitesearch" value="" id="ss0"></input>
-;; <label for="ss0" title="ウェブ検索"><font size="-1" color="#000000">Web</font></label></td>
-;; <td>
-;; <input type="radio" name="sitesearch" value="oldtype.sumibi.org" checked id="ss1"></input>
-;; <label for="ss1" title="検索 oldtype.sumibi.org"><font size="-1" color="#000000">oldtype.sumibi.org</font></label></td>
-;; </tr>
-;; </table>
-;; <input type="hidden" name="client" value="pub-5721837636688174"></input>
-;; <input type="hidden" name="forid" value="1"></input>
-;; <input type="hidden" name="ie" value="UTF-8"></input>
-;; <input type="hidden" name="oe" value="UTF-8"></input>
-;; <input type="hidden" name="safe" value="active"></input>
-;; <input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://oldtype.sumibi.org/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://oldtype.sumibi.org/;LP:1;FORID:1"></input>
-;; <input type="hidden" name="hl" value="ja"></input>
-;; </td></tr></table>
-;; </form>
+;;<!-- SiteSearch Google -->
+;;<center>
+;;<form method=get action="http://www.google.co.jp/search">
+;;<table bgcolor="#FFFFFF"><tr valign=top><td>
+;;<a href="http://www.google.co.jp/">
+;;<img src="http://www.google.com/logos/Logo_40wht.gif" 
+;;border="0" alt="Google" align="absmiddle"></a>
+;;</td>
+;;<td>
+;;<input type=text name=q size=31 maxlength=255 value="">
+;;<input type=hidden name=ie value=UTF-8>
+;;<input type=hidden name=oe value=UTF-8>
+;;<input type=hidden name=hl value="ja">
+;;<input type=submit name=btnG value="Google 検索">
+;;<font size=-1>
+;;<input type=hidden name=domains value="oldtype.sumibi.org"><br>
+;;<input type=radio name=sitesearch value=""> WWW を検索 
+;;<input type=radio name=sitesearch value="oldtype.sumibi.org" checked> oldtype.sumibi.org を検索
+;;</font>
+;;</td></tr></table>
+;;</form>
+;;</center>
 ;;<!-- SiteSearch Google -->
 (define (oldtype:google-searchbox)
-  (form/
-   (@/ (method "get")
-       (action "http://www.google.co.jp/custom")
-       (target "_top"))
-   (table/
-    (@/ (class "searchbox"))
-    (tr/
-     (td/
-      (@/ (nowrap "nowrap")
-          (valign "top")
-          (align "left")
-          (height "32"))
-      (a/
-       (@/ (href "http://www.google.com/"))
-       (img/
-        (@/ (src "http://www.google.com/logos/Logo_25wht.gif")
-            (border "0")
-            (alt "Google")
-            (align "middle")))))
-     (td/
-      (@/ (nowrap "nowrap"))
-      (input/ 
-       (@/ (type "hidden")
-           (name "domains")
-           (value (oldtype:get-arguments 'fqdn))))
-      (label/
-       (@/ (for "sbi")
-           (style "display: none"))
-       "検索用語を入力")
-      (input/
-       (@/ (type "text")
-           (name "q")
-           (size "20")
-           (maxlength "255")
-           (value "")
-           (id "sbi")))
-      (label/
-       (@/ (for "sbb")
-           (style "display: none"))
-       "検索フォームを送信")
-      (input/
-       (@/
-        (type "submit")
-        (name "sa")
-        (value "検索")
-        (id "sbb")))))
-    (tr/
-     (td/ 
-      (input/
-       (@/ (type "radio")
-           (name "sitesearch")
-           (value "")
-           (id "ss0")))
-      (label/
-       (@/ (for "ss0")
-           (title "ウェブ検索"))
-       (font/
-        (@/ (size "-1")
-            (color "#000000"))
-        "Web")))
-     (td/
-      (input/
-       (@/ (type "radio")
-           (name "sitesearch")
-           (value (oldtype:get-arguments 'fqdn))
-           (checked "")
-           (id "ss1")))
-      (label/
-       (@/ (for "ss1")
-           (title (string-append "検索 " (oldtype:get-arguments 'fqdn))))
-       (font/
-        (@/ (size "-1")
-            (color "#000000"))
-        (oldtype:get-arguments 'fqdn))))))
-   (input/
-    (@/ (type "hidden") (name "client") (value "pub-5721837636688174")))
-   (input/
-    (@/ (type "hidden") (name "forid")  (value "1")))
-   (input/
-    (@/ (type "hidden") (name "ie")     (value "UTF-8")))
-   (input/
-    (@/ (type "hidden") (name "oe")     (value "UTF-8")))
-   (input/
-    (@/ (type "hidden") (name "safe")   (value "active")))
-   (input/
-    (@/ (type "hidden")
-        (name "cof")
-        (value (format "GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:38;LW:100;L:http://~a/kahua/oldtype/staticimg/oldtype_logo_small.png;S:http://~a/;LP:1;FORID:1"
-                       (oldtype:get-arguments 'fqdn)
-                       (oldtype:get-arguments 'fqdn)))))
-   (input/
-    (@/ (type "hidden") (name "hl")     (value "ja")))))
+  (form/ (@/ (method "get")
+            (action "http://www.google.co.jp/search"))
+         (table/ (@/ (bgcolor "#FFFFFF"))
+                 (tr/ (@/ (valign "top"))
+                      (td/
+                       (a/ (@/ (href "http://www.google.co.jp/"))
+                           (img/ (@/ (src "http://www.google.com/logos/Logo_40wht.gif")
+                                     (border "0")
+                                     (alt "Google")
+                                     (width "50")
+                                     (align "absmiddle")))))
+                      (td/
+                       (input/ (@/ (type "text")
+                                   (name "q")
+                                   (size "31")
+                                   (maxlength "255")
+                                   (value "")))
+                       (input/ (@/ (type "hidden")
+                                   (name "ie")
+                                   (value "UTF-8")))
+                       (input/ (@/ (type "hidden")
+                                   (name "oe")
+                                   (value "UTF-8")))
+                       (input/ (@/ (type "hidden")
+                                   (name "hl")
+                                   (value "ja")))
+                       (input/ (@/ (type "submit")
+                                   (name "btnG")
+                                   (value "Google 検索")))
+                       (font/ (@/ (size "-1"))
+                              (input/ (@/ (type "hidden")
+                                          (name "domains")
+                                          (value (oldtype:get-arguments 'fqdn))))
+                              (br/)
+                              (input/ (@/ (type "radio")
+                                          (name "sitesearch")
+                                          (value "")))
+                              "WWW を検索"
+                              (input/ (@/ (type "radio")
+                                          (name "sitesearch")
+                                          (value (oldtype:get-arguments 'fqdn))
+                                          (checked "true")))
+                              (string-append (oldtype:get-arguments 'fqdn)
+                                             " を検索")))))))
 
 
 (define (oldtype:icon-image sym)

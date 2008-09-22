@@ -693,3 +693,19 @@ table.comment {
         width: 70%;
 	text-align: left;
 }
+
+td.header_L {
+        border-style: solid;
+        border-color: #ffffff;
+        border-width: 1px;
+	align:        left;
+}
+
+td.header_R {
+        border-style: solid;
+        border-color: #ffffff;
+        border-width: 1px;
+	align:        right;
+}
+
+

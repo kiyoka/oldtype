@@ -361,7 +361,7 @@
                       (input/ (@/ (id "SubmitComment")
                                   (type "submit")
                                   (value "Submit comment")
-                                  (onClick "setTimeout( function () { $( 'SubmitComment' ).setAttribute( 'disabled', 'true' ); }, 300);")
+                                  (onClick "setTimeout( function () { $( 'SubmitComment' ).setAttribute( 'disabled', 'true' ); }, 10);")
                                   )))))))
 
       ;; display comment

@@ -287,7 +287,8 @@
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/import/tooltips.js"))       (type "text/javascript")))
                 (script/ (@/ (src (string-append "/kahua/" (kahua-worker-type) "/oldtype.js"))               (type "text/javascript"))))
          (body/
-          (@/ (onload "setup_tooltips();"))
+          (@/ (onload "setup_tooltips();")
+              (onunload "$( 'SubmitComment' ).setAttribute( 'disabled', 'false' );"))
           (div/ (@/ (class "header"))
                 (if (eq? 'w3m (oldtype-user-agent))
                     (div/

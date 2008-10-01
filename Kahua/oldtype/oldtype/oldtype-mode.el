@@ -416,7 +416,7 @@ Buffer string between BEG and END are replaced with URL."
 			  (int-to-string oldtype-image-height-s))
 			 (img-m 
 			  (int-to-string oldtype-image-height-m)))))
-		 (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url height)))
+		 (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url nil height)))
 	     t)
 
 	    ;; ##(amazon asincode), ##(youtube asincode), 
@@ -439,7 +439,7 @@ Buffer string between BEG and END are replaced with URL."
 			(int-to-string oldtype-image-height-s))
 		       ((youtube-m amazon-m)
 			(int-to-string oldtype-image-height-m)))))
-	       (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url height))
+	       (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url nil height))
 	     t)
 	    
 	    ;; ##(todo), ##(done) ...

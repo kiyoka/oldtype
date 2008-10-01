@@ -207,15 +207,22 @@
           (cdr expr)))
         (len (length (cdr expr))))
     (case command
-      ((img)
+      ((img img-s img-m)
        (if (< 0 len)
            (img/ (@/ (src
                       (let1 str (car arg)
                             (if (#/^[.][.]/ str)
                                 (string-append (oldtype:static-base-path) "img/" str)
                                 str)))
-                     (alt (oldtype:otpath->basename (car arg)))))
-           (p/ "!!Error : No argument ##(img URL) command")))
+                     (alt (oldtype:otpath->basename (car arg)))
+                     (height
+                      (case command
+                        ((img-s)
+                         oldtype:image-height-s)
+                        ((img-m)
+                         oldtype:image-height-m)))
+                     ))
+           (p/ (format "!!Error : No argument ##(~a URL) command") command)))
       ((todo)
        (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.todo.png"))
                  (alt "TODO") (class "wideicon"))))
@@ -241,6 +248,17 @@
                  (height"355"))))
            (p/ "!!Error : No argument ##(youtube URL) command")))
 
+      ((youtube-s youtube-m)
+       (if (< 0 len)
+           (let1 _videoid (car arg)
+                 (img/
+                  (@/ (src (format "http://img.youtube.com/vi/~a/1.jpg" _videoid))
+                      (alt _videoid)
+                      (height (case command
+                                ((youtube-s) oldtype:image-height-s)
+                                ((youtube-m) oldtype:image-height-m))))))
+           (p/ (format "!!Error : No argument ##(~a URL) command") command)))
+
       ;; thumbnail image by SimpleAPI
       ((thumb)
        (if (< 0 len)
@@ -259,7 +277,7 @@
                        (border "0")))))
            (p/ "!!Error : No argument ##(thumb URL) command")))
 
-      ((amazon)
+      ((amazon amazon-s amazon-m)
        (if (< 0 len)
            (let* ((_asin (car arg))
                   (_asin (if (#/^[0-9]+$/ _asin)
@@ -272,10 +290,14 @@
                    (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
                        (alt _asin)
                        (class "help")
-                       (title "Click here to open amazon.co.jp"))))
+                       (title "Click here to open amazon.co.jp")
+                       (height (case command
+                                 ((amazon)   "")
+                                 ((amazon-s) oldtype:image-height-s)
+                                 ((amazon-m) oldtype:image-height-m))))))
                  `(p/ ,(format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin))))
-           (p/ "!!Error : No argument ##(amazon URL) command")))
-      
+           (p/ (format "!!Error : No argument ##(~a URL) command") command)))
+
       ;; timestamp
       ((timestamp)
        (if (< 0 len)

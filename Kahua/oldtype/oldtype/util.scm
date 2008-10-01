@@ -65,6 +65,9 @@
 (define oldtype:version  *oldtype-version*)
 (define oldtype:site-url "http://sourceforge.jp/projects/oldtype/")
 (define oldtype:rank-limit 5)
+(define oldtype:image-height-s 40)
+(define oldtype:image-height-m 80)
+
 
 ;;=================================================
 ;; Utility for OldType

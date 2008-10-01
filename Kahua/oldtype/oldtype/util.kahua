@@ -251,12 +251,15 @@
       ((youtube-s youtube-m)
        (if (< 0 len)
            (let1 _videoid (car arg)
-                 (img/
-                  (@/ (src (format "http://img.youtube.com/vi/~a/1.jpg" _videoid))
-                      (alt _videoid)
-                      (height (case command
-                                ((youtube-s) oldtype:image-height-s)
-                                ((youtube-m) oldtype:image-height-m))))))
+                 (a/ (@/ (href (format "http://www.youtube.com/v/~a" _videoid)))
+                     (img/
+                      (@/ (src (format "http://img.youtube.com/vi/~a/1.jpg" _videoid))
+                          (alt _videoid)
+                          (class "help")
+                          (title "Click here to open YouTube.com")
+                          (height (case command
+                                    ((youtube-s) oldtype:image-height-s)
+                                    ((youtube-m) oldtype:image-height-m)))))))
            (p/ (format "!!Error : No argument ##(~a URL) command") command)))
 
       ;; thumbnail image by SimpleAPI

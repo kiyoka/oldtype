@@ -41,6 +41,8 @@
           oldtype:version
           oldtype:site-url
           oldtype:rank-limit
+          oldtype:image-height-s
+          oldtype:image-height-m
           oldtype:get-string-of-today
           oldtype:editpath
           oldtype:workpath

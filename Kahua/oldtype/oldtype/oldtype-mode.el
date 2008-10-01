@@ -121,6 +121,8 @@
   (beep)
   (sleep-for 1))
 
+(defconst oldtype-image-height-s 40)
+(defconst oldtype-image-height-m 80)
 
 (defconst oldtype-image-icon-string
   "H_")
@@ -172,6 +174,12 @@
     (when entry
       (cdr entry))))
 
+
+;;--- debugging message logger
+(defvar oldtype-debug nil)                       ; debugging enable/disable flag.
+(defun oldtype-debug-print (string)
+  (if oldtype-debug
+      (message string)))
 
 (defun oldtype-insert-image (beg end image &rest args)
   "Display image on the current buffer.
@@ -314,6 +322,29 @@ Buffer string between BEG and END are replaced with URL."
 	 nil))
      lst)))
 
+
+;;
+;; compose region with image file
+;;
+(defun oldtype-compose-region-with-image (beg end icon-str file &optional width height)
+  ;;--- debugging message logger
+  (let* ((alist `(
+		  (src . ,file)))
+	 (alist  (if width
+		     (cons `(width . ,width) alist)
+		   alist))
+	 (alist  (if height
+		     (cons `(height . ,height) alist)
+		   alist)))
+    (compose-region beg
+		    end
+		    icon-str)
+    (oldtype-remove-image beg
+			  end)
+    (oldtype-insert-image-file beg
+			       end
+			       alist)))
+
 ;; 
 ;; fontification
 ;;
@@ -354,9 +385,9 @@ Buffer string between BEG and END are replaced with URL."
 	(_wikiname-pattern
 	 "\\([\[][\[]\\)\\([^\]]+\\)\\([\]][\]]\\)")
 	(_image-pattern
- 	 "\\(##[(]img[ ]+\\)\\([^)]+\\)\\([)]\\)")
+ 	 "\\(##[(]\\(img[\-]?[sm]?\\)[ ]+\\)\\([^)]+\\)\\([)]\\)")
 	(_various-webservice-pattern
- 	 "\\(##[(]\\(amazon\\|youtube\\)[ ]+\\)\\([^)]+\\)\\([)]\\)")
+ 	 "\\(##[(]\\(amazon\\|amazon-s\\|amazon-m\\|youtube\\|youtube-s\\|youtube-m\\)[ ]+\\)\\([^)]+\\)\\([)]\\)")
 	(_simple-command-pattern
  	 "\\(##[(]\\(todo\\|done\\)[)]\\)"))
 
@@ -375,19 +406,17 @@ Buffer string between BEG and END are replaced with URL."
 	    ;; ##(img URL)
 	    (,_image-pattern
 	     2
-	     (when (not (code-linep (match-beginning 2)))
+	     (when (not (code-linep (match-beginning 1)))
 	       (let* ((beg       (match-beginning 1))
-		      (image-url (match-string-no-properties 2))
-		      (end       (match-end 3)))
-		 (compose-region beg
-				 end
-				 oldtype-image-icon-string)
-		 (oldtype-remove-image beg
-				       end)
-		 (oldtype-insert-image-file beg
-					    end
-					    `(
-					      (src . ,image-url)))))
+		      (image-url (match-string-no-properties 3))
+		      (end       (match-end 4))
+		      (height     
+		       (case (intern (match-string-no-properties 2))
+			 (img-s 
+			  (int-to-string oldtype-image-height-s))
+			 (img-m 
+			  (int-to-string oldtype-image-height-m)))))
+		 (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url height)))
 	     t)
 
 	    ;; ##(amazon asincode), ##(youtube asincode), 
@@ -396,45 +425,35 @@ Buffer string between BEG and END are replaced with URL."
 	     (let* ((beg       (match-beginning 1))
 		    (command   (match-string-no-properties 2))
 		    (value     (match-string-no-properties 3))
-		    (end       (match-end 4)))
-	       (compose-region beg
-			       end
-			       oldtype-image-icon-string)
-	       (oldtype-remove-image beg
-				     end)
-	       (oldtype-insert-image-file beg
-					  end
-					  `(
-					    (src . 
-						 ,(case (intern command)
-						    (amazon
-						     (amazon-asincode-to-url value))
-						    (youtube
-						     (youtube-video-to-url value))
-						    (nil
-						     ""))))))
+		    (end       (match-end 4))
+		    (image-url (case (intern command)
+				 ((amazon amazon-s amazon-m) 
+				  (amazon-asincode-to-url value))
+				 ((youtube youtube-s youtube-m)
+				  (youtube-video-to-url value))
+				 (t
+				  "")))
+		    (height
+		     (case (intern command)
+		       ((youtube-s amazon-s)
+			(int-to-string oldtype-image-height-s))
+		       ((youtube-m amazon-m)
+			(int-to-string oldtype-image-height-m)))))
+	       (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url height))
 	     t)
 	    
 	    ;; ##(todo), ##(done) ...
 	    (,_simple-command-pattern
 	     2
 	     (let ((beg         (match-beginning 1))
-		   (command-sym (intern (match-string-no-properties 2)))
-		   (end         (match-end 1)))
-	       (compose-region beg
-			       end
-			       oldtype-image-icon-string)
-	       (oldtype-remove-image beg
-				     end)
-	       (oldtype-insert-image-file beg
-					  end
-					  `(
-					    (src . 
-						 ,(cond 
-						   ((eq command-sym 'todo)
-						    "../img/icon.todo.png")
-						   (t
-						    "../img/icon.done.png"))))))
+		   (end         (match-end 1))
+		   (image-url
+		    (case (intern (match-string-no-properties 2))
+		      (todo
+		       "../img/icon.todo.png")
+		      (t
+		       "../img/icon.done.png"))))
+	       (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url))
 	     t)
 
 	    ;; [[WikiName]] or [[URL|Name]]

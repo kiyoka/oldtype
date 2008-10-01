@@ -46,6 +46,29 @@
       (display appendix)
       (newline))))
 
+;;
+;; test pattern:
+;;  (thumbnail-filter "line 1 line 2 line 3 line 4 ##(amazon 4873113482) ##(img-s ../img/abc.jpg)")
+;; result:
+;;  "##(img-s ../img/abc.jpg)  ##(amazon-s 4873113482) "
+;; 
+(define (thumbnail-filter contents-str)
+  (let1 ret '()
+        (regexp-replace-all
+         #/##\((img|img-s|img-m|youtube|youtube-s|youtube-m|amazon|amazon-s|amazon-m)[ ]+([^\)]+)\)/
+         contents-str
+         (lambda (m)
+           (push! ret (list
+                       (rxmatch-substring m 1)
+                       (rxmatch-substring m 2)))))
+        (string-join
+         (map
+          (lambda (x)
+            (let1 command-pair (string-split (car x) #\-)
+                  (string-append
+                   "##(" (car command-pair) "-s " (cadr x) ") ")))
+          (reverse ret)))))
+
 
 (define (output-blog-list save-filename entrylist)
   (with-output-to-file save-filename
@@ -57,7 +80,11 @@
              (when (#/[.][0-9]+/ filename)
                (display
                 (string-append "- [[" (oldtype:otpath->wikiname filename) "]]"))
-               (print (car (port->string-list (current-input-port))))))))
+               (let* ((lst (port->string-list (current-input-port)))
+                      (image-line (thumbnail-filter (string-join lst))))
+                 (print (car lst)) ;; first line
+                 (when (< 0 (string-length image-line))
+                   (print image-line)))))))
        entrylist))))
 
 

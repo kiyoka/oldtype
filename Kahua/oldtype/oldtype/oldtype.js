@@ -29,8 +29,8 @@ function otEditEnd( bodyId ) {
 // for tooltips.js
 function setup_tooltips( ) {
     $$("body .help").each( function(input) {
-        new Tooltip(input, {backgroundColor: "#FC9", borderColor: "#C96", 
-                            textColor: "#000", textShadowColor: "#FFF",
+	new Tooltip(input, {backgroundColor: "#FC9", borderColor: "#C96",
+			    textColor: "#000", textShadowColor: "#FFF",
 			    maxWidth: 400,
 			    appearDuration: .15,
 			    hideDuration: .15,

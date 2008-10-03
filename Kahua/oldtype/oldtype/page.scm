@@ -1,5 +1,5 @@
 ;;;
-;;; oldtype/page - wiki page infomation
+;;; oldtype/page - wiki page information
 ;;;
 ;;;  Copyright (c) 2008 Kiyoka Nishiyama, All rights reserved.
 ;;;
@@ -25,11 +25,11 @@
 ;;;
 ;;;  $Id: $
 ;;;
-;;; 
+;;;
 
 ;;
 ;; page information of single wiki page of OldType.
-;; it contains multi <oldtype-line> infomation
+;; it contains multi <oldtype-line> information
 ;;
 
 (define-module oldtype.page
@@ -65,14 +65,14 @@
 
 (define-class <oldtype-page> ()
   (;; Customization parameters -----------------------
-   
+
    ;; page name (utf-8)
    (name        :accessor name-of        :init-keyword :name
                 :init-value "none")
-   ;; sxml data in page 
+   ;; sxml data in page
    (sxml        :accessor sxml-of        :init-keyword :sxml
                 :init-value '())
-   ;; <oldtype-timeline> in page 
+   ;; <oldtype-timeline> in page
    (timeline    :accessor timeline-of    :init-keyword :timeline
                 :init-value '())
    ;; vector of text in page
@@ -96,7 +96,7 @@
          (oldtype-parse wiki-port)))
   (set! (plain-of self)
         (list->vector
-         (string-split 
+         (string-split
           (oldtype:sxml->plain-text (sxml-of self))
           #\newline)))
   self)
@@ -108,7 +108,7 @@
     (sxml     . ,(sxml-of     self))
     (timeline . ,(serialize (timeline-of self)))
     (plain    . ,(vector->list (plain-of self)))))
-                  
+
 
 (define-method deserialize ((dummy <oldtype-page>) internal-data)
   (make <oldtype-page>

@@ -1,7 +1,7 @@
 #!/usr/local/bin/gosh
 
 (use srfi-1)
-
+(use srfi-13)
 
 (define (load-td2 port)
   (let (
@@ -28,28 +28,28 @@
          (let1 pair (string-split str #/[ ]+/)
                (string-append
                 (if (#/^Date: / str)
-                    (format "( \"~a\" . " (cadr pair))
+                    (format "( \"~a\" " (cadr pair))
                     "")
                 (format "(~a . \"~a\")" (car pair) (cadr pair)))))
         ((= 0 (string-length str))
          (reset-body!))
-        ((#/^.$/ str)
+        ((#/^[.]$/ str)
          (string-append (reset-body!)
                         " )"))
         (else
-         (let1 str (regexp-replace-all #/[\"]/ str "'")
+         (let1 str (string-trim
+                    (regexp-replace-all #/[\"]/ str "'"))
                (push-body! str)
                #f))))
      str-list)))
 
 
 (define (main argv)
-  (let1 mode (string->symbol (cadr argv))
-        (print "(")
-        (for-each print
-                  (load-td2
-                   (current-input-port)))
-        (print ")")))
+  (print "(")
+  (for-each print
+            (load-td2
+             (current-input-port)))
+  (print ")"))
 
 
   

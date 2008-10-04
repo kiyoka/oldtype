@@ -6,3 +6,8 @@
 gosh ./convertToSexp.scm d < td2.txt > td2.scm
 gosh ./convertToSexp.scm c < tdc.txt > tdc.scm
 
+#gosh ./convertToSexp.scm d < td2_small.txt > td2.scm
+#gosh ./convertToSexp.scm c < tdc_small.txt > tdc.scm
+
+mkdir -p out
+gosh ./convertToOT.scm td2.scm tdc.scm

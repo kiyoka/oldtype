@@ -7,9 +7,9 @@
 ;; "20081231" => "2008_12_31"
 ;;
 (define (convert-date date)
-  (let ((y #?=(substring date 0 4))
-        (m #?=(substring date 4 6))
-        (d #?=(substring date 6 8)))
+  (let ((y (substring date 0 4))
+        (m (substring date 4 6))
+        (d (substring date 6 8)))
     (string-append y "_" m "_" d)))
 
 (define (output-oldtype-file date entry-data)
@@ -23,9 +23,14 @@
           ((assq-ref entry 'Title:)
            (for-each
             (lambda (lst)
-              (if (string? (car lst))
-                  (display (car lst) port)))
-            entry))))
+              (when (string? (car lst))
+                (begin
+                  (display (car lst) port)
+                  (newline port)
+                  (newline port))))
+            entry)
+           (display "##(comment)" port)
+           (newline port))))
        entry-data))))
 
 

@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+#cat tdiary_data/**/*.td2 | iconv -f euc-jp -t utf8 > td2.txt
+#cat tdiary_data/**/*.tdc | iconv -f euc-jp -t utf8 > tdc.txt
+
+gosh ./convertToSexp.scm d < td2.txt > td2.scm
+gosh ./convertToSexp.scm c < tdc.txt > tdc.scm
+

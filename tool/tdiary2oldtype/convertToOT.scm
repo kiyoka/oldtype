@@ -2,6 +2,7 @@
 
 (use srfi-1)
 (use util.list)
+(use rfc.uri)
 
 ;;
 ;; "20081231" => "2008_12_31"
@@ -12,42 +13,53 @@
         (d (substring date 6 8)))
     (string-append y "_" m "_" d)))
 
-(define (output-oldtype-file date entry-data)
-  (call-with-output-file (format "./out/xxxx.~a.ot" (convert-date date))
+(define (output-oldtype-file username date entry-data)
+
+  (define (display-diary entry port)
+    (for-each
+     (lambda (lst)
+       (when (string? (car lst))
+         (begin
+            (display (car lst) port)
+            (newline port)
+            (newline port))))
+     entry))
+
+  (define (display-comment entry port)
+    (let1 name (assq-ref entry 'Name:)
+          (for-each
+           (lambda (x)
+             (let1 str (car x)
+                   (when (string? str)
+                     (when (not (#/http:\/\// str))
+                       (begin
+                         (display  (format "##(comment-data ~a ~a)"
+                                           (uri-encode-string name)
+                                           (uri-encode-string str))
+                                   port)
+                         (newline port))))))
+           entry)))
+
+  (call-with-output-file (format "./out/~a.~a.ot" username (convert-date date))
     (lambda (port)
       port
-      (for-each
-       (lambda (entry) ;; entry is a diary or a comment.
-         (cond
-          ;; diary
-          ((assq-ref entry 'Title:)
-           (for-each
-            (lambda (lst)
-              (when (string? (car lst))
-                (begin
-                  (display (car lst) port)
-                  (newline port)
-                  (newline port))))
-            entry)
-           (display "##(comment)" port)
-           (newline port))))
-       entry-data))))
+      (begin
+        (for-each
+         (lambda (entry) ;; entry is a diary or a comment.
+           (cond
+            ((assq-ref entry 'Title:)
+             ;; diary
+             (display-diary entry port))
+            ;; comment
+            (else
+             (display-comment entry port))))
+         entry-data)
+        (display "##(comment)" port)
+        (newline port)))))
 
 
-;; comment
 
-
-;;          (else
-;;           #f)
-;;   
-;;           (write (assq-ref entry 'Name:))
-;;           (for-each
-;;            (lambda (lst)
-;;              (if (string? (car lst))
-;;                  (print (car lst))))))))))))
-
-
-(define (save-oldtype-data diary-data comment-data)
+(define (save-oldtype-data username diary-data comment-data)
   (let1 h (make-hash-table 'string=?)
         ;; make hash data ( key is string of date , value is alist of diary or comment)
         (for-each
@@ -61,17 +73,19 @@
         (hash-table-for-each
          h
          (lambda (k v)
-           (output-oldtype-file k v)))))
+           (output-oldtype-file username k (reverse v))))))
 
 
 (define (main argv)
-  (let ((diary-file     (cadr argv))
-        (comment-file   (caddr argv)))
+  (let ((username       (cadr argv))         
+        (diary-file     (caddr argv))
+        (comment-file   (cadddr argv)))
     (let ((diary-data
            (call-with-input-file diary-file read))
           (comment-data
            (call-with-input-file comment-file read)))
       (save-oldtype-data
+       username
        diary-data
        comment-data))))
       

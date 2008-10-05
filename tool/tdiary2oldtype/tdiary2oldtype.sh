@@ -10,4 +10,4 @@ gosh ./convertToSexp.scm c < tdc.txt > tdc.scm
 #gosh ./convertToSexp.scm c < tdc_small.txt > tdc.scm
 
 mkdir -p out
-gosh ./convertToOT.scm td2.scm tdc.scm
+gosh ./convertToOT.scm ${USER} td2.scm tdc.scm

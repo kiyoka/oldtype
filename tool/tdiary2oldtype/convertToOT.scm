@@ -13,6 +13,29 @@
         (d (substring date 6 8)))
     (string-append y "_" m "_" d)))
 
+
+;;
+;; "<%=a 'link|str' %>          =>  [[link|str]]
+;; "<%=isbn_image 'id' %>       =>  ##(amazon id)
+;;
+(define (convert-command str)
+  (let* ((str
+          (regexp-replace-all #/<%=[ ]?a[ ]+'([^|]+)[|]([^']+)'[ ]+%>/ #?=str
+                              (lambda (m)
+                                (string-append "[["
+                                               #?=(rxmatch-substring m 2)
+                                               "|"
+                                               #?=(rxmatch-substring m 1)
+                                               "]]"))))
+         (str
+          (regexp-replace-all #/<%=[ ]?isbn_image[ ]+'([^']+)'[ ]+%>/ #?=str
+                              (lambda (m)
+                                (string-append "##(amazon "
+                                               (rxmatch-substring m 1)
+                                               ")")))))
+    #?=str))
+
+  
 (define (output-oldtype-file username date entry-data)
 
   (define (display-diary entry port)
@@ -20,9 +43,9 @@
      (lambda (lst)
        (when (string? (car lst))
          (begin
-            (display (car lst) port)
-            (newline port)
-            (newline port))))
+           (display (convert-command (car lst)) port)
+           (newline port)
+           (newline port))))
      entry))
 
   (define (display-comment entry port)

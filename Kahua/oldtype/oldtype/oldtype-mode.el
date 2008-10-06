@@ -28,6 +28,9 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.8]
+;;     1. Fixed bug: illegal ASINCODE of amazon and VIDEOCODE of youtube use for image file creation.
+;;
 ;;   [0.0.7]
 ;;     1. Fixed bug: Added The '-' character to ASINCODE of amazon and VIDEOCODE of youtube.
 ;;
@@ -53,7 +56,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.0.7")
+(defconst oldtype-version "0.0.8")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -357,10 +360,14 @@ Buffer string between BEG and END are replaced with URL."
   ;;   (amazon-asincode-to-url "4873113482")
   ;;
   (defun amazon-asincode-to-url (asincode)
-    (format "http://images.amazon.com/images/P/%s.09.MZZZZZZZ_.jpg" asincode))
+    (if (string-match "^[a-zA-Z0-9-]+$" asincode)
+	(format "http://images.amazon.com/images/P/%s.09.MZZZZZZZ_.jpg" asincode)
+      nil))
 
   (defun youtube-video-to-url (videocode)
-    (format "http://img.youtube.com/vi/%s/1.jpg" videocode))
+    (if (string-match "^[a-zA-Z0-9-]+$" asincode)
+	(format "http://img.youtube.com/vi/%s/1.jpg" videocode)
+      nil))
 
   (defun code-linep (pos)
     (save-excursion
@@ -439,7 +446,8 @@ Buffer string between BEG and END are replaced with URL."
 			(int-to-string oldtype-image-height-s))
 		       ((youtube-m amazon-m)
 			(int-to-string oldtype-image-height-m)))))
-	       (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url nil height))
+	       (if image-url
+		   (oldtype-compose-region-with-image beg end oldtype-image-icon-string image-url nil height)))
 	     t)
 	    
 	    ;; ##(todo), ##(done) ...

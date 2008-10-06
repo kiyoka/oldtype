@@ -365,7 +365,7 @@ Buffer string between BEG and END are replaced with URL."
       nil))
 
   (defun youtube-video-to-url (videocode)
-    (if (string-match "^[a-zA-Z0-9-]+$" asincode)
+    (if (string-match "^[a-zA-Z0-9-]+$" videocode)
 	(format "http://img.youtube.com/vi/%s/1.jpg" videocode)
       nil))
 

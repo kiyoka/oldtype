@@ -17,7 +17,8 @@
                                (string-join ret "\n")
                                "\" )"))))
     (define (push-body! str)
-      (push! body str))
+      (if (not (and (null? body) (= 0 (string-length str))))
+          (push! body str)))
 
     (filter-map
      (lambda (str)
@@ -28,11 +29,11 @@
          (let1 pair (string-split str #/[ ]+/)
                (string-append
                 (if (#/^Date: / str)
-                    (format "( \"~a\" " (cadr pair))
+                    (begin
+                      (reset-body!)
+                      (format "( \"~a\" " (cadr pair)))
                     "")
                 (format "(~a . \"~a\")" (car pair) (cadr pair)))))
-        ((= 0 (string-length str))
-         (reset-body!))
         ((#/^[.]$/ str)
          (string-append (reset-body!)
                         " )"))

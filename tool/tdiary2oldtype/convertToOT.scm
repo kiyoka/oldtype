@@ -20,20 +20,28 @@
 ;;
 (define (convert-command str)
   (let* ((str
-          (regexp-replace-all #/<%=[ ]?a[ ]+'([^|]+)[|]([^']+)'[ ]+%>/ #?=str
+          (regexp-replace-all #/<a[ ]+href='([^']+)'>([^<]+)<\/a>/ str
                               (lambda (m)
                                 (string-append "[["
-                                               #?=(rxmatch-substring m 2)
+                                               (rxmatch-substring m 1)
                                                "|"
-                                               #?=(rxmatch-substring m 1)
+                                               (rxmatch-substring m 2)
                                                "]]"))))
          (str
-          (regexp-replace-all #/<%=[ ]?isbn_image[ ]+'([^']+)'[ ]+%>/ #?=str
+          (regexp-replace-all #/<%=[ ]?a[ ]+'([^|]+)[|]([^']+)'[ ]+%>/ str
+                              (lambda (m)
+                                (string-append "[["
+                                               (rxmatch-substring m 2)
+                                               "|"
+                                               (rxmatch-substring m 1)
+                                               "]]"))))
+         (str
+          (regexp-replace-all #/<%=[ ]?isbn_image[ ]+'([^']+)'[ ]+%>/ str
                               (lambda (m)
                                 (string-append "##(amazon "
                                                (rxmatch-substring m 1)
                                                ")")))))
-    #?=str))
+    str))
 
   
 (define (output-oldtype-file username date entry-data)

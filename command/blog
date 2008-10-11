@@ -38,7 +38,7 @@
                   (string-append "* [[" (oldtype:otpath->wikiname filename) "]]"))))
              (for-each
               (lambda (line)
-                (if (#/##\(comment\)/ line)
+                (if (and (#/##\(comment\)/ line) (not (#/^[!]/ line)))
                     (print (string-append "comment please => [[" (oldtype:otpath->wikiname filename) "]]"))
                     (print line)))
               (port->string-list (current-input-port))))))
@@ -46,56 +46,31 @@
       (display appendix)
       (newline))))
 
-;;
-;; test pattern:
-;;   (thumbnail-filter '("line 1"
-;;                       "line 2"
-;;                       "line 3"
-;;                       "line 4"
-;;                       "##(amazon 4873113482)       ##(img-s ../img/abc.jpg)"
-;;                       "! ##(youtube 4873113482)    ##(img-m ../img/abc.jpg)"
-;;                       ))
-;; result:
-;;  "##(img-s ../img/abc.jpg)  ##(amazon-s 4873113482) "
-;; 
-(define (thumbnail-filter str-list)
-  (let1 ret '()
-        (for-each
-         (lambda (line)
-           (when (not (#/^!/ line))
-             (regexp-replace-all
-              #/##\((img|img-s|img-m|youtube|youtube-s|youtube-m|amazon|amazon-s|amazon-m)[ ]+([^\)]+)\)/
-              line
-              (lambda (m)
-                (push! ret (list
-                            (rxmatch-substring m 1)
-                            (rxmatch-substring m 2)))))))
-         str-list)
-        (string-join
-         (map
-          (lambda (x)
-            (let1 command-pair (string-split (car x) #\-)
-                  (string-append
-                   "##(" (car command-pair) "-s " (cadr x) ") ")))
-          (reverse ret)))))
 
-
-(define (output-blog-list save-filename entrylist)
+(define (output-blog-list save-filename group-entries)
   (with-output-to-file save-filename
     (lambda ()
+      (print "  Past blog entries. ")
       (for-each
-       (lambda (filename)
-         (with-input-from-file (string-append (oldtype:editpath) "/" filename)
-           (lambda ()
-             (when (#/[.][0-9]+/ filename)
-               (display
-                (string-append "- [[" (oldtype:otpath->wikiname filename) "]]"))
-               (let* ((lst (port->string-list (current-input-port)))
-                      (image-line (thumbnail-filter lst)))
-                 (print (car lst)) ;; first line
-                 (when (< 0 (string-length image-line))
-                   (print image-line)))))))
-       entrylist))))
+       (lambda (group)
+         (let ((month_year (car group))
+               (entries    (cdr group)))
+           (print 
+            (string-append "* [[!" (oldtype:user-local) ".blog." #?=month_year "]]"))
+           (for-each
+            (lambda (filename)
+              (with-input-from-file (string-append (oldtype:editpath) "/" filename)
+                (lambda ()
+                  (when (#/[.][0-9]+/ #?=filename)
+                    (display
+                     (string-append "-   [[" (oldtype:otpath->wikiname filename) "]]"))
+                    (let* ((lst (port->string-list (current-input-port)))
+                           (image-line (oldtype:thumbnail-filter lst)))
+                      (print (car lst)) ;; first line
+                      (when (< 0 (string-length image-line))
+                        (print image-line)))))))
+            (reverse (sort entries)))))
+       group-entries))))
 
 
 (define (main argv)
@@ -105,7 +80,11 @@
                 (take* (ot-blog-entrylist) ot-new-entry-limit))
                "")
   (output-blog-list (string-append ot-blog ".list.ot")
-                    (ot-blog-entrylist))
+                    (sort 
+                     (oldtype:grouping-blog-entries
+                      (ot-blog-entrylist))
+                     (lambda (x y) (string>? (car x) (car y)))))
+
   (for-each
    (lambda (x)
      (let ((year_month (car x))
@@ -117,5 +96,5 @@
                     "##(nolist)")))
    (oldtype:grouping-blog-entries
     (ot-blog-entrylist)))
-
+  
   (exit 0))

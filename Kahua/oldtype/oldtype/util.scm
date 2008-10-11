@@ -55,6 +55,7 @@
           oldtype:utc->RFC822-date-string
           oldtype:utc->ago-string
           oldtype:grouping-blog-entries
+          oldtype:thumbnail-filter
           pretty-print-sexp))
 (select-module oldtype.util)
 
@@ -304,6 +305,40 @@
                            name)))
      valid-entries)
     (hash-table->alist ht)))
+
+
+;;
+;; test pattern:
+;;   (thumbnail-filter '("line 1"
+;;                       "line 2"
+;;                       "line 3"
+;;                       "line 4"
+;;                       "##(amazon 4873113482)       ##(img-s ../img/abc.jpg)"
+;;                       "! ##(youtube 4873113482)    ##(img-m ../img/abc.jpg)"
+;;                       ))
+;; result:
+;;  "##(img-s ../img/abc.jpg)  ##(amazon-s 4873113482) "
+;; 
+(define (oldtype:thumbnail-filter str-list)
+  (let1 ret '()
+        (for-each
+         (lambda (line)
+           (when (not (#/^[!]/ line))
+             (regexp-replace-all
+              #/##\((img|img-s|img-m|youtube|youtube-s|youtube-m|amazon|amazon-s|amazon-m)[ ]+([^\)]+)\)/
+              line
+              (lambda (m)
+                (push! ret (list
+                            (rxmatch-substring m 1)
+                            (rxmatch-substring m 2)))))))
+         str-list)
+        (string-join
+         (map
+          (lambda (x)
+            (let1 command-pair (string-split (car x) #\-)
+                  (string-append
+                   "##(" (car command-pair) "-s " (cadr x) ") ")))
+          (reverse ret)))))
 
 
 (provide "oldtype/util")

@@ -61,14 +61,17 @@
           (for-each
            (lambda (x)
              (let1 str (car x)
-                   (when (string? str)
-                     (when (not (#/http:\/\// str))
-                       (begin
-                         (display  (format "##(comment-data ~a ~a)"
-                                           (uri-encode-string name)
-                                           (uri-encode-string str))
-                                   port)
-                         (newline port))))))
+                   (when (and (string? str)
+                              (not (#/^TrackBack$/ name))
+                              (not (#/porno/ str))
+                              (not (#/casino/ str))
+                              (not (#/viagra/ str)))
+                     (begin
+                       (display  (format "##(comment-data ~a ~a)"
+                                         (uri-encode-string name)
+                                         (uri-encode-string str))
+                                 port)
+                       (newline port)))))
            entry)))
 
   (call-with-output-file (format "./out/~a.~a.ot" username (convert-date date))

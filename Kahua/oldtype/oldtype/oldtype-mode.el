@@ -360,12 +360,12 @@ Buffer string between BEG and END are replaced with URL."
   ;;   (amazon-asincode-to-url "4873113482")
   ;;
   (defun amazon-asincode-to-url (asincode)
-    (if (string-match "^[a-zA-Z0-9-]+$" asincode)
+    (if (string-match "^[a-zA-Z0-9-_]+$" asincode)
 	(format "http://images.amazon.com/images/P/%s.09.MZZZZZZZ_.jpg" asincode)
       nil))
 
   (defun youtube-video-to-url (videocode)
-    (if (string-match "^[a-zA-Z0-9-]+$" videocode)
+    (if (string-match "^[a-zA-Z0-9-_]+$" videocode)
 	(format "http://img.youtube.com/vi/%s/1.jpg" videocode)
       nil))
 

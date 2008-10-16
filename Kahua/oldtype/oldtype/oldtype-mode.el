@@ -24,10 +24,13 @@
 ;;
 ;;
 ;; How to nstall and How to use:
-;;     http://oldtype.sumibi.org/
+;;     http://oldtype.sumibi.org/show-page/oldtype-mode
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.0.9]
+;;     1. Bugfix: 'Converting URL to ##(amazon ASIN) command' feature generates wrong ASIN code.
+;;
 ;;   [0.0.8]
 ;;     1. Fixed bug: illegal ASINCODE of amazon and VIDEOCODE of youtube use for image file creation.
 ;;
@@ -56,7 +59,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.0.8")
+(defconst oldtype-version "0.0.9")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -669,6 +672,8 @@ Buffer string between BEG and END are replaced with URL."
 	   "\\(http://[^\t \n]+\\|.+html?\\)")
 	  (_url_amazon-pattern
 	   "\\(http://.*amazon[.]c.*\\)/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)[^0-9A-Z-]?\\(.*\\)")
+	  (_url_amazon-pattern-part
+	   "/dp/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)")
 	  (_url_youtube-pattern
 	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_-]+\\)\\(.*\\)"))
 
@@ -733,6 +738,9 @@ Buffer string between BEG and END are replaced with URL."
 		 (s     (match-beginning 1))
 		 (e     (match-end 3))
 		 (title (oldtype-fetch-html-title url)))
+	    (message str)
+	    (when (string-match    _url_amazon-pattern-part  str)
+	      (setq asin (match-string 1 str)))
 	    (delete-region s e)
 	    (goto-char s)
 	    (insert (format "##(amazon %s)  %s" asin title))))

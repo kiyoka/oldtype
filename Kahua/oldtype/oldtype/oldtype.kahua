@@ -394,7 +394,13 @@
 
 
 ;; define elements for RSS 2.0
-(define-elements channel rss description lastBuildDate docs generator item pubDate author guid atom:link)
+(define-elements channel rss description lastBuildDate docs generator item pubDate author guid atom:link no-escape)
+
+;; Added no-esacpe element to Kahua framework
+(define-element no-escape (attrs auxs contents context cont)
+  (cont (list (apply make-no-escape-text-element contents))
+	context))
+
 
 ;; get-rss entry
 (define (gen-rss/ base-url index-page entry-pages)
@@ -437,7 +443,14 @@
                                          ""))))
                 (item/
                  (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
-                 (description/      (string-join (get-plain-list e) "\n"))
+                 (description/
+                  (no-escape/
+                   (string-append
+                    "<![CDATA[<pre>"
+                    (regexp-replace-all #/\]\]>/ 
+                                        (string-join (get-plain-list e) "\n")
+                                        "")
+                    "</pre>]]>")))
                  (link/             uri)
                  (guid/             uri)
                  (pubDate/          (oldtype:utc->RFC822-date-string

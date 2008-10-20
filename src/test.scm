@@ -90,11 +90,11 @@
               (serialize (log-by-lineno oldtype-timeline 1))))
 
       (test "ago string of lineno 1 <oldtype-timeline>"
-            "  (4 months ago)" 
+            "  (7 months ago)" 
             (lambda ()
               (get-ago (log-by-lineno oldtype-timeline 1))))
       (test "ago string of lineno 1 <oldtype-page>"
-            "  (4 months ago)"
+            "  (7 months ago)"
             (lambda ()
               (get-ago oldtype-page 1)))
       
@@ -118,7 +118,7 @@
 
       (test "date,ago,rank,committer of lineno 1 <oldtype-page>"
             '((date  . "2008-03-20 21:36 (+0900)")
-              (ago   . "  (4 months ago)")
+              (ago   . "  (7 months ago)")
               (rank  . 5)
               (committer . "kiyoka"))
             (lambda ()

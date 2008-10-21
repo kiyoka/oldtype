@@ -647,7 +647,7 @@ Buffer string between BEG and END are replaced with URL."
     (with-temp-buffer
       (shell-command 
        (concat
-	(format "w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'%s\' |" url)
+	"w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'" url "\' |"
 	"awk \'-F\<\' \'/title_alt/ { print $2; }\' |"
 	"tail -1 |"
 	"awk \'-F\"\' \'{ printf(\"%s\", $2); }\'")
@@ -738,7 +738,6 @@ Buffer string between BEG and END are replaced with URL."
 		 (s     (match-beginning 1))
 		 (e     (match-end 3))
 		 (title (oldtype-fetch-html-title url)))
-	    (message str)
 	    (when (string-match    _url_amazon-pattern-part  str)
 	      (setq asin (match-string 1 str)))
 	    (delete-region s e)

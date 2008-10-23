@@ -72,7 +72,7 @@
             (rxmatch-substring m 1)
             wikiname)))
 
-(define (oldtype:wiki-macro->plain expr)
+(define (oldtype:wiki-macro->plain expr rich-mode)
   (let ((command (car expr))
         (arg  ;; symbol list to string list.
          (map
@@ -83,25 +83,46 @@
           (cdr expr)))
         (len (length (cdr expr))))
     (case command
-      ((img)        "[img] ")
+      ((img img-s img-m)
+       (if (and (#/^http:/ (car arg)) rich-mode)
+           (string-append "<img src=\"" (car arg) "\"/>")
+           "[img] "))
       ((todo)       "[TODO] ")
       ((done)       "[DONE] ")
-      ((youtube)    "[YouTube] ")
+      ((youtube youtube-s youtube-m)
+           (if (< 0 len)
+               (let ((_videoid (car arg)))
+                 (if (not rich-mode)
+                     (format #f "[YouTube ~a] " _videoid)
+                     (string-append "<img src=\"" (oldtype:youtube-thumbnail _videoid) "\""
+                                    (case command
+                                      ((youtube)   " ")
+                                      ((youtube-s) (format #f " height=~a " oldtype:image-height-s))
+                                      ((youtube-m) (format #f " height=~a " oldtype:image-height-m)))
+                                    "/>")))
+               "!!Error : No argument ##(youtube VIDEOID) command"))
       ((thumb)
        (if (< 0 len)
            (let1 _url (car arg)
                  (string-append "[Thumb " _url "] "))
            "!!Error : No argument ##(thumb URL) command"))
-      ((amazon)
+      ((amazon amazon-s amazon-m)
        (if (< 0 len)
            (let* ((_asin (car arg))
                   (_asin (if (#/^[0-9]+$/ _asin)
                              (format "~10,,,'0@a" _asin)
                              _asin)))
              (if (#/^[0-9a-zA-Z]+$/ _asin)
-                 (format "[Amazon ~a] " _asin)
+                 (if (not rich-mode)
+                     (format #f "[Amazon ~a]" _asin)
+                     (string-append "<img src=\"" (oldtype:amazon-thumbnail _asin) "\""
+                                    (case command
+                                      ((amazon)   " ")
+                                      ((amazon-s) (format #f " height=~a " oldtype:image-height-s))
+                                      ((amazon-m) (format #f " height=~a " oldtype:image-height-m)))
+                                    "/>"))
                  (format "!!Error : ASIN code format error for ##(amazon asin) command \"~a\"!!" _asin)))
-           "!!Error : No argument ##(amazon URL) command"))
+           "!!Error : No argument ##(amazon ASINCODE) command"))
       ;; timestamp
       ((timestamp)   "[timestamp] ")
       ;; since
@@ -164,7 +185,7 @@
 ;;     ( "wikiname1" "wikiname2")
 ;;   )
 ;;
-(define (oldtype:sxml->plain-text sxmls)
+(define (oldtype:sxml->plain-text sxmls rich-mode)
   (tree->string
    (let rec
        ((sxmls sxmls))
@@ -190,15 +211,29 @@
                       ((pre-ol1)     (cons "# "     (rec arg)))
                       ((pre-ol2)     (cons "## "    (rec arg)))
                       ((pre-ol3)     (cons "### "   (rec arg)))
-                      ((h1)          (cons "[] "    (rec arg)))
-                      ((h2)          (cons "* "     (rec arg)))
-                      ((h3)          (cons "** "    (rec arg)))
-                      ((h4)          (cons "*** "   (rec arg)))
-                      ((h5)          (cons "**** "  (rec arg)))
-                      ((h6)          (cons "***** " (rec arg)))
-                      ((wiki-macro)  (oldtype:wiki-macro->plain arg))
+                      ((h1)          (if rich-mode
+                                         (list "<h1>"   (rec arg) "</h1>")
+                                         (cons "[] "    (rec arg))))
+                      ((h2)          (if rich-mode
+                                         (list "<h2>"   (rec arg) "</h2>")
+                                         (cons "* "     (rec arg))))
+                      ((h3)          (if rich-mode
+                                         (list "<h3>"   (rec arg) "</h3>")
+                                         (cons "** "    (rec arg))))
+                      ((h4)          (if rich-mode
+                                         (list "<h4>"   (rec arg) "</h4>")
+                                         (cons "*** "   (rec arg))))
+                      ((h5)          (if rich-mode
+                                         (list "<h5>"   (rec arg) "</h5>")
+                                         (cons "**** "  (rec arg))))
+                      ((h6)          (if rich-mode
+                                         (list "<h6>"   (rec arg) "</h6>")
+                                         (cons "***** " (rec arg))))
+                      ((wiki-macro)  (oldtype:wiki-macro->plain arg rich-mode))
                       ((wiki-name)   (oldtype:wikiname->plain (car arg)))
-                      ((hr)          (list "----\n"))
+                      ((hr)          (if rich-mode
+                                         (list "<hr>")
+                                         (list "----\n")))
                       ((@)           '())
                       ((@@)          '())
                       (else

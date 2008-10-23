@@ -58,6 +58,7 @@
           get-text
           get-text-list
           get-plain-list
+          get-rich-list
           get-rss-entry-pages
           ))
 (select-module oldtype.page)
@@ -78,6 +79,9 @@
    ;; vector of text in page
    (plain       :accessor plain-of       :init-keyword :plain
                 :init-value '())
+   ;; vector of rich text in page
+   (rich        :accessor rich-of        :init-keyword :rich
+                :init-value '())
    ))
 
 
@@ -97,7 +101,12 @@
   (set! (plain-of self)
         (list->vector
          (string-split
-          (oldtype:sxml->plain-text (sxml-of self))
+          (oldtype:sxml->plain-text (sxml-of self) #f)
+          #\newline)))
+  (set! (rich-of self)
+        (list->vector
+         (string-split
+          (oldtype:sxml->plain-text (sxml-of self) #t)
           #\newline)))
   self)
 
@@ -107,7 +116,8 @@
     (name     . ,(name-of     self))
     (sxml     . ,(sxml-of     self))
     (timeline . ,(serialize (timeline-of self)))
-    (plain    . ,(vector->list (plain-of self)))))
+    (plain    . ,(vector->list (plain-of self)))
+    (rich     . ,(vector->list (rich-of self)))))
 
 
 (define-method deserialize ((dummy <oldtype-page>) internal-data)
@@ -115,7 +125,8 @@
     :name      (assq-ref internal-data 'name)
     :sxml      (assq-ref internal-data 'sxml)
     :timeline  (deserialize (make <oldtype-timeline>) (assq-ref internal-data 'timeline))
-    :plain     (list->vector (assq-ref internal-data 'plain))))
+    :plain     (list->vector (assq-ref internal-data 'plain))
+    :rich      (list->vector (assq-ref internal-data 'rich))))
 
 
 (define-method get-revision ((self <oldtype-page>) lineno)
@@ -147,6 +158,9 @@
 
 (define-method get-plain-list ((self <oldtype-page>))
   (vector->list (plain-of self)))
+
+(define-method get-rich-list ((self <oldtype-page>))
+  (vector->list (rich-of self)))
 
 
 (define-method _get-rss-lineno-list ((self <oldtype-page>))

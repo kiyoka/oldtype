@@ -160,7 +160,14 @@
       ('plain
        (let* (
               (sxml           (oldtype-parse input-port))
-              (sexp           (oldtype:sxml->plain-text sxml)))
+              (sexp           (oldtype:sxml->plain-text sxml #f)))
+         (print
+          (tree->string
+           sexp))))
+      ('rich
+       (let* (
+              (sxml           (oldtype-parse input-port))
+              (sexp           (oldtype:sxml->plain-text sxml #t)))
          (print
           (tree->string
            sexp))))

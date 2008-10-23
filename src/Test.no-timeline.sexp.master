@@ -25,4 +25,5 @@
   (annotation)
   (text)
   (distribution))
- (plain "* UnitTest用のサンプルファイル" "----" "*** start" "*** Entry1" "*** Entry2" "*** end" ""))
+ (plain "* UnitTest用のサンプルファイル" "----" "*** start" "*** Entry1" "*** Entry2" "*** end" "")
+ (rich "<h2>UnitTest用のサンプルファイル" "</h2><hr><h4>start" "</h4><h4>Entry1" "</h4><h4>Entry2" "</h4><h4>end" "</h4>"))

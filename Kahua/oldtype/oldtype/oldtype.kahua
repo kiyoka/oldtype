@@ -440,7 +440,7 @@
                  (description/
                   (string-append
                    "<pre>"
-                   (string-join (get-plain-list e) "\n")
+                   (string-join (get-rich-list e) "\n")
                    "</pre>"))
                  (link/             uri)
                  (guid/             uri)

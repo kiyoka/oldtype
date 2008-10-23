@@ -56,6 +56,10 @@
           oldtype:utc->ago-string
           oldtype:grouping-blog-entries
           oldtype:thumbnail-filter
+          oldtype:amazon-link
+          oldtype:amazon-thumbnail
+          oldtype:youtube-link
+          oldtype:youtube-thumbnail
           pretty-print-sexp))
 (select-module oldtype.util)
 
@@ -340,5 +344,18 @@
                    "##(" (car command-pair) "-s " (cadr x) ") ")))
           (reverse ret)))))
 
+
+(define (oldtype:amazon-link asin-code)
+  (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" asin-code))
+
+(define (oldtype:amazon-thumbnail asin-code)
+  (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" asin-code))
+
+(define (oldtype:youtube-link video-id)
+  (format #f "http://www.youtube.com/v/~a" video-id))
+
+(define (oldtype:youtube-thumbnail video-id)
+  (format #f "http://img.youtube.com/vi/~a/1.jpg" video-id))
+                                   
 
 (provide "oldtype/util")

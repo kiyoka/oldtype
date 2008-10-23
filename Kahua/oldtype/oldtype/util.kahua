@@ -251,9 +251,9 @@
       ((youtube-s youtube-m)
        (if (< 0 len)
            (let1 _videoid (car arg)
-                 (a/ (@/ (href (format "http://www.youtube.com/v/~a" _videoid)))
+                 (a/ (@/ (href (oldtype:youtube-link _videoid)))
                      (img/
-                      (@/ (src (format "http://img.youtube.com/vi/~a/1.jpg" _videoid))
+                      (@/ (src (oldtype:youtube-thumbnail _videoid))
                           (alt _videoid)
                           (class "help")
                           (title "Click here to open YouTube.com")
@@ -288,9 +288,9 @@
                              _asin)))
              (if (#/^[0-9a-zA-Z]+$/ _asin)
                  (a/
-                  (@/ (href (format #f "http://amazon.co.jp/o/ASIN/~a/kiye-22/ref=nosim" _asin)))
+                  (@/ (href (oldtype:amazon-link _asin)))
                   (img/
-                   (@/ (src (format #f "http://images.amazon.com/images/P/~a.09.MZZZZZZZ_.jpg" _asin))
+                   (@/ (src (oldtype:amazon-thumbnail _asin))
                        (alt _asin)
                        (class "help")
                        (title "Click here to open amazon.co.jp")

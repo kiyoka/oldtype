@@ -171,6 +171,11 @@
          (print
           (tree->string
            sexp))))
+      ('commands
+       (let* (
+              (sxml           (oldtype-parse input-port))
+              (sexp           (oldtype:sxml->command-list sxml)))
+         (pretty-print-sexp sexp)))
       (else
        (cerr (format "Unsupported type. [~a]" (symbol->string type)))
        (exit 1))))

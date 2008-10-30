@@ -13,6 +13,8 @@ all: log.txt  Test.ann.txt  Entry1.ann.txt  Entry2.ann.txt
 	gosh -I ../Kahua/oldtype ./oldtype_to plain     ../edit/Sample2.ot > Sample2.txt
 	gosh -I ../Kahua/oldtype ./oldtype_to rich      ../edit/Sample1.ot > Sample1.rich.txt
 	gosh -I ../Kahua/oldtype ./oldtype_to rich      ../edit/Sample2.ot > Sample2.rich.txt
+	gosh -I ../Kahua/oldtype ./oldtype_to commands  ../edit/Sample1.ot > Sample1.commands
+	gosh -I ../Kahua/oldtype ./oldtype_to commands  ../edit/Sample2.ot > Sample2.commands
 
 test: log.txt Test.ann.txt
 	gosh -I ../Kahua/oldtype test.scm  ${OTSAMPLE} log.txt Test.ann.txt > test.log

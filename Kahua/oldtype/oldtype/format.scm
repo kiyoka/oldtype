@@ -52,6 +52,7 @@
           oldtype:expand-page
           oldtype:format-line-plainly
           oldtype:sxml->plain-text
+          oldtype:sxml->command-list
           ))
 (select-module oldtype.format)
 
@@ -85,7 +86,12 @@
     (case command
       ((img img-s img-m)
        (if (and (#/^http:/ (car arg)) rich-mode)
-           (string-append "<img src=\"" (car arg) "\"/>")
+           (string-append "<img src=\"" (car arg) "\""
+                          (case command
+                            ((img)   " ")
+                            ((img-s) (format #f " height=~a " oldtype:image-height-s))
+                            ((img-m) (format #f " height=~a " oldtype:image-height-m)))
+                          "/>")
            "[img] "))
       ((todo)       "[TODO] ")
       ((done)       "[DONE] ")
@@ -142,40 +148,38 @@
 
 ;;
 ;; SXML to wiki-command list in the page.
-;;   TODO: unit-test
 ;;
-;(define (oldtype:sxml->command-list sxmls)
-;  (let* (
-;         (commands '())
-;         (sxmls sxmls))
-;    (match sxmls
-;           (()  '())
-;           (((and (name . _) sxml) . rest) ;; generic node
-;            (let1 arg (cdr sxml)
-;                  (cons
-;                   (case name
-;                     ((div)
-;                      (let* ((param (car arg)) ;; param is assoc-list
-;                             (lineno (assq-ref param 'lineno)))
-;                        (rec (cdr arg))))
-;                     ((a)
-;                      (let1 param (car arg) ;; param is assoc-list
-;                            (rec (cdr arg))))
-;                     ((p-normal pre-quote pre-verb pre-ul1 pre-ul2 pre-ul3 pre-ol1 pre-ol2 pre-ol3 h1 h2 h3 h4 h5 h6)
-;                      (rec arg))
-;                     ((hr @ @@)
-;                      '())
-;                     ((wiki-macro)
-;                      (push! commands (car arg)))
-;                     ((wiki-name)
-;                      (push! commands (car arg)))
-;                     (else
-;                      (format "!!Error : no such tag \"~a\"!!" name)))
-;                   (rec rest))))
-;           ((other . rest)
-;            (cons other (rec rest))))
-;    commands))
-;
+(define (oldtype:sxml->command-list sxmls)
+  (let1 commands '()
+        (let rec
+            ((sxmls sxmls))
+          (match sxmls
+                 (()  '())
+                 (((and (name . _) sxml) . rest) ;; generic node
+                  (let1 arg (cdr sxml)
+                        (cons
+                         (case name
+                           ((div)
+                            (let* ((param (car arg)) ;; param is assoc-list
+                                   (lineno (assq-ref param 'lineno)))
+                              (rec (cdr arg))))
+                           ((a)
+                            (let1 param (car arg) ;; param is assoc-list
+                                  (rec (cdr arg))))
+                           ((p-normal pre-quote pre-verb pre-ul1 pre-ul2 pre-ul3 pre-ol1 pre-ol2 pre-ol3 h1 h2 h3 h4 h5 h6)
+                            (rec arg))
+                           ((wiki-macro)
+                            (push! commands arg))
+                           ((wiki-name)
+                            (push! commands arg))
+                           (else
+                            '()))
+                         (rec rest))))
+                 ((other . rest)
+                  (cons other (rec rest)))))
+        (reverse commands)))
+
+
 
 ;;
 ;; return:

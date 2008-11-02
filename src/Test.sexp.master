@@ -99,4 +99,9 @@
    (13317 6 5 4 3)
    (13304 2)))
  (plain "* UnitTest用のサンプルファイル" "----" "*** start" "*** Entry1" "*** Entry2" "*** end" "")
- (rich "<h2>UnitTest用のサンプルファイル" "</h2><hr><h4>start" "</h4><h4>Entry1" "</h4><h4>Entry2" "</h4><h4>end" "</h4>"))
+ (rich "<h2>UnitTest用のサンプルファイル" "</h2><hr><h4>start" "</h4><h4>Entry1" "</h4><h4>Entry2" "</h4><h4>end" "</h4>")
+ (commands
+  (reference "Entry1" "Test")
+  ("Entry1")
+  (reference "Entry2" "Test")
+  ("Entry2")))

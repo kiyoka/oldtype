@@ -112,6 +112,7 @@
                       (string-append orig "\n")))
                 (get-text-list oldtype-page)))))
             ""
+            '() ;; command-list
             lineno
             ))))
    nodeset))
@@ -274,7 +275,7 @@
                  (rec rest)))))))))
 
 
-(define (standard-page wikiname barcode nodes first-line . rest-arg)
+(define (standard-page wikiname barcode nodes first-line command-list . rest-arg)
   (html/ (head/ (title/ (string-append wikiname " / " first-line))
                 (link/ (@/ (rel "stylesheet") (type "text/css")
                            (href (string-append "/kahua/" (kahua-worker-type) "/oldtype.css"))))
@@ -333,6 +334,8 @@
                        (title "PLAIN TEXT"))
                    (oldtype:icon-image 'plain))
                (oldtype:hatena-bookmarks wikiname))
+          (text/ "Related pages:")(oldtype:reference-pages/ wikiname command-list)
+          (br/)
           barcode
           (hr/)
           nodes
@@ -356,23 +359,25 @@
 
 
 (define (show-page/page wikiname)
-  (let1 oldtype-page (oldtype:load-page (kahua-site-root) wikiname)
-        (standard-page
-         wikiname
-         (if oldtype-page
-             (oldtype-page->barcode oldtype-page)
-             (br/))
-         (if oldtype-page
-             (oldtype-page->higher-order-tag oldtype-page)
-             (div/
-              (p/
-               (@/ (class "center"))
-               (strong/
-                (@/ (class "caption"))
-                "This wikipage was not found."))))
-         (if oldtype-page
-             (oldtype-first-line oldtype-page)
-             ""))))
+  (let ((oldtype-page (oldtype:load-page (kahua-site-root) wikiname))
+        (command-list (oldtype:load-command-list (kahua-site-root))))
+    (standard-page
+     wikiname
+     (if oldtype-page
+         (oldtype-page->barcode oldtype-page)
+         (br/))
+     (if oldtype-page
+         (oldtype-page->higher-order-tag oldtype-page)
+         (div/
+          (p/
+           (@/ (class "center"))
+           (strong/
+            (@/ (class "caption"))
+            "This wikipage was not found."))))
+     (if oldtype-page
+         (oldtype-first-line oldtype-page)
+         "")
+     command-list)))
 
 
 (define-entry (show-page wikiname)

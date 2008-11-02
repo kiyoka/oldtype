@@ -31,6 +31,8 @@ Entry1.ann.txt: ../edit/Entry1.ot
 Entry2.ann.txt: ../edit/Entry2.ot
 	svn ann ../edit/Entry2.ot  > Entry2.ann.txt
 
+reftest:
+	gosh -I ../Kahua/oldtype ../command/genref /Users/kiyoka/work/site-unstable
 
 svninfo:
 	svn --xml info ${OTSAMPLE} > info.xml

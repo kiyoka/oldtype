@@ -149,7 +149,16 @@
 ;;
 ;; SXML to wiki-command list in the page.
 ;;
-(define (oldtype:sxml->command-list sxmls)
+;;  data format is :
+;;    '(
+;;       ("string")                  ;; means [[string]] wiki name
+;;       (reference "B" "A")         ;; means `page A has reference to page B.' ( A->B )
+;;       (command arg1 arg2...)      ;; means ##(command arg1 arg2...)
+;;        .
+;;        .
+;;     )
+;;
+(define (oldtype:sxml->command-list sxmls wikiname)
   (let1 commands '()
         (let rec
             ((sxmls sxmls))
@@ -171,6 +180,9 @@
                            ((wiki-macro)
                             (push! commands arg))
                            ((wiki-name)
+                            (if (string? (car arg))
+                                (if (not (#/[|]/ (car arg)))
+                                    (push! commands (list 'reference (car arg) wikiname))))
                             (push! commands arg))
                            (else
                             '()))

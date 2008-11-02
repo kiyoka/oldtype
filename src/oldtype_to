@@ -174,7 +174,7 @@
       ('commands
        (let* (
               (sxml           (oldtype-parse input-port))
-              (sexp           (oldtype:sxml->command-list sxml)))
+              (sexp           (oldtype:sxml->command-list sxml wikiname)))
          (pretty-print-sexp sexp)))
       (else
        (cerr (format "Unsupported type. [~a]" (symbol->string type)))

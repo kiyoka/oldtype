@@ -5,12 +5,11 @@
 . ${OT_HOME}/bin/lib.sh
 
 _oldtype_to() {
-    t=$1
-    src=$2
-    dst=$3
-    log=$4
-    ann=$5
-    ${OT_HOME}/src/oldtype_to ${t} ${src} ${log} ${ann} > ../_out/${base}.sexp.tmp
+    src=$1
+    log=$2
+    ann=$3
+    ${OT_HOME}/src/oldtype_to internal ${src} ${log} ${ann} > ../_out/${base}.sexp.tmp
+    ${OT_HOME}/src/oldtype_to commands ${src} ${log} ${ann} > ../_out/${base}.commands
 
     if [ "$?" = "0" ] ; then
 	/bin/mv -f ../_out/${base}.sexp.tmp ../_out/${base}.sexp
@@ -41,7 +40,7 @@ for f in $locallist;
 do
   base=`basename ${f} .ot`
   echo "[" ${base} "]"
-  _oldtype_to internal "${base}.ot" ../_out/${base}.sexp
+  _oldtype_to "${base}.ot"
 done
 
 function convert_p() {
@@ -73,8 +72,13 @@ do
 	  echo ${msg}
 	  logger "OldType: ${msg}"
       fi
-      _oldtype_to internal "${base}.ot" ../_out/${base}.sexp     ../_tmp/tmp.log ../_tmp/tmp.ann
+      _oldtype_to "${base}.ot"   ../_tmp/tmp.log ../_tmp/tmp.ann
   fi
 done
+
+# create _commands.sexp
+echo "(" > ../_out/__commands.sexp
+cat ../_out/*.commands >> ../_out/__commands.sexp
+echo ")" >> ../_out/__commands.sexp
 
 popd

@@ -35,6 +35,7 @@
   (use oldtype.page)
   (export 
    oldtype:load-page
+   oldtype:load-command-list
    ))
 (select-module oldtype.core)
 
@@ -60,6 +61,27 @@
                      (make <oldtype-page>)
                      (read (current-input-port)))))
                 #f))))
+
+
+(define (oldtype:load-command-list _site-root)
+  (define (gen-sexp-filename1)
+    (string-append _site-root "/tmp/oldtype/_out/__commands.sexp"))
+  (define (gen-sexp-filename2)
+    (string-append "./__commands.sexp"))
+  (let1 filename (cond
+                  ((file-exists? (gen-sexp-filename1))
+                   (gen-sexp-filename1))
+                  ((file-exists? (gen-sexp-filename2))
+                   (gen-sexp-filename2))
+                  (else
+                   #f))
+        (if filename
+            (with-input-from-file filename
+              (lambda ()
+                (apply
+                 append
+                 (read (current-input-port)))))
+            #f)))
 
 
 (provide "oldtype/core")

@@ -81,7 +81,7 @@
                 (apply
                  append
                  (read (current-input-port)))))
-            #f)))
+            '())))
 
 
 (provide "oldtype/core")

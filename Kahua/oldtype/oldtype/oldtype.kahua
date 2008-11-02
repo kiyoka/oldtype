@@ -334,7 +334,7 @@
                        (title "PLAIN TEXT"))
                    (oldtype:icon-image 'plain))
                (oldtype:hatena-bookmarks wikiname))
-          (text/ "Related pages:")(oldtype:reference-pages/ wikiname command-list)
+          (text/ "Related pages:")(oldtype:reference-pages/ wikiname command-list 10)
           (br/)
           barcode
           (hr/)

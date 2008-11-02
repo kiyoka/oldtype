@@ -472,14 +472,8 @@
          (img/ (@/ (src (string-append "http://b.hatena.ne.jp/entry/image/http://" (oldtype:get-arguments 'fqdn) path)))))))
 
 
-(define (oldtype:reference-pages/ wikiname command-list)
-  (let1 ret 
-        (map/
-         (lambda (name)
-           (node-set/
-            (text/ " ")
-            (a/ (@/ (href name))
-                name)))
+(define (oldtype:reference-pages/ wikiname command-list limit)
+  (let* ((refs
          (reverse
           (sort
            (delete-duplicates
@@ -496,9 +490,17 @@
                          #f))
                    #f))
              command-list)))))
-        (if (null? ret)
-            (text/ "")
-            ret)))
+         (refs (take* refs limit)))
+    (if (null? refs)
+        (text/ "")
+        (map/
+         (lambda (name)
+           (node-set/
+            (text/ " ")
+            (a/ (@/ (href name))
+                name)))
+         refs))))
+
        
        
 

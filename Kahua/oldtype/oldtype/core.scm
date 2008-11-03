@@ -36,6 +36,7 @@
   (export 
    oldtype:load-page
    oldtype:load-command-list
+   oldtype:reference-with-pagerank
    ))
 (select-module oldtype.core)
 
@@ -62,6 +63,38 @@
                      (read (current-input-port)))))
                 #f))))
 
+
+;;
+;; return
+;;  (
+;;   ("wikiname" . count)
+;;     .
+;;     .
+;;  )
+;;
+(define (oldtype:reference-with-pagerank command-list)
+  (let* ((to-s
+          (filter-map
+           (lambda (x)
+             (if (eq? 'reference (car x))
+                 (let ((from (caddr x))
+                       (to   (cadr x)))
+                   to)
+                 #f))
+           command-list))
+         (ht (make-hash-table 'string=?)))
+    (for-each
+     (lambda (to)
+       (hash-table-push! ht to to))
+     to-s)
+    (sort
+     (hash-table-map
+      ht
+      (lambda (key value)
+        (cons key (length value))))
+     (lambda (x y)
+       (> (cdr x) (cdr y))))))
+  
 
 (define (oldtype:load-command-list _site-root)
   (define (gen-sexp-filename1)

@@ -708,4 +708,12 @@ td.header_R {
 	align:        right;
 }
 
-
+a.large {
+        font-size: large;
+}
+a.normal {
+	font-size: normal;
+}
+a.small {
+	font-size: small;
+}

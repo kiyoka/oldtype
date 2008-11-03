@@ -473,35 +473,46 @@
 
 
 (define (oldtype:reference-pages/ wikiname command-list limit)
-  (let* ((refs
-         (reverse
-          (sort
-           (delete-duplicates
-            (filter-map
-             (lambda (x)
-               (if (eq? 'reference (car x))
-                   (let ((from (caddr x))
-                         (to   (cadr x)))
-                     (if (and (string=? wikiname to)
-                              (not (string=? from wikiname))
-                              (not (string=? from "!RecentChanges"))
-                              (not (string=? from "!AllPages")))
-                         from
-                         #f))
-                   #f))
-             command-list)))))
-         (refs (take* refs limit)))
+  (let* (
+         (refs
+          (delete-duplicates
+           (filter-map
+            (lambda (x)
+              (if (eq? 'reference (car x))
+                  (let ((from (caddr x))
+                        (to   (cadr x)))
+                    (if (and (string=? wikiname to)
+                             (not (string=? from wikiname))
+                             (not (string=? from "!RecentChanges"))
+                             (not (string=? from "!AllPages")))
+                        from
+                        #f))
+                  #f))
+            command-list)))
+         (pages
+          (filter
+           (lambda (name)
+             (member name refs))
+           (map car (oldtype:reference-with-pagerank command-list))))
+         (pages
+          (map-with-index
+           (lambda (i v)
+             (cons i v))
+           (take* pages limit))))
+
     (if (null? refs)
         (text/ "")
         (map/
-         (lambda (name)
-           (node-set/
-            (text/ " ")
-            (a/ (@/ (href name))
-                name)))
-         refs))))
-
-       
-       
-
+         (lambda (x)
+           (let ((i (car x))
+                 (name (cdr x)))
+             (node-set/
+              (text/ " ")
+              (a/ (@/ (href name)
+                      (class 
+                        (if (> (/ limit 2) i)
+                            "large"
+                            "small")))
+                  name))))
+         pages))))
 

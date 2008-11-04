@@ -490,6 +490,7 @@
                         #f))
                   #f))
             command-list)))
+         (refs (take* refs limit))
          (pages
           (filter
            (lambda (name)
@@ -499,7 +500,7 @@
           (map-with-index
            (lambda (i v)
              (cons i v))
-           (take* pages limit))))
+           pages)))
 
     (if (null? refs)
         (text/ "")

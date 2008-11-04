@@ -363,6 +363,7 @@
                         nodes
                         (p/ "Back to " (oldtype:expand-wiki-name (name-of oldtype-page))))
                        ""
+                       '()
                        1)))))
         (table/ (@/ (class "comment"))
                 (tr/ (th/

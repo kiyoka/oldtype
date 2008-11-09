@@ -28,6 +28,9 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.1.0]
+;;     1. Added oldtype-todays-entry() function.
+;; 
 ;;   [0.0.9]
 ;;     1. Bugfix: 'Converting URL to ##(amazon ASIN) command' feature generates wrong ASIN code.
 ;;
@@ -59,7 +62,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.0.9")
+(defconst oldtype-version "0.1.0")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -634,6 +637,32 @@ Buffer string between BEG and END are replaced with URL."
      alink-list)
     (if (not found)
 	(newline))))
+
+
+(defun oldtype-todays-entry ()
+  "Open today's blog entry file."
+  (interactive)
+
+  (defun oldtype-today ()
+    (let* ((oldtype-hour-offset 0)
+	   (offset-second (* oldtype-hour-offset 60 60))
+	   (now (current-time))
+	   (high (nth 0 now))
+	   (low (+ (nth 1 now) offset-second))
+	   (micro (nth 2 now)))
+      (setq high (+ high (/ low 65536))
+	    low (% low 65536))
+      (when (< low 0)
+	(setq high (1- high)
+	      low (+ low 65536)))
+      (list high low micro)))
+
+  (let ((bufname 
+	 (concat (getenv "USER")
+		 "."
+		 (format-time-string "%Y_%m_%d" (oldtype-today))
+		 ".ot")))
+    (find-file-other-window bufname)))
 
 
 ;;

@@ -392,8 +392,12 @@
                          (oldtype:icon-image 'comment)
                          (uri-decode-string (car arg))))
                    (tr/ (td/
-                         (pre/ (@/ (class "comment"))
-                               (uri-decode-string (cadr arg))))))))
+                         (map/
+                          (lambda (line)
+                            (pre/ (@/ (class "comment")) line))
+                          (string-split 
+                           (uri-decode-string (cadr arg))
+                           #\newline)))))))
 
       ;; no listing to !RecentChanges
       ((nolist)

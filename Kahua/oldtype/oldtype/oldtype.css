@@ -538,7 +538,7 @@ p.oldtype {
 
 pre.verb {
 	color: #333333;
-	background-color: #e6e6fa;
+	background-color: #c6c7d3;
         padding-top: 0.0em;
         padding-bottom: 0.0em;
 	padding: 0.0em;
@@ -682,6 +682,14 @@ strong.notice {
 }
 
 pre.comment {
+	margin-left:	0.5em;
+	font-size:      medium;
+	padding-left:   0.5em;
+	margin-top:     1px;
+	margin-bottom:  1px;
+}
+
+p.comment {
 	margin-left:	0.5em;
 	font-size:      medium;
 	padding-left:   0.5em;

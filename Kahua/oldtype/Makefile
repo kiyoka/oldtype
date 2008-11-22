@@ -36,7 +36,8 @@ KAHUACONFIG =  -S /home/kiyoka/work/site-unstable
 
 TEST_DIR    = $(PWD)
 SCRIPTFILES = \
-	$(package)/$(package).kahua $(package)/version.kahua $(package)/util.kahua $(package)/format.scm $(package)/core.scm \
+	$(package)/$(package).kahua $(package)/version.kahua $(package)/util.kahua $(package)/oldtype-rss.kahua \
+	$(package)/format.scm $(package)/core.scm \
 	$(package)/parse.scm $(package)/util.scm $(package)/pasttime.scm $(package)/page.scm $(package)/timeline.scm \
 	$(package)/log.scm $(package)/svn.scm
 STATICFILES = $(package)/$(package).css $(package)/staticimg/*.png $(package)/staticimg/*.gif $(package)/*.el $(package)/import/*.js $(package)/import/*.css $(package)/$(package).js

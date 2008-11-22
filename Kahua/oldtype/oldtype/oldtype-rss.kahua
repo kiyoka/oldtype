@@ -17,8 +17,6 @@
 (use srfi-1)
 (use srfi-19)
 (use srfi-27)
-(load "oldtype/version.kahua")
-(load "oldtype/util.kahua")
 (use util.list)
 (use util.match)
 (use gauche.sequence)

@@ -19,6 +19,7 @@
 (use srfi-27)
 (load "oldtype/version.kahua")
 (load "oldtype/util.kahua")
+(load "oldtype/oldtype-rss.kahua")
 (use util.list)
 (use util.match)
 (use gauche.sequence)

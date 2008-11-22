@@ -1,0 +1,94 @@
+;; -*- coding: utf-8; mode: kahua -*-
+;;
+;;  Copyright (c) 2008 Kiyoka Nishiyama, All rights reserved.
+;;  See COPYING for terms and conditions of using this software
+;;
+;; $Id:$
+;;
+
+(use oldtype.parse)
+(use oldtype.format)
+(use oldtype.util)
+(use oldtype.core)
+(use oldtype.log)
+(use oldtype.timeline)
+(use oldtype.page)
+(use oldtype.svn)
+(use srfi-1)
+(use srfi-19)
+(use srfi-27)
+(use util.list)
+(use util.match)
+(use gauche.sequence)
+(use rfc.uri)
+
+
+;; define elements for RSS 2.0
+(define-elements channel rss description lastBuildDate docs generator item pubDate author guid atom:link)
+
+;; get-rss entry
+(define (gen-rss/ base-url index-page entry-pages)
+  (let* ((wikiname       (name-of index-page))
+         (entry-pages    (if (null? entry-pages)
+                             (list index-page)
+                             entry-pages))
+         (build-date-utc
+          (last
+           (sort
+            (map
+             (lambda (e)
+               (utc-of
+                (get-latest-log
+                 (timeline-of e))))
+             entry-pages))))
+         (build-date-utc
+          (- build-date-utc (* 60 5))))  ;; build date is 5 minutes ago from latest entry
+    (rss/ (@/ (version "2.0")
+              (xmlns:atom "http://www.w3.org/2005/Atom"))
+          (channel/
+           (atom:link/
+            (@/ (href (string-append base-url "get-rss/" wikiname))
+                (rel  "self")
+                (type "application/rss+xml")))
+           (title/                (string-append wikiname "::" (oldtype-first-line index-page)))
+           (link/                 (string-append base-url "show-page/" wikiname))
+           (description/          (oldtype-first-line index-page))
+           (lastBuildDate/        (oldtype:utc->RFC822-date-string build-date-utc))
+           (docs/                 "http://blogs.law.harvard.edu/tech/rss")
+           (generator/            (string-append "OldType version " *oldtype-version*))
+           (map/
+            (lambda (e)
+              (let* ((timeline (timeline-of e))
+                     (lineno   (- (last (get-latest-lines timeline)) 5))
+                     (uri      
+                      (string-append base-url "show-page/" (uri-encode-string (name-of e))
+                                     (if (< 1 lineno)
+                                         (string-append "#" (number->string lineno))
+                                         ""))))
+                (item/
+                 (title/            (string-append (name-of e) "::" (oldtype-first-line e)))
+                 (description/
+                  (string-append
+                   "<pre>"
+                   (string-join (get-rich-list e) "\n")
+                   "</pre>"))
+                 (link/             uri)
+                 (guid/             uri)
+                 (pubDate/          (oldtype:utc->RFC822-date-string
+                                     (utc-of
+                                      (get-latest-log timeline))))
+                 (author/       (committer-of (get-latest-log timeline))))))
+            entry-pages)
+           ))))
+
+
+(define-entry (get-rss wikiname)
+  (let1 oldtype-page (oldtype:load-page (kahua-site-root) wikiname)
+        (when/ oldtype-page
+               (gen-rss/ 
+                (format "http://~a/" (oldtype:get-arguments 'fqdn))
+                oldtype-page
+                (filter-map
+                 (lambda (x)
+                   (oldtype:load-page (kahua-site-root) (cdr x)))
+                 (get-rss-entry-pages oldtype-page))))))

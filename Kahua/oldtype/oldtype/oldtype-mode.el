@@ -657,12 +657,11 @@ Buffer string between BEG and END are replaced with URL."
 	      low (+ low 65536)))
       (list high low micro)))
 
-  (let ((bufname 
+  (let ((wikiname 
 	 (concat (getenv "USER")
 		 "."
-		 (format-time-string "%Y_%m_%d" (oldtype-today))
-		 ".ot")))
-    (find-file-other-window bufname)))
+		 (format-time-string "%Y_%m_%d" (oldtype-today)))))
+    (oldtype-openfile wikiname)))
 
 
 ;;

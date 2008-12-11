@@ -394,7 +394,7 @@
                    (tr/ (td/
                          (map/
                           (lambda (line)
-                            (pre/ (@/ (class "comment")) line))
+                            (p/ (@/ (class "comment")) line))
                           (string-split 
                            (uri-decode-string (cadr arg))
                            #\newline)))))))

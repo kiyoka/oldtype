@@ -31,7 +31,7 @@
   (let* ((wikiname       (name-of index-page))
          (entry-pages    (if (null? entry-pages)
                              (list index-page)
-                             entry-pages))
+                             (take* entry-pages oldtype:rss-limit)))
          (build-date-utc
           (last
            (sort

@@ -41,6 +41,7 @@
           oldtype:version
           oldtype:site-url
           oldtype:rank-limit
+          oldtype:rss-limit
           oldtype:image-height-s
           oldtype:image-height-m
           oldtype:get-string-of-today
@@ -72,6 +73,7 @@
 (define oldtype:version  *oldtype-version*)
 (define oldtype:site-url "http://sourceforge.jp/projects/oldtype/")
 (define oldtype:rank-limit 5)
+(define oldtype:rss-limit 30)
 (define oldtype:image-height-s 40)
 (define oldtype:image-height-m 80)
 

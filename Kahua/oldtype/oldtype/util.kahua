@@ -20,67 +20,36 @@
 
 
 ;;<!-- SiteSearch Google -->
-;;<center>
-;;<form method=get action="http://www.google.co.jp/search">
-;;<table bgcolor="#FFFFFF"><tr valign=top><td>
-;;<a href="http://www.google.co.jp/">
-;;<img src="http://www.google.com/logos/Logo_40wht.gif" 
-;;border="0" alt="Google" align="absmiddle"></a>
-;;</td>
-;;<td>
-;;<input type=text name=q size=31 maxlength=255 value="">
-;;<input type=hidden name=ie value=UTF-8>
-;;<input type=hidden name=oe value=UTF-8>
-;;<input type=hidden name=hl value="ja">
-;;<input type=submit name=btnG value="Google 検索">
-;;<font size=-1>
-;;<input type=hidden name=domains value="oldtype.sumibi.org"><br>
-;;<input type=radio name=sitesearch value=""> WWW を検索 
-;;<input type=radio name=sitesearch value="oldtype.sumibi.org" checked> oldtype.sumibi.org を検索
-;;</font>
-;;</td></tr></table>
+;;<form action="http://www.google.com/cse" id="cse-search-box">
+;;  <div>
+;;    <input type="hidden" name="cx" value="005847915313634728664:qzl0os7e8d4" />
+;;    <input type="hidden" name="ie" value="UTF-8" />
+;;    <input type="text" name="q" size="31" />
+;;    <input type="submit" name="sa" value="検索" />
+;;  </div>
 ;;</form>
-;;</center>
+;;<script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&lang=ja"></script>
 ;;<!-- SiteSearch Google -->
 (define (oldtype:google-searchbox)
-  (form/ (@/ (method "get")
-            (action "http://www.google.co.jp/search"))
-         (table/ (@/ (bgcolor "#FFFFFF"))
-                 (tr/ (@/ (valign "top"))
-                      (td/
-                       (input/ (@/ (type "text")
-                                   (name "q")
-                                   (size "31")
-                                   (maxlength "255")
-                                   (value "")))
-                       (input/ (@/ (type "hidden")
-                                   (name "ie")
-                                   (value "UTF-8")))
-                       (input/ (@/ (type "hidden")
-                                   (name "oe")
-                                   (value "UTF-8")))
-                       (input/ (@/ (type "hidden")
-                                   (name "hl")
-                                   (value "ja")))
-                       (input/ (@/ (type "submit")
-                                   (name "btnG")
-                                   (value "Google 検索")))
-                       (font/ (@/ (size "-1"))
-                              (input/ (@/ (type "hidden")
-                                          (name "domains")
-                                          (value (oldtype:get-arguments 'fqdn))))
-                              (br/)
-                              (input/ (@/ (type "radio")
-                                          (name "sitesearch")
-                                          (value "")))
-                              "WWW を検索"
-                              (input/ (@/ (type "radio")
-                                          (name "sitesearch")
-                                          (value (oldtype:get-arguments 'fqdn))
-                                          (checked "true")))
-                              (string-append (oldtype:get-arguments 'fqdn)
-                                             " を検索")))))))
-
+  (node-set/
+   (form/ (@/ (method "get")
+              (action "http://www.google.com/cse")
+              (id     "cse-search-box"))
+          (div/
+           (input/ (@/ (type  "hidden")
+                       (name  "cx")
+                       (value "005847915313634728664:qzl0os7e8d4")))
+           (input/ (@/ (type  "hidden")
+                       (name  "ie")
+                       (value "UTF-8")))
+           (input/ (@/ (type  "text")
+                       (name  "q")
+                       (size  "31")))
+           (input/ (@/ (type  "submit")
+                       (name  "sa")
+                       (value "検索")))))
+   (script/ (@/ (type  "text/javascript")
+                (src   "http://www.google.com/coop/cse/brand?form=cse-search-box&lang=ja")))))
 
 (define (oldtype:icon-image sym)
   (case sym

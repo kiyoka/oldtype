@@ -478,7 +478,7 @@
 
      (pre.ul1 
              (margin-left "0.5em")
-             (background-image "url(staticimg/dot18.png)")
+             (background-image "url(/kahua/oldtype/staticimg/dot18.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left  "1.5em")
@@ -487,7 +487,7 @@
      
      (pre.ul2 
              (margin-left "2.0em")
-             (background-image "url(staticimg/dot14.png)")
+             (background-image "url(/kahua/oldtype/staticimg/dot14.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left  "1.5em")
@@ -496,7 +496,7 @@
      
      (pre.ul3 
              (margin-left "3.5em")
-             (background-image "url(staticimg/dot12.png)")
+             (background-image "url(/kahua/oldtype/staticimg/dot12.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left "1.5em")
@@ -505,7 +505,7 @@
 
      (pre.ol1 
              (margin-left "0.5em")
-             (background-image "url(staticimg/triangle18.png)")
+             (background-image "url(/kahua/oldtype/staticimg/triangle18.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left "1.5em")
@@ -514,7 +514,7 @@
      
      (pre.ol2 
              (margin-left "2.0em")
-             (background-image "url(staticimg/triangle14.png)")
+             (background-image "url(/kahua/oldtype/staticimg/triangle14.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left "1.5em")
@@ -523,7 +523,7 @@
      
      (pre.ol3 
              (margin-left "3.5em")
-             (background-image "url(staticimg/triangle12.png)")
+             (background-image "url(/kahua/oldtype/staticimg/triangle12.png)")
              (background-repeat "no-repeat")
              (font-size "medium")
              (padding-left "1.5em")

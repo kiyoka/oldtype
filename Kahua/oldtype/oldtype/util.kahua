@@ -291,6 +291,30 @@
        (a/ (@/ (href (string-append (oldtype:static-base-path) "oldtype-mode.el")))
            "[Download oldtype-mode.el now]"))
 
+      ;; feed meter's script
+      ((feedmeter)
+       (if (< 1 len)
+           (let1 uri-of-rss (uri-encode-string (car arg))
+                 (a/ (@/ (href (format "http://feedmeter.net/detail.php?r=~a" uri-of-rss))
+                         (target "feedmeter"))
+                     (img/ (@/ (src (format "http://feedmeter.net/image.php?r=~a" uri-of-rss))
+                               (border "0")
+                               (width  "60")
+                               (height "36")
+                               (alt (cadr arg))))))
+           (p/ "!!Error : Miss match argument number ##(feedmeter URI-of-RSS title) command")))
+
+      ;; lingr badge
+      ;; example: lingr badge of Gauche
+      ;; <script type="text/javascript" src="http://www.lingr.com/room/gbq0WCLQEF2/badge/render" charset="utf-8"></script>
+      ((lingr)
+       (if (< 0 len)
+           (let1 _code (car arg)
+                 (script/ (@/ (type     "text/javascript")
+                              (src      (format "http://www.lingr.com/room/~a/badge/render"_code))
+                              (charset  "utf-8"))))
+           (p/ "!!Error : No argument ##(lingr CODE) command")))
+
       ;; input comment
       ((comment)
        (form/cont/

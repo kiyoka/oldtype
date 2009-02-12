@@ -14,7 +14,8 @@ fi
 
 echo "RecentChanges of OldType contents." >  ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
 echo "----"                               >> ${OT_EDITHOME}/edit/!RecentChanges.ot.tmp
-_svn t --xml info ${lst} | ${OT_HOME}/src/oldtype_svninfo shell | while read line
+_svn t --xml info ${lst}  > ../_tmp/svn.info
+cat ../_tmp/svn.info | ${OT_HOME}/src/oldtype_svninfo shell | while read line
 do
   if [ "" != "${line}" ] ; then
       eval ${line}

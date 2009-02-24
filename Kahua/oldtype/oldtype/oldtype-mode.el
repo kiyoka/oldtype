@@ -28,6 +28,9 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.1.1]
+;;     1. Supported URL to ##(nicovideo ID) command conversion feature.  ( C-c C-c key )
+;;
 ;;   [0.1.0]
 ;;     1. Added oldtype-todays-entry() function.
 ;; 
@@ -703,7 +706,9 @@ Buffer string between BEG and END are replaced with URL."
 	  (_url_amazon-pattern-part
 	   "/dp/\\([0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-][0-9A-Z-]\\)")
 	  (_url_youtube-pattern
-	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_-]+\\)\\(.*\\)"))
+	   "\\(http://.*youtube[.]com/watch\\?v=\\)\\([0-9A-Za-z_-]+\\)\\(.*\\)")
+	  (_url_nicovideo-pattern
+	   "\\(http://.*nicovideo[.]jp/watch/\\)\\([0-9A-Za-z_-]+\\)"))
 
       (let ((cur    (point))
 	    (str    (buffer-substring-no-properties (point) (point-at-eol))))
@@ -782,6 +787,16 @@ Buffer string between BEG and END are replaced with URL."
 	    (delete-region s e)
 	    (goto-char s)
 	    (insert (format "##(youtube %s)  %s" video title))))
+	 ;; http://www.nicovideo.jp/watch ...  nicovideo-command
+	 ((string-match      (concat "^" _url_nicovideo-pattern) str)
+	  (re-search-forward             _url_nicovideo-pattern (point-at-eol) t)
+	  (let* ((video (match-string 2))
+		 (url   (match-string 0))
+		 (s     (match-beginning 1))
+		 (e     (match-end 2)))
+	    (delete-region s e)
+	    (goto-char s)
+	    (insert (format "##(nicovideo %s)" video))))
 	 ;; http://host/path/of/contents... anchor-keyword
 	 ((string-match      (concat "^" _url_file-pattern) str)
 	  (re-search-forward             _url_file-pattern (point-at-eol) t)

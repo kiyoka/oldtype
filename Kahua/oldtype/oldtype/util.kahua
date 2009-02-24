@@ -165,6 +165,8 @@
           (get-text-list oldtype-page))))
 
 
+(define-elements iframe)
+
 (define (oldtype:format-macro expr oldtype-page)
   (let ((command (car expr))
         (arg  ;; symbol list to string list.
@@ -198,6 +200,19 @@
       ((done)
        (img/ (@/ (src (string-append (oldtype:static-image-path) "icon.done.png"))
                  (alt "done") (class "wideicon"))))
+
+      ((nicovideo)
+       (if (< 0 len)
+           (iframe/ (@/ (width  "312")
+                        (height "176")
+                        (src (format "http://ext.nicovideo.jp/thumb/~a" (car arg)))
+                        (scrolling "no")
+                        (style "border:solid 1px #CCC;")
+                        (frameborder "0"))
+                    (a/ (@/ (href (format "http://www.nicovideo.jp/watch/~a" (car arg))))
+                        "nicovideo"))
+           (p/ "!!Error : No argument ##(nicovideo ID) command")))
+
       ((youtube)
        (if (< 0 len)
            (object/

@@ -300,10 +300,11 @@
                                                                              1))
                      (br/))
                     (text/ ""))
-                (table/ 
+                (table/
                  (tr/
                   (td/ (@/ (class "header_L"))
-                       (oldtype:icon-image 'logo)
+                       (oldtype:icon-image 'logo))
+                  (td/ (@/ (class "header_R"))
                        (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
                                (class "help")
                                (title "Recent changes of This site"))
@@ -320,11 +321,11 @@
                        (oldtype:icon-image 'new2)
                        (oldtype:icon-image 'new1)
                        (oldtype:icon-image 'new0)
-                       (span/ "Latest)"))
-                  (td/ (@/ (class "header_R"))
+                       (span/ "Latest)")
+                       (br/)
+                       (br/)
                        (oldtype:google-searchbox)
                        (span/ (@/ (class "forw3m")))))))
-          (br/)
           (h1/ wikiname
                " "
                (a/ (@/ (href (oldtype:gen-rss-path wikiname))

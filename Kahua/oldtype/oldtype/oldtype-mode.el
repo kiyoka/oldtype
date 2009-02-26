@@ -65,7 +65,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.1.0")
+(defconst oldtype-version "0.1.1")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face

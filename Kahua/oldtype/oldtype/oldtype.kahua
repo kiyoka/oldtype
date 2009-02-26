@@ -305,7 +305,14 @@
              (tr/
               (td/ (@/ (class "header_L"))
                    (oldtype:icon-image 'logo))
-              (td/ (@/ (class "header_R"))
+              (td/ (@/ (class "header_L"))
+                   (string-join
+                    (map
+                     (lambda (x)
+                       (oldtype:space->nbsp " "))
+                     (iota 200))
+                    " "))
+              (td/ (@/ (class "header_search"))
                    (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
                            (class "help")
                            (title "Recent changes of This site"))

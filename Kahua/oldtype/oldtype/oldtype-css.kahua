@@ -581,6 +581,12 @@
              (border-width "1px")
              (align "right"))
 
+     (td.header_search
+             (border-style "solid")
+             (border-color "#ffffff")
+             (border-width "1px")
+             (width "300px")
+             (align "right"))
 
      (a.large 
              (font-size "large"))

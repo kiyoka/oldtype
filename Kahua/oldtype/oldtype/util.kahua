@@ -404,7 +404,8 @@
                           (lambda (line)
                             (p/ (@/ (class "comment")) line))
                           (string-split 
-                           (uri-decode-string (cadr arg))
+                           (oldtype:space->nbsp
+                            (uri-decode-string (cadr arg)))
                            #\newline)))))))
 
       ;; no listing to !RecentChanges

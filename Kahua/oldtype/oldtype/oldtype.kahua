@@ -305,7 +305,18 @@
              (tr/
               (td/ (@/ (class "header_L"))
                    (oldtype:icon-image 'logo))
-              (td/ (@/ (class "header_space")))
+              (td/ (@/ (class "header_title"))
+                   (h1/ wikiname
+                        " "
+                        (a/ (@/ (href (oldtype:gen-rss-path wikiname))
+                                (class "help")
+                                (title "This is RSS feed URL"))
+                            (oldtype:icon-image 'rss))
+                        (a/ (@/ (href (oldtype:gen-plain-path wikiname))
+                                (class "help")
+                                (title "PLAIN TEXT"))
+                            (oldtype:icon-image 'plain))
+                        (oldtype:hatena-bookmarks wikiname)))
               (td/ (@/ (class "header_search"))
                    (a/ (@/ (href (oldtype:gen-page-path "!RecentChanges"))
                            (class "help")
@@ -328,17 +339,6 @@
                    (br/)
                    (oldtype:google-searchbox)
                    (span/ (@/ (class "forw3m"))))))))
-          (h1/ wikiname
-               " "
-               (a/ (@/ (href (oldtype:gen-rss-path wikiname))
-                       (class "help")
-                       (title "This is RSS feed URL"))
-                   (oldtype:icon-image 'rss))
-               (a/ (@/ (href (oldtype:gen-plain-path wikiname))
-                       (class "help")
-                       (title "PLAIN TEXT"))
-                   (oldtype:icon-image 'plain))
-               (oldtype:hatena-bookmarks wikiname))
           (text/ "Related pages:")(oldtype:reference-pages/ wikiname command-list 10)
           (br/)
           barcode

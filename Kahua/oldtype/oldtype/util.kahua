@@ -336,10 +336,12 @@
         (@@/ (cont
               (entry-lambda (:keyword name comment)
                 (let1 nodes 
-                      (p/
-                       (oldtype:icon-image 'face-surprise)
-                       "Error: commit action failed.")
-                      (if (or (> 1 (string-length name))
+                    (p/
+                     (oldtype:icon-image 'face-surprise)
+                     "Error: commit action failed.")
+                  (if (oldtype:comment-is-spam? comment)
+                      #?=(format #f "spam rejected [~a] [~a]" name comment)
+                      (if (or (> 1 (string-length #?=name))
                               (> 1 (string-length comment)))
                           (set! nodes (p/
                                        (oldtype:icon-image 'face-ng)
@@ -349,30 +351,30 @@
                                        :user     (oldtype:get-arguments 'anon-user)
                                        :pass     (oldtype:get-arguments 'anon-pass)
                                        :basepath (oldtype:workpath))
-                                (init work (string-append
-                                            (number->string (sys-time))
-                                            "."
-                                            (number->string (random-integer 100))))
-                                (save-text-list work (name-of oldtype-page)
-                                                (oldtype:add-comment oldtype-page name comment))
-                                (let1 result (status work (name-of oldtype-page))
-                                      (when (string=? "M" (car result))
-                                        (begin
-                                          (commit work)
-                                          (clean work)
-                                          (set! nodes
-                                                (p/
-                                                 (oldtype:icon-image 'face-ok)
-                                                 "Thank you! Your comment was registered. Please wait 3 minutes and back.")))))))
-                      (standard-page
-                       (name-of oldtype-page)
-                       (br/)
-                       (div/
-                        nodes
-                        (p/ "Back to " (oldtype:expand-wiki-name (name-of oldtype-page))))
-                       ""
-                       '()
-                       1)))))
+                            (init work (string-append
+                                        (number->string (sys-time))
+                                        "."
+                                        (number->string (random-integer 100))))
+                            (save-text-list work (name-of oldtype-page)
+                                            (oldtype:add-comment oldtype-page name comment))
+                            (let1 result (status work (name-of oldtype-page))
+                              (when (string=? "M" (car result))
+                                (begin
+                                  (commit work)
+                                  (clean work)
+                                  (set! nodes
+                                        (p/
+                                         (oldtype:icon-image 'face-ok)
+                                         "Thank you! Your comment was registered. Please wait 3 minutes and back."))))))))
+                  (standard-page
+                   (name-of oldtype-page)
+                   (br/)
+                   (div/
+                    nodes
+                    (p/ "Back to " (oldtype:expand-wiki-name (name-of oldtype-page))))
+                   ""
+                   '()
+                   1)))))
         (table/ (@/ (class "comment"))
                 (tr/ (th/
                       (oldtype:icon-image 'double-comment)

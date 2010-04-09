@@ -61,6 +61,7 @@
           oldtype:amazon-thumbnail
           oldtype:youtube-link
           oldtype:youtube-thumbnail
+          oldtype:comment-is-spam?
           pretty-print-sexp))
 (select-module oldtype.util)
 
@@ -359,5 +360,11 @@
 (define (oldtype:youtube-thumbnail video-id)
   (format #f "http://img.youtube.com/vi/~a/1.jpg" video-id))
                                    
+;;=================================================
+;; Utility for Spam
+;;
+(define (oldtype:comment-is-spam? comment)
+  (#/[<][aA][ ]+[hH][rR][eE][fF]/ comment))
+
 
 (provide "oldtype/util")

@@ -4,6 +4,12 @@ TARGET=/tmp/_oldtype_stable
 batch0:
 	bash -c "export OT_HOME=`pwd` ; cd bin; ./batch.sh"
 
+rackup_stable:
+	kahua-spvr -S ~/work/site-stable -H 8081
+
+rackup_develop:
+	kahua-spvr -S ~/work/site-stable -H 8082
+
 dist_stable:
 	mkdir -p $(TARGET)
 	/bin/cp -r * $(TARGET)/

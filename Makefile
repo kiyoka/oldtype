@@ -1,15 +1,12 @@
 
+TARGET=/tmp/_oldtype_stable
+
 batch0:
 	bash -c "export OT_HOME=`pwd` ; cd bin; ./batch.sh"
 
-stable:
-	tar cf  ../stable.tar --exclude .svn * 
-	tar xfC ../stable.tar ../branches/stable
-	/bin/rm -f ../stable.tar
-	cat ./config.sh | sed 's/OT_MASTER=nil/OT_MASTER=t/' | sed 's/site-unstable/site-stable/' | sed 's/newtype/oldtype/' > ../branches/stable/config.sh
-	cat ./Kahua/oldtype/Makefile | sed 's/site-unstable/site-stable/' > ../branches/stable/Kahua/oldtype/Makefile
-
-merge:
-	bash -c "cd .. ; svn merge tags/0.3.9@HEAD trunk@HEAD branches/stable"
-	cat ./config.sh | sed 's/OT_MASTER=nil/OT_MASTER=t/' | sed 's/site-unstable/site-stable/' | sed 's/newtype/oldtype/' > ../branches/stable/config.sh
-	cat ./Kahua/oldtype/Makefile | sed 's/site-unstable/site-stable/' > ../branches/stable/Kahua/oldtype/Makefile
+dist_stable:
+	mkdir -p $(TARGET)
+	/bin/cp -r * $(TARGET)/
+	cat ./config.sh | sed 's/OT_MASTER=nil/OT_MASTER=t/' | sed 's/site-unstable/site-stable/' | sed 's/newtype/oldtype/' > $(TARGET)/config.sh
+	cat ./Kahua/oldtype/Makefile | sed 's/site-unstable/site-stable/' > $(TARGET)/Kahua/oldtype/Makefile
+	echo generated stable release to "$(TARGET)"

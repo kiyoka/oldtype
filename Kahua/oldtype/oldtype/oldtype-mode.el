@@ -28,6 +28,10 @@
 ;;
 ;;
 ;; ChangeLog:
+;;   [0.1.2]
+;;     1. Bugfix: C-c C-c key generates "Received cookie: ... TITLE" string on alink.
+;;                Rejected "Received cookie: ... " string to fix bug.
+;;
 ;;   [0.1.1]
 ;;     1. Supported URL to ##(nicovideo ID) command conversion feature.  ( C-c C-c key )
 ;;
@@ -65,7 +69,7 @@
 ;;     1. first release
 ;;
 ;;
-(defconst oldtype-version "0.1.1")
+(defconst oldtype-version "0.1.2")
 
 (defconst oldtype-wikiname-face 'oldtype-wikiname-face)
 (defface  oldtype-wikiname-face
@@ -190,8 +194,10 @@
 ;;--- debugging message logger
 (defvar oldtype-debug nil)                       ; debugging enable/disable flag.
 (defun oldtype-debug-print (string)
-  (if oldtype-debug
-      (message string)))
+  (when oldtype-debug
+    (message "%s" string))
+  string)
+	
 
 (defun oldtype-insert-image (beg end image &rest args)
   "Display image on the current buffer.
@@ -677,11 +683,13 @@ Buffer string between BEG and END are replaced with URL."
    ((string-match "http://" url)
     (with-temp-buffer
       (shell-command 
-       (concat
-	"w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'" url "\' |"
-	"awk \'-F\<\' \'/title_alt/ { print $2; }\' |"
-	"tail -1 |"
-	"awk \'-F\"\' \'{ printf(\"%s\", $2); }\'")
+       (oldtype-debug-print
+	(concat
+	 "w3m -no-graph -halfdump -o ext_halfdump=1 -o strict_iso2022=0 -o fix_width_conv=1 \'" url "\' |& "
+	 "grep title_alt |"
+	 "awk \'-F\<\' \'/title_alt/ { print $2; }\' |"
+	 "tail -1 |"
+	 "awk \'-F\"\' \'{ printf(\"%s\", $2); }\'"))
        (current-buffer))
       (replace-string "[" "<" nil (point-min) (point-max))
       (replace-string "]" ">" nil (point-min) (point-max))

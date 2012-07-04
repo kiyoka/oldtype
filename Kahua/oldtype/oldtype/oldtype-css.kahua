@@ -130,8 +130,8 @@
              (font-size "small")
              (line-height "115%")
              (white-space "pre-wrap")
-             (width "100%")
-             (overflow "auto")
+             (width "90%")
+             (overflow "hidden")
              (margin-left "4em"))
 
      (h1
@@ -583,7 +583,7 @@
              (border-style "solid")
              (border-color "#ffffff")
              (border-width "1px")
-             (width        "100%"))
+             (width        "90%"))
 
      (td.header_search
              (border-style "solid")
@@ -595,7 +595,7 @@
              (border-style "solid")
              (border-color "#ffffff")
              (border-width "1px")
-             (width        "100%"))
+             (width        "90%"))
      
      (a.large 
              (font-size "large"))

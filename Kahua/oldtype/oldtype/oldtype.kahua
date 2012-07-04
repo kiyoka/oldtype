@@ -77,47 +77,7 @@
 
 
 (define (oldtype-info-page oldtype-page lineno nodeset)
-  (a/cont/
-   (@@/ (cont
-         (entry-lambda ()
-           (standard-page
-            (name-of oldtype-page)
-            (br/)
-            (div/
-             (h2/ "Information of This Line.")
-             (table/
-              (tr/
-               (td/ "committer")
-               (td/ (get-committer oldtype-page lineno)))
-              (tr/
-               (td/ "commit date")
-               (td/ (string-append
-                     (get-date oldtype-page lineno)
-                     (get-ago oldtype-page lineno))))
-              (tr/
-               (td/ "commit revision")
-               (td/ (get-revision oldtype-page lineno)))
-              (tr/
-               (td/ "original-src")
-               (td/ (get-text oldtype-page lineno)))
-              (tr/
-               (td/ "lineno")
-               (td/ lineno)))
-             (h2/ "Information of This Page.")
-             (pre/
-              (node-set
-               (map-with-index
-                (lambda (index orig)
-                  (if (eq? (+ index 1) lineno)
-                      (b/ (@/ (class "here"))
-                          (string-append orig "\n"))
-                      (string-append orig "\n")))
-                (get-text-list oldtype-page)))))
-            ""
-            '() ;; command-list
-            lineno
-            ))))
-   nodeset))
+  nodeset)
 
 
 ;; utility : oldtype-page to highger-order-tag
@@ -195,24 +155,7 @@
                                                      _rest)
                                                (div/ (@/ (style "padding-left:  5em;"))
                                                      _rest))
-                                           (div/ (@/
-                                                  (id (format "~a:editarea" lineno))
-                                                  (style "display: none; height: 4em; padding-left: 5em;"))
-                                                 (form/ (@/ (id (format "~a:editform" lineno))
-                                                            (action "."))
-                                                        (input/ (@/
-                                                                 (id (format "~a:edittext" lineno))
-                                                                 (size 80)
-                                                                 (type "text")
-                                                                 (value (get-text oldtype-page lineno))))
-                                                        (oldtype:space->nbsp "  ")
-                                                        (input/ (@/
-                                                                 (type "button")
-                                                                 (value "Submit")
-                                                                 (onClick (format "otEditEnd( ~a );" lineno))))
-                                                        (br/)
-                                                        (strong/ (@/ (class "notice"))
-                                                                 "This is a demonstration. you cannot update this wiki page, sorry...")))))))))
+                                           (div/ "")))))))
                          ((a)
                           (let1 param (car arg) ;; param is assoc-list
                                 `(,@(a/

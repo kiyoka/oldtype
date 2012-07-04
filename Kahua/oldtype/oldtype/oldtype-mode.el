@@ -835,11 +835,13 @@ Buffer string between BEG and END are replaced with URL."
 	 (buffer-substring-no-properties (point-min) (point-max)))))
     
     (defun prefix-check (line)
-      (not
-       (notany
-	(lambda (_prefix)
-	  (string-match (concat "\\." _prefix "$") line))
-	oldtype-image-prefix-list)))
+      t)
+;; stoped prefix-check 
+;;      (not
+;;       (notany
+;;	(lambda (_prefix)
+;;	  (string-match (concat "\\." _prefix "$") line))
+;;	oldtype-image-prefix-list)))
     
     (mapcar
      (lambda (x)

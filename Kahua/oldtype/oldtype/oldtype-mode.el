@@ -218,10 +218,11 @@ Buffer string between BEG and END are replaced with IMAGE."
 		  nil
 		  '(t nil)
 		  nil
-		  url))
+		  "-L"
+		  url
+		  ))
    (t
     (insert-file-contents url))))
-
 
 (defun oldtype-create-image (url &optional width height)
   (let (data pixel-width pixel-height
